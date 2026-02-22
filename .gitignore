@@ -1,33 +1,49 @@
-HELP.md
+# ======================
+# Maven / Build
+# ======================
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.log
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# ======================
+# IntelliJ IDEA
+# ======================
+.idea/
 *.iml
+*.iws
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
 
-### VS Code ###
-.vscode/
+# ======================
+# Java
+# ======================
+*.class
+*.jar
+*.war
+
+# ======================
+# Environment / Config (optional secrets)
+# ======================
+.env
+application-local.properties
+
+# ======================
+# Oracle Driver (VERY IMPORTANT)
+# ======================
+lib/ojdbc11.jar
+
+# ======================
+# Logs
+# ======================
+logs/
+*.out
+
+# ======================
+# Node (if frontend later)
+# ======================
+node_modules/
+dist/
