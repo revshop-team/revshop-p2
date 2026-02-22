@@ -1,2 +1,1 @@
-# revshop-p2
-RevShop P2 is a full-stack monolithic e-commerce web application that supports both buyers and sellers, featuring product browsing, cart management, order processing, role-based access control, notifications, and simulated payment integration.
+RevShop  is a full-stack monolithic e-commerce web application built using Java, Spring MVC, Spring Data, Thymeleaf, and Oracle Database, supporting buyer and seller functionalities such as product management, cart, order processing, authentication, notifications, and simulated payment with integrated testing, logging, and code quality tools.
