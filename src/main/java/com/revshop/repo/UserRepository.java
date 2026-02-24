@@ -1,12 +1,13 @@
-package com.revshop.repository;
+package com.revshop.repo;
 
 import com.revshop.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // For login (email-based authentication)
     Optional<User> findByEmail(String email);
 }

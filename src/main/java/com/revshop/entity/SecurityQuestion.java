@@ -20,4 +20,20 @@ public class SecurityQuestion {
 
     @Column(name = "question_text", nullable = false, length = 200)
     private String questionText;
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
+    }
+
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
 }
