@@ -29,18 +29,13 @@ public class BuyerController {
     private OrderService orderService;
 
 
+    // buyer's home page
     @GetMapping("/home")
     public String buyerHome() {
         return "buyer/home";
     }
 
-    // see buyer order's
-//    @GetMapping("/orders")
-//    public String buyerOrders() {
-//        return "buyer/orders";
-//    }
-
-    // see buyer profile
+    // buyer profile
     @GetMapping("/profile")
     public String buyerProfile() {
         return "buyer/profile";
@@ -111,7 +106,7 @@ public class BuyerController {
         return "buyer/cart";
     }
 
-    // increase the cart items
+    // increase the cart items quantity
     @GetMapping("/cart/increase/{id}")
     public String increaseQty(@PathVariable Long id) {
 
@@ -120,7 +115,7 @@ public class BuyerController {
         return "redirect:/buyer/cart";
     }
 
-    // decrease the cart items
+    // decrease the cart items quantity
     @GetMapping("/cart/decrease/{id}")
     public String decreaseQty(@PathVariable Long id) {
 
@@ -130,12 +125,13 @@ public class BuyerController {
     }
 
 
-    // IMPORTANT: This was missing
+    // checkout page render's
     @GetMapping("/cart/checkout")
     public String checkoutPage() {
         return "buyer/checkout";
     }
 
+    // checkout the cart items
     @PostMapping("/cart/checkout")
     public String checkout(Authentication authentication,
                            @RequestParam String fullName,
@@ -162,6 +158,7 @@ public class BuyerController {
         return "redirect:/buyer/orders";
     }
 
+    // see all order's of buyer
     @GetMapping("/orders")
     public String viewOrders(Authentication authentication, Model model) {
 

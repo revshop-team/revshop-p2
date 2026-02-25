@@ -26,17 +26,28 @@ public class SellerController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    public SellerController(ProductService productService,
+                            UserService userService,
+                            CategoryRepository categoryRepository) {
 
+        this.productService = productService;
+        this.userService = userService;
+        this.categoryRepository = categoryRepository;
+    }
+
+    // render seller's dashboard
     @GetMapping("/dashboard")
     public String sellerDashboard() {
         return "seller/dashboard";
     }
 
+    // seller products
     @GetMapping("/products")
     public String sellerProducts() {
         return "seller/products";
     }
 
+    // seller's sales
     @GetMapping("/sales")
     public String sellerSales() {
         return "seller/sales";

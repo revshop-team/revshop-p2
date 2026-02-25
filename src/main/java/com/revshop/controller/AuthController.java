@@ -62,6 +62,7 @@ public class AuthController {
                           BCryptPasswordEncoder passwordEncoder,
                           ProductService productService,
                           CategoryService categoryService) {
+
         this.securityQuestionRepository = securityQuestionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -78,6 +79,7 @@ public class AuthController {
         return "Auth API Working!";
     }
 
+    // default / home page
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("products", productService.getAllProducts());
@@ -85,6 +87,7 @@ public class AuthController {
         return "public-home";
     }
 
+    // Register page render's
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User());
@@ -92,18 +95,21 @@ public class AuthController {
         return "register";
     }
 
+    // register the user
     @PostMapping("/register-user")
     public String register(User user) {
         userService.registerUser(user);
         return "redirect:/login";
     }
 
+    // login form render's
     @GetMapping("/login")
     public String showLoginForm() {
-        System.out.println("displaying login form");
+//        System.out.println("displaying login form");
         return "login";
     }
 
+    // show access denied page for unauthorize request
     @GetMapping("/access-denied")
     public String accessDenied() {
         return "access-denied";
