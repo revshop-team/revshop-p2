@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,7 +29,17 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/","/login","/register", "/register-user", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/home",
+                                "/login",
+                                "/register",
+                                "/register-user",
+                                "/forgot-password",
+                                "/reset-password",
+                                "/verify-email"
+                        )
+                        .permitAll()
                         .requestMatchers("/seller/**").hasRole("SELLER")
                         .requestMatchers("/buyer/**").hasRole("BUYER")
                         .anyRequest().authenticated()
@@ -44,7 +53,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/logout")
+                        .logoutSuccessUrl("/logout?login")
                         .permitAll()
                 )
                 .authenticationProvider(authenticationProvider())

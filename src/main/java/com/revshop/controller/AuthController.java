@@ -39,13 +39,14 @@ import com.revshop.entity.User;
 import com.revshop.repo.SecurityQuestionRepository;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceImpl.UserServiceImpl;
+import com.revshop.serviceInterfaces.CategoryService;
+import com.revshop.serviceInterfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -53,13 +54,19 @@ public class AuthController {
     private final SecurityQuestionRepository securityQuestionRepository;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
     public AuthController(SecurityQuestionRepository securityQuestionRepository,
                           UserRepository userRepository,
-                          BCryptPasswordEncoder passwordEncoder) {
+                          BCryptPasswordEncoder passwordEncoder,
+                          ProductService productService,
+                          CategoryService categoryService) {
         this.securityQuestionRepository = securityQuestionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     @Autowired
@@ -69,6 +76,13 @@ public class AuthController {
     @GetMapping("/test")
     public String test() {
         return "Auth API Working!";
+    }
+
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "public-home";
     }
 
     @GetMapping("/register")
@@ -93,60 +107,6 @@ public class AuthController {
     @GetMapping("/access-denied")
     public String accessDenied() {
         return "access-denied";
-    }
-
-    // forgot password page render api
-    @GetMapping("/forgot-password")
-    public String forgotPasswordPage() {
-        return "forgot-password";
-    }
-
-    @PostMapping("/verify-email")
-    public String verifyEmail(@RequestParam String email, Model model) {
-
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-
-            model.addAttribute("email", user.getEmail());
-            model.addAttribute("question", user.getSecurityQuestion().getQuestionText());
-            model.addAttribute("showResetForm", true);
-
-            return "forgot-password";
-        }
-
-        model.addAttribute("error", "Email not found");
-        return "forgot-password";
-    }
-
-    @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String email,
-                                @RequestParam String securityAnswer,
-                                @RequestParam String newPassword,
-                                Model model) {
-
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isPresent()) {
-
-            User user = optionalUser.get();
-
-            if (user.getSecurityAnswer().equalsIgnoreCase(securityAnswer)) {
-
-                user.setPassword(passwordEncoder.encode(newPassword));
-                userRepository.save(user);
-
-                model.addAttribute("success", "Password changed successfully");
-                return "forgot-password";
-            }
-        }
-
-        model.addAttribute("error", "Invalid security answer");
-        model.addAttribute("showResetForm", true);
-        model.addAttribute("email", email);
-
-        return "forgot-password";
     }
 
 }

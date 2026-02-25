@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>RevShop | Cart</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark px-4">
+    <span class="navbar-brand mb-0 h5">RevShop</span>
+    <a th:href="@{/buyer/products}" class="btn btn-outline-light btn-sm">
+        Continue Shopping
+    </a>
+</nav>
+
+<div class="container py-5">
+
+    <div class="row g-4">
+
+        <!-- 🛒 CART ITEMS -->
+        <div class="col-lg-8">
+
+            <h4 class="fw-bold mb-4">Shopping Cart</h4>
+
+            <div th:if="${cart == null || #lists.isEmpty(cart.cartItems)}"
+                 class="alert alert-info rounded-4">
+                Your cart is empty.
+            </div>
+
+            <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
+
+                <div class="card mb-3 shadow-sm"
+                     th:each="item : ${cart.cartItems}">
+
+                    <div class="card-body">
+                        <div class="row align-items-center">
+
+                            <!-- Image -->
+                            <div class="col-md-2 text-center">
+                                <img src="https://via.placeholder.com/100"
+                                     class="img-fluid rounded">
+                            </div>
+
+                            <!-- Name -->
+                            <div class="col-md-4">
+                                <h6 class="fw-semibold mb-1"
+                                    th:text="${item.product.productName}"></h6>
+                                <small class="text-muted"
+                                       th:text="${item.product.description}"></small>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="col-md-2 text-center">
+                                <span class="text-success fw-semibold">
+                                    ₹ <span th:text="${item.product.sellingPrice}"></span>
+                                </span>
+                            </div>
+
+                            <!-- Quantity Controls -->
+                            <div class="col-md-2 text-center">
+
+                                <div class="btn-group btn-group-sm">
+
+                                    <a th:href="@{/buyer/cart/decrease/{id}(id=${item.cartItemId})}"
+                                       class="btn btn-outline-secondary">
+                                        −
+                                    </a>
+
+                                    <button class="btn btn-light" disabled
+                                            th:text="${item.quantity}">
+                                    </button>
+
+                                    <a th:href="@{/buyer/cart/increase/{id}(id=${item.cartItemId})}"
+                                       class="btn btn-outline-secondary">
+                                        +
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Total -->
+                            <div class="col-md-2 text-end">
+                                <span class="fw-bold">
+                                    ₹
+                                    <span th:text="${item.product.sellingPrice * item.quantity}"></span>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 💳 SUMMARY -->
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-4">Order Summary</h5>
+
+                    <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Items</span>
+                            <span th:text="${#lists.size(cart.cartItems)}"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>
+                                ₹
+                                <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Shipping</span>
+                            <span class="text-success">Free</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+                            <span>Total</span>
+                            <span>
+                                ₹
+                                <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
+                                </span>
+                            </span>
+                        </div>
+
+                        <a th:href="@{/buyer/cart/checkout}"
+                           class="btn btn-success w-100">
+                            Proceed to Checkout
+                        </a>
+
+                    </div>
+
+                    <div th:if="${cart == null || #lists.isEmpty(cart.cartItems)}"
+                         class="text-muted text-center">
+                        Nothing to summarize.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
