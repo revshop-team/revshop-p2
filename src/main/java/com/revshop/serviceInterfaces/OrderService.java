@@ -1,5 +1,6 @@
 package com.revshop.serviceInterfaces;
 
+import com.revshop.entity.BuyerDetails;
 import com.revshop.entity.Order;
 
 import java.util.List;
@@ -15,5 +16,8 @@ public interface OrderService {
                   String pincode);
 
     List<Order> getOrdersByBuyer(String email);
+
+//    void updateBuyerDetails(String email, BuyerDetails updatedDetails);
+
 
 }

@@ -8,12 +8,13 @@
 
 <body class="bg-light">
 
-<nav class="navbar navbar-dark bg-dark px-4">
-    <span class="navbar-brand mb-0 h5">RevShop</span>
-    <a th:href="@{/buyer/products}" class="btn btn-outline-light btn-sm">
-        Continue Shopping
-    </a>
-</nav>
+<!--<nav class="navbar navbar-dark bg-dark px-4">-->
+<!--    <span class="navbar-brand mb-0 h5">RevShop</span>-->
+<!--    <a th:href="@{/buyer/products}" class="btn btn-outline-light btn-sm">-->
+<!--        Continue Shopping-->
+<!--    </a>-->
+<!--</nav>-->
+<div th:replace="buyer/fragments/navbar :: navbar"></div>
 
 <div class="container py-5">
 

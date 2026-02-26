@@ -7,8 +7,7 @@ import com.revshop.serviceInterfaces.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
@@ -21,13 +20,15 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final OrderAddressRepository orderAddressRepository;
+    private final BuyerDetailsRepository buyerDetailsRepository;
 
     public OrderServiceImpl(UserRepository userRepository,
                             CartRepository cartRepository,
                             CartItemRepository cartItemRepository,
                             ProductRepository productRepository,
                             OrderRepository orderRepository,
-                            OrderAddressRepository orderAddressRepository) {
+                            OrderAddressRepository orderAddressRepository,
+                            BuyerDetailsRepository buyerDetailsRepository) {
 
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.orderAddressRepository = orderAddressRepository;
+        this.buyerDetailsRepository = buyerDetailsRepository;
     }
 
     @Override
@@ -117,5 +119,20 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BuyerNotFoundException("Buyer not found"));
 
         return orderRepository.findByBuyer(buyer);
+    }
+
+    public void updateBuyerDetails(String email, BuyerDetails updatedDetails) {
+
+        BuyerDetails existing =
+                buyerDetailsRepository.findByUser_Email(email)
+                                .orElseThrow(() ->
+                                        new BuyerNotFoundException("buyer not found"));
+
+        existing.setFullName(updatedDetails.getFullName());
+        existing.setGender(updatedDetails.getGender());
+        existing.setDateOfBirth(updatedDetails.getDateOfBirth());
+        existing.setPhone(updatedDetails.getPhone());
+
+        buyerDetailsRepository.save(existing);
     }
 }

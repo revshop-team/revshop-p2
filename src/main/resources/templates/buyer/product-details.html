@@ -140,6 +140,43 @@
 
             </div>
 
+            <hr class="mt-5">
+
+            <h4 class="fw-bold mb-4">Customer Reviews</h4>
+
+            <div th:if="${reviews == null || #lists.isEmpty(reviews)}"
+                 class="alert alert-info rounded-4">
+                No reviews yet for this product.
+            </div>
+
+            <div th:each="review : ${reviews}"
+                 class="card mb-3 shadow-sm rounded-4">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div class="fw-semibold">
+                            <span th:text="${review.buyer.email}"></span>
+                        </div>
+
+                        <div class="text-warning fw-bold">
+                            ⭐ <span th:text="${review.rating}"></span>/5
+                        </div>
+
+                    </div>
+
+                    <p class="mt-2 mb-1"
+                       th:text="${review.reviewComment}"></p>
+
+                    <small class="text-muted"
+                           th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}">
+                    </small>
+
+                </div>
+
+            </div>
+
             <!-- ACTION BUTTONS -->
             <div class="d-grid gap-3 mt-4">
 

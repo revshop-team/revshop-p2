@@ -1,10 +1,8 @@
 package com.revshop.exceptions;
 
-
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
 
 
 @ControllerAdvice
@@ -16,4 +14,12 @@ public class GlobalExceptionHandler {
 
         return "register";
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public void handleUserNotFoundException(UserNotFoundException ex){
+        System.out.println("User not found Exception occured");
+    }
+
+
+
 }

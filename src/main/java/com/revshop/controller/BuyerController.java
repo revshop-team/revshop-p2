@@ -1,11 +1,8 @@
 package com.revshop.controller;
 
-import com.revshop.entity.Cart;
-import com.revshop.entity.Order;
-import com.revshop.entity.Product;
-import com.revshop.serviceInterfaces.CartService;
-import com.revshop.serviceInterfaces.OrderService;
-import com.revshop.serviceInterfaces.ProductService;
+import com.revshop.entity.*;
+import com.revshop.repo.ReviewRepository;
+import com.revshop.serviceInterfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,18 +24,83 @@ public class BuyerController {
     private CartService cartService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private BuyerService buyerService;
+    @Autowired
+    private ReviewService reviewService;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
 
     // buyer's home page
     @GetMapping("/home")
-    public String buyerHome() {
+    public String buyerHome(Authentication authentication, Model model) {
+
+        String buyerEmail = authentication.getName();
+
+        List<Category> categories = categoryService.getAllCategories();
+
+        PageRequest pageable = PageRequest.of(
+                0,
+                8,
+                Sort.by("createdAt").descending()
+        );
+
+        Page<Product> latestProducts =
+                productService.getActiveProducts(pageable);
+
+//        model.addAttribute("categories", categories);
+        model.addAttribute("latestProducts", latestProducts.getContent());
+        model.addAttribute("buyerEmail", buyerEmail);
+
         return "buyer/home";
     }
 
+//    ------------------------------------------------------------------------------------------------
+    
     // buyer profile
     @GetMapping("/profile")
-    public String buyerProfile() {
+    public String viewProfile(@RequestParam(defaultValue = "false") boolean edit,
+                              Authentication authentication,
+                              Model model) {
+
+        String email = authentication.getName();
+
+        // 1️⃣ Existing profile logic (KEEP THIS)
+        BuyerDetails buyerDetails =
+                buyerService.getBuyerDetailsByEmail(email);
+
+        // 2️⃣ New stats logic (ADD THIS)
+        List<Order> orders =
+                orderService.getOrdersByBuyer(email);
+
+        int totalOrders = orders.size();
+
+        double totalSpending = 0;
+        for (Order order : orders) {
+            totalSpending += order.getTotalAmount();
+        }
+
+        // 3️⃣ Add everything to model (KEEP + ADD)
+        model.addAttribute("buyerDetails", buyerDetails);
+        model.addAttribute("editMode", edit);
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("totalSpending", totalSpending);
+
         return "buyer/profile";
+    }
+
+    @PostMapping("/profile/update")
+    public String updateProfile(Authentication authentication,
+                                @ModelAttribute BuyerDetails buyerDetails) {
+
+        String email = authentication.getName();
+
+        buyerService.updateBuyerDetails(email, buyerDetails);
+
+        return "redirect:/buyer/profile";
     }
 
     //  view all products exist in RevShop
@@ -75,8 +137,11 @@ public class BuyerController {
     public String viewProductDetails(@PathVariable Long id, Model model) {
 
         Product product = productService.getProductById(id);
+        List<Review> reviews =
+                reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(id);
 
         model.addAttribute("product", product);
+        model.addAttribute("reviews", reviews);
 
         return "buyer/product-details";
     }
@@ -167,7 +232,26 @@ public class BuyerController {
         List<Order> orders = orderService.getOrdersByBuyer(buyerEmail);
 
         model.addAttribute("orders", orders);
+        model.addAttribute("buyerEmail", buyerEmail);
 
         return "buyer/orders";
+    }
+
+    @PostMapping("/review")
+    public String submitReview(@RequestParam Long orderId,
+                               @RequestParam Long productId,
+                               @RequestParam Integer rating,
+                               @RequestParam String comment,
+                               java.security.Principal principal) {
+
+        reviewService.addReview(
+                orderId,
+                productId,
+                rating,
+                comment,
+                principal.getName()
+        );
+
+        return "redirect:/buyer/orders";
     }
 }
