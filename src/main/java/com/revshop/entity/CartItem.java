@@ -22,17 +22,17 @@ public class CartItem {
     @Column(name = "cart_item_id")
     private Long cartItemId;
 
-    // Many items belong to ONE cart
+    // MANY ITEMS BELONG TO ONE CART
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    // Product reference
+    // PRODUCT REFERENCE
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // Seller reference (matches your original schema)
+    // SELLER REFERENCE (MATCHES YOUR ORIGINAL SCHEMA)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private User seller;

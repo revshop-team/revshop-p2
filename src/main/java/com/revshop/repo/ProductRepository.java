@@ -13,10 +13,23 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    /**
+     * @param seller
+     * @return List<Product>
+     */
     List<Product> findBySeller(User seller);
 
+    /**
+     * @param isActive
+     * @param pageable
+     * @return Page<Product>
+     */
     Page<Product> findByIsActive(Integer isActive, Pageable pageable);
 
+    /**
+     * @param id
+     * @return Optional<Product>
+     */
     Optional<Product> findById(Long id);
 
 

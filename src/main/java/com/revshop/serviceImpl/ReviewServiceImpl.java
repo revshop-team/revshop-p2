@@ -4,6 +4,10 @@ import com.revshop.entity.Order;
 import com.revshop.entity.Product;
 import com.revshop.entity.Review;
 import com.revshop.entity.User;
+import com.revshop.exceptions.OrderNotFoundException;
+import com.revshop.exceptions.ProductNotFoundException;
+import com.revshop.exceptions.ReviewRestrictedException;
+import com.revshop.exceptions.UserNotFoundException;
 import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.ReviewService;
 import org.springframework.stereotype.Service;
@@ -39,13 +43,16 @@ public class ReviewServiceImpl implements ReviewService {
                           String userEmail) {
 
         User buyer = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found"));
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Order not found"));
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() ->
+                        new ProductNotFoundException("Product not found"));
 
         boolean validPurchase =
                 orderItemRepository
@@ -57,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
                         );
 
         if (!validPurchase) {
-            throw new RuntimeException("You cannot review this product.");
+            throw new ReviewRestrictedException("You cannot review this product.");
         }
 
         boolean alreadyReviewed =
@@ -73,7 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if (rating < 1 || rating > 5) {
-            throw new RuntimeException("Rating must be between 1 and 5.");
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
 
         Review review = new Review();

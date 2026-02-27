@@ -30,6 +30,8 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
+
+//                         open authentication routes
                         .requestMatchers(
                                 "/",
                                 "/home",
@@ -41,24 +43,35 @@ public class SecurityConfig {
                                 "/verify-email"
                         )
                         .permitAll()
+
+//                         routes only seller role can access
                         .requestMatchers("/seller/**").hasRole("SELLER")
+
+//                        routes only buyer can access
                         .requestMatchers("/buyer/**").hasRole("BUYER")
+
+//                        authenticate other routes
                         .anyRequest().authenticated()
                 )
+//                exception handling for 403 pages (forbidden pages)
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
                 )
+
+//                form Login
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler(successHandler)
                         .permitAll()
                 )
+//                logout route
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
+//                authentication provider
                 .authenticationProvider(authenticationProvider())
                 .build();
     }
@@ -71,6 +84,7 @@ public class SecurityConfig {
         return provider;
     }
 
+//    for encoding password
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
         return  new BCryptPasswordEncoder();

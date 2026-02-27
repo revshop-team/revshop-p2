@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataInitializer {
 
+    /**
+     *
+     * @param repository
+     * @return add the security questions to DB if security questions table is EMPTY
+     */
     @Bean
     CommandLineRunner initQuestions(SecurityQuestionRepository repository) {
         return args -> {

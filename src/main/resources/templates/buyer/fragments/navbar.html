@@ -1,5 +1,64 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+<nav class="navbar navbar-expand-lg custom-navbar"
      th:fragment="navbar">
+
+    <style>
+        .custom-navbar {
+            background: #0f172a;
+            padding: 18px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .custom-navbar .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+        }
+
+        .custom-navbar .nav-link {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .custom-navbar .nav-link:hover {
+            color: #ffffff !important;
+        }
+
+        .custom-navbar .nav-link::after {
+            content: "";
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #38bdf8;
+            transition: 0.3s ease;
+        }
+
+        .custom-navbar .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .custom-navbar .btn-logout {
+            border-radius: 20px;
+            padding: 6px 18px;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            transition: all 0.3s ease;
+        }
+
+        .custom-navbar .btn-logout:hover {
+            background-color: #38bdf8;
+            color: #0f172a;
+        }
+
+        .navbar-toggler {
+            border-color: rgba(255,255,255,0.2);
+        }
+    </style>
 
     <div class="container">
 
@@ -22,45 +81,38 @@
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/buyer/home}">
-                        Home
-                    </a>
+                       th:href="@{/buyer/home}">Home</a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/buyer/products}">
-                        Products
-                    </a>
+                       th:href="@{/buyer/products}">Products</a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/buyer/cart}">
-                        Cart
-                    </a>
+                       th:href="@{/buyer/cart}">Cart</a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/buyer/orders}">
-                        Orders
-                    </a>
+                       th:href="@{/buyer/orders}">Orders</a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       th:href="@{/buyer/profile}">
-                        Profile
-                    </a>
+                       th:href="@{/buyer/favourites}">Favourites</a>
                 </li>
 
-
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/buyer/profile}">Profile</a>
+                </li>
 
             </ul>
 
             <a th:href="@{/logout}"
-               class="btn btn-outline-light btn-sm">
+               class="btn btn-logout">
                 Logout
             </a>
 

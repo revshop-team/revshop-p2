@@ -42,11 +42,11 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void addToCart(Long productId, String buyerEmail) {
 
-        // Get Buyer
+        // GET BUYER
         User buyer = userRepository.findByEmail(buyerEmail)
                 .orElseThrow(() -> new BuyerNotFoundException("Buyer not found"));
 
-        // Find or Create Cart
+        // FIND OR CREATE CART
         Cart cart = cartRepository.findByBuyer(buyer)
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
@@ -55,11 +55,11 @@ public class CartServiceImpl implements CartService {
                     return cartRepository.save(newCart);
                 });
 
-        // Get Product
+        // GET PRODUCT
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
-        //  Check if product already in cart
+        //  CHECK IF PRODUCT ALREADY IN CART
         Optional<CartItem> existingItem =
                 cartItemRepository.findByCartAndProduct(cart, product);
 
@@ -111,11 +111,13 @@ public class CartServiceImpl implements CartService {
     public void decreaseQuantity(Long cartItemId) {
 
         CartItem item = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new CartItemNotFoundException("Cart item not found"));
+                .orElseThrow(() ->
+                        new CartItemNotFoundException("Cart item not found"));
 
         if (item.getQuantity() > 1) {
             item.setQuantity(item.getQuantity() - 1);
             cartItemRepository.save(item);
+
         } else {
             cartItemRepository.delete(item);
         }

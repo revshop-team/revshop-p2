@@ -39,7 +39,7 @@ public class Order {
     @Column(name = "status", length = 30)
     private String status; // PLACED, SHIPPED, DELIVERED, CANCELLED
 
-    // One Order -> Many Order Items
+    // ONE ORDER -> MANY ORDER ITEMS
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 

@@ -7,6 +7,9 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f8f9fa;
@@ -55,14 +58,63 @@
             background-color: #198754;
             border-color: #198754;
         }
+
+        /* ❤️ Favourite Button */
+        .favourite-btn {
+            width: 36px;
+            height: 36px;
+            transition: all 0.2s ease;
+        }
+
+        .favourite-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* Tooltip Wrapper */
+        .favourite-wrapper {
+            position: relative;
+        }
+
+        /* Custom Tooltip */
+        .favourite-tooltip {
+            position: absolute;
+            bottom: 115%;
+            right: 50%;
+            transform: translateX(50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        /* Tooltip Arrow */
+        .favourite-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+        }
+
+        /* Show on hover */
+        .favourite-wrapper:hover .favourite-tooltip {
+            opacity: 1;
+            transform: translateX(50%) translateY(-4px);
+        }
     </style>
 </head>
 
 <body>
 
-
 <div th:replace="buyer/fragments/navbar :: navbar"></div>
-
 
 <div class="container py-5">
 
@@ -100,16 +152,38 @@
         </form>
     </div>
 
-
-    <!-- 🔷 PRODUCT GRID -->
+    <!-- PRODUCT GRID -->
     <div class="row g-4">
 
         <div class="col-md-4 col-lg-3"
              th:each="product : ${productPage.content}">
 
-            <div class="card product-card shadow-sm h-100">
+            <div class="card product-card shadow-sm h-100 position-relative">
 
-                <!-- Placeholder Image -->
+                <!-- ❤️ Custom Favourite Button -->
+                <form th:action="@{/buyer/favourite/toggle/{id}(id=${product.productId})}"
+                      method="post"
+                      class="position-absolute top-0 end-0 m-2 favourite-wrapper">
+
+                    <input type="hidden" name="redirectTo" value="products"/>
+
+                    <span class="favourite-tooltip"
+                          th:text="${favouriteProductIds.contains(product.productId) ? 'Remove from Favourites' : 'Add to Favourites'}">
+                    </span>
+
+                    <button type="submit"
+                            class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center favourite-btn">
+
+                        <i th:if="${favouriteProductIds.contains(product.productId)}"
+                           class="bi bi-heart-fill text-danger fs-5"></i>
+
+                        <i th:unless="${favouriteProductIds.contains(product.productId)}"
+                           class="bi bi-heart text-danger fs-5"></i>
+
+                    </button>
+                </form>
+
+                <!-- Product Image -->
                 <img src="https://via.placeholder.com/300x200"
                      class="card-img-top product-img"
                      alt="Product">
@@ -157,8 +231,7 @@
 
     </div>
 
-
-    <!-- 🔷 PAGINATION -->
+    <!-- PAGINATION -->
     <nav class="mt-5">
         <ul class="pagination justify-content-center">
 
@@ -191,7 +264,6 @@
     </nav>
 
 </div>
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

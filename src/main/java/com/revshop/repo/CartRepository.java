@@ -10,6 +10,10 @@ import java.util.Optional;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
+    /**
+     * @param buyer
+     * @return  Optional<Cart>
+     */
     Optional<Cart> findByBuyer(User buyer);
 
 }

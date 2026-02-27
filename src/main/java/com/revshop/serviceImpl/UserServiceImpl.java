@@ -2,6 +2,7 @@ package com.revshop.serviceImpl;
 
 import com.revshop.entity.User;
 import com.revshop.exceptions.EmailAlreadyExistsException;
+import com.revshop.exceptions.UserNotFoundException;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceInterfaces.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found: " + email));
+                        new UserNotFoundException("User not found: " + email));
 
     }
 

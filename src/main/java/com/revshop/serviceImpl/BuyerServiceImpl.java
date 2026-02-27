@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class BuyerServiceImpl implements BuyerService {
 
-    @Autowired
-    private BuyerDetailsRepository buyerDetailsRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final BuyerDetailsRepository buyerDetailsRepository;
+    private final UserRepository userRepository;
 
+    public BuyerServiceImpl(BuyerDetailsRepository buyerDetailsRepository,
+                            UserRepository userRepository) {
+        this.buyerDetailsRepository = buyerDetailsRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public BuyerDetails getBuyerDetailsByEmail(String email) {
@@ -25,14 +28,10 @@ public class BuyerServiceImpl implements BuyerService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return buyerDetailsRepository.findById(user.getUserId())
-//                .orElseThrow(() ->
-//                        new RuntimeException("Buyer details not found"));
                 .orElseGet(() -> {
-
                     BuyerDetails empty = new BuyerDetails();
                     empty.setUser(user);
 
-//                    return buyerDetailsRepository.save(empty);
                     return empty;
                 });
     }

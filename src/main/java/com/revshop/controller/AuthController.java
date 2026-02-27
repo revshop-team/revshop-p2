@@ -41,6 +41,7 @@ import com.revshop.repo.UserRepository;
 import com.revshop.serviceImpl.UserServiceImpl;
 import com.revshop.serviceInterfaces.CategoryService;
 import com.revshop.serviceInterfaces.ProductService;
+import com.revshop.serviceInterfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -56,22 +57,23 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final UserService userService;
 
     public AuthController(SecurityQuestionRepository securityQuestionRepository,
                           UserRepository userRepository,
                           BCryptPasswordEncoder passwordEncoder,
                           ProductService productService,
-                          CategoryService categoryService) {
+                          CategoryService categoryService,
+                          UserServiceImpl userService) {
 
         this.securityQuestionRepository = securityQuestionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.productService = productService;
         this.categoryService = categoryService;
+        this.userService = userService;
     }
 
-    @Autowired
-    private UserServiceImpl userService;
 
     // Test endpoint
     @GetMapping("/test")
@@ -105,7 +107,6 @@ public class AuthController {
     // login form render's
     @GetMapping("/login")
     public String showLoginForm() {
-//        System.out.println("displaying login form");
         return "login";
     }
 

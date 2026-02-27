@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductService {
 
-//    void save(Product product);
+
     void saveProduct(Product product, User seller);
 
     List<Product> getProductBySeller(User seller);

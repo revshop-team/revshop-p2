@@ -18,13 +18,9 @@ import java.time.LocalDateTime;
 @RequestMapping("/seller")
 public class SellerController {
 
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final ProductService productService;
+    private final UserService userService;
+    private final CategoryRepository categoryRepository;
 
     public SellerController(ProductService productService,
                             UserService userService,
@@ -35,25 +31,25 @@ public class SellerController {
         this.categoryRepository = categoryRepository;
     }
 
-    // render seller's dashboard
+    // RENDER SELLER'S DASHBOARD
     @GetMapping("/dashboard")
     public String sellerDashboard() {
         return "seller/dashboard";
     }
 
-    // seller products
+    // SELLER PRODUCTS
     @GetMapping("/products")
     public String sellerProducts() {
         return "seller/products";
     }
 
-    // seller's sales
+    // SELLER'S SALES
     @GetMapping("/sales")
     public String sellerSales() {
         return "seller/sales";
     }
 
-    // Show Add Product Page
+    // show add product page
     @GetMapping("/add-product")
     public String showAddProductForm(Model model) {
 
@@ -63,7 +59,7 @@ public class SellerController {
         return "seller/add-product";
     }
 
-    // save products
+    // SAVE PRODUCTS
     @PostMapping("/save-product")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam(value = "newCategoryName", required = false) String newCategoryName,
@@ -78,21 +74,21 @@ public class SellerController {
         boolean hasDropdown = selectedCategory != null && selectedCategory.getCategoryId() != null;
         boolean hasManual = newCategoryName != null && !newCategoryName.trim().isEmpty();
 
-        // Case: Both filled
+        // CASE: BOTH FILLED
         if (hasDropdown && hasManual) {
             model.addAttribute("error", "Select OR enter category, not both.");
             model.addAttribute("categories", categoryRepository.findAll());
             return "seller/add-product";
         }
 
-        // Case: None filled
+        // CASE: NONE FILLED
         if (!hasDropdown && !hasManual) {
             model.addAttribute("error", "Please select or enter a category.");
             model.addAttribute("categories", categoryRepository.findAll());
             return "seller/add-product";
         }
 
-        // Case: Manual category entered
+        // CASE: MANUAL CATEGORY ENTERED
         if (hasManual) {
 
             Category category = categoryRepository
@@ -116,7 +112,7 @@ public class SellerController {
         return "redirect:/seller/my-products";
     }
 
-    // view seller's products
+    // VIEW SELLER'S PRODUCTS
     @GetMapping("/my-products")
     public String viewProducts(Model model,
                                Authentication authentication){

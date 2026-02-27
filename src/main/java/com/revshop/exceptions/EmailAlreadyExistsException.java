@@ -6,6 +6,9 @@ package com.revshop.exceptions;
  */
 public class EmailAlreadyExistsException extends RuntimeException{
 
+    /**
+     * @param message
+     */
     public EmailAlreadyExistsException(String message) {
         super(message);
     }

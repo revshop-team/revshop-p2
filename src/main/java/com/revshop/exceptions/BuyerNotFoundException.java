@@ -1,10 +1,12 @@
 package com.revshop.exceptions;
 
 
-/**
- * Exception: BuyerNotFoundException
- */
+
 public class BuyerNotFoundException extends RuntimeException{
+
+    /**
+     * @param message
+     */
     public BuyerNotFoundException(String message) {
         super(message);
     }

@@ -11,20 +11,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ForgotPasswordController {
 
-    @Autowired
-    private ForgotPasswordService forgotPasswordService;
+    private final ForgotPasswordService forgotPasswordService;
 
     public ForgotPasswordController(ForgotPasswordService forgotPasswordService) {
         this.forgotPasswordService = forgotPasswordService;
     }
 
-    // forgot password render's
+    // FORGOT PASSWORD RENDER'S
     @GetMapping("/forgot-password")
     public String forgotPasswordPage() {
         return "forgot-password";
     }
 
-    // verify the user email is register or not
+    // VERIFY THE USER EMAIL IS REGISTER OR NOT
     @PostMapping("/verify-email")
     public String verifyEmail(@RequestParam String email, Model model) {
 
@@ -44,7 +43,7 @@ public class ForgotPasswordController {
         return "forgot-password";
     }
 
-    // upate new password
+    // UPATE NEW PASSWORD
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String email,
                                 @RequestParam String securityAnswer,

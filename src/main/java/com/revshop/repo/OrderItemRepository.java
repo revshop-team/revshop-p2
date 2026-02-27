@@ -8,6 +8,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
+    /**
+     * @param orderId
+     * @param buyerId
+     * @param productId
+     * @param status
+     * @return boolean
+     */
     boolean existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductIdAndOrder_Status(
             Long orderId,
             Long buyerId,

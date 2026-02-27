@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public ForgotPasswordServiceImpl(UserRepository userRepository,
+                                     BCryptPasswordEncoder passwordEncoder) {
+
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public boolean verifyEmail(String email) {

@@ -39,4 +39,36 @@ public class Favourite {
 
     @Column(name = "added_at")
     private LocalDateTime addedAt = LocalDateTime.now();
+
+    public Long getFavouriteId() {
+        return favouriteId;
+    }
+
+    public void setFavouriteId(Long favouriteId) {
+        this.favouriteId = favouriteId;
+    }
+
+    public User getBuyer() {
+        return buyer;
+    }
+
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public LocalDateTime getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDateTime addedAt) {
+        this.addedAt = addedAt;
+    }
 }

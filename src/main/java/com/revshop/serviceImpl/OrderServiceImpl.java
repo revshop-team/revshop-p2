@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderAddressRepository orderAddressRepository;
     private final BuyerDetailsRepository buyerDetailsRepository;
+    private final PaymentRepository paymentRepository;
 
     public OrderServiceImpl(UserRepository userRepository,
                             CartRepository cartRepository,
@@ -28,7 +30,8 @@ public class OrderServiceImpl implements OrderService {
                             ProductRepository productRepository,
                             OrderRepository orderRepository,
                             OrderAddressRepository orderAddressRepository,
-                            BuyerDetailsRepository buyerDetailsRepository) {
+                            BuyerDetailsRepository buyerDetailsRepository,
+                            PaymentRepository paymentRepository) {
 
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
@@ -37,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
         this.orderRepository = orderRepository;
         this.orderAddressRepository = orderAddressRepository;
         this.buyerDetailsRepository = buyerDetailsRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -48,13 +52,14 @@ public class OrderServiceImpl implements OrderService {
                          String addressLine2,
                          String city,
                          String state,
-                         String pincode) {
+                         String pincode,
+                         String paymentMethod) {
 
-        // 1️⃣ Get buyer
+        // GET BUYER
         User buyer = userRepository.findByEmail(buyerEmail)
                 .orElseThrow(() -> new RuntimeException("Buyer not found"));
 
-        // 2️⃣ Get cart
+        // GET CART
         Cart cart = cartRepository.findByBuyer(buyer)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -62,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Cart is empty");
         }
 
-        // 3️⃣ Create order
+        // CREATE ORDER
         Order order = new Order();
         order.setBuyer(buyer);
         order.setOrderDate(java.time.LocalDateTime.now());
@@ -71,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new java.util.ArrayList<>();
         double totalAmount = 0.0;
 
-        // 4️⃣ Convert CartItems → OrderItems
+        // CONVERT CARTITEMS → ORDERITEMS
         for (CartItem cartItem : cart.getCartItems()) {
 
             OrderItem orderItem = new OrderItem();
@@ -91,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
-        // 5️⃣ Save address
+        // Save address
         OrderAddress address = new OrderAddress();
         address.setOrder(order);
         address.setAddressType("SHIPPING");
@@ -105,9 +110,32 @@ public class OrderServiceImpl implements OrderService {
 
         orderAddressRepository.save(address);
 
-        // 6️⃣ CLEAR CART PROPERLY
+        // CREATE PAYMENT
 
-        cart.getCartItems().clear();   // orphanRemoval = true will delete items
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setPaymentMethod(paymentMethod);
+        payment.setAmount(totalAmount);
+
+        if ("COD".equals(paymentMethod)) {
+
+            // ORDER IS PLACED BUT PAYMENT NOT YET COLLECTED
+            payment.setPaymentStatus("PENDING");
+            order.setStatus("PLACED");
+
+        } else {
+
+            // SIMULATING ONLINE PAYMENT SUCCESS
+            payment.setPaymentStatus("SUCCESS");
+            payment.setPaidAt(java.time.LocalDateTime.now());
+            order.setStatus("PLACED");
+
+        }
+
+        paymentRepository.save(payment);
+
+        // CLEAR CART PROPERLY
+        cart.getCartItems().clear();
         cartRepository.save(cart);
     }
 
@@ -116,9 +144,14 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrdersByBuyer(String email) {
 
         User buyer = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BuyerNotFoundException("Buyer not found"));
+                .orElseThrow(() ->
+                        new BuyerNotFoundException("Buyer not found"));
 
-        return orderRepository.findByBuyer(buyer);
+        List<Order> orders = orderRepository.findByBuyer(buyer);
+
+        orders.sort(Comparator.comparing(Order::getOrderDate).reversed());
+
+        return orders;
     }
 
     public void updateBuyerDetails(String email, BuyerDetails updatedDetails) {

@@ -6,18 +6,18 @@ import com.revshop.entity.Order;
 import java.util.List;
 
 public interface OrderService {
-    void checkout(String buyerEmail,
+    void checkout(String email,
                   String fullName,
                   String phone,
                   String addressLine1,
                   String addressLine2,
                   String city,
                   String state,
-                  String pincode);
+                  String pincode,
+                  String paymentMethod);
 
     List<Order> getOrdersByBuyer(String email);
 
-//    void updateBuyerDetails(String email, BuyerDetails updatedDetails);
 
 
 }

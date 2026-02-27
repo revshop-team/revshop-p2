@@ -2,6 +2,7 @@ package com.revshop.serviceImpl;
 
 import com.revshop.entity.Product;
 import com.revshop.entity.User;
+import com.revshop.exceptions.ProductNotFoundException;
 import com.revshop.repo.ProductRepository;
 import com.revshop.serviceInterfaces.ProductService;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,7 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -48,7 +49,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() ->
+                        new ProductNotFoundException("Product not found"));
     }
 
     @Override

@@ -9,6 +9,10 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
+    /**
+     * @param categoryName
+     * @return Optional<Category>
+     */
     Optional<Category> findByCategoryNameIgnoreCase(String categoryName);
 
 }

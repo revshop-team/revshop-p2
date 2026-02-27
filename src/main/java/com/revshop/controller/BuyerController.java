@@ -1,7 +1,11 @@
 package com.revshop.controller;
 
 import com.revshop.entity.*;
+import com.revshop.exceptions.UserNotFoundException;
+import com.revshop.repo.FavouriteRepository;
+import com.revshop.repo.PaymentRepository;
 import com.revshop.repo.ReviewRepository;
+import com.revshop.repo.UserRepository;
 import com.revshop.serviceInterfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,28 +15,45 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/buyer")
 public class BuyerController {
 
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private CartService cartService;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private CategoryService categoryService;
-    @Autowired
-    private BuyerService buyerService;
-    @Autowired
-    private ReviewService reviewService;
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final ProductService productService;
+    private final CartService cartService;
+    private final OrderService orderService;
+    private final CategoryService categoryService;
+    private final BuyerService buyerService;
+    private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
+    private final FavouriteRepository favouriteRepository;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
+
+    public BuyerController(ProductService productService, CartService cartService,
+                           OrderService orderService, CategoryService categoryService,
+                           BuyerService buyerService, ReviewService reviewService,
+                           ReviewRepository reviewRepository, FavouriteRepository favouriteRepository,
+                           UserRepository userRepository, PaymentRepository paymentRepository) {
+
+        this.productService = productService;
+        this.cartService = cartService;
+        this.orderService = orderService;
+        this.categoryService = categoryService;
+        this.buyerService = buyerService;
+        this.reviewService = reviewService;
+        this.reviewRepository = reviewRepository;
+        this.favouriteRepository = favouriteRepository;
+        this.userRepository = userRepository;
+        this.paymentRepository = paymentRepository;
+    }
 
     // buyer's home page
     @GetMapping("/home")
@@ -58,8 +79,7 @@ public class BuyerController {
         return "buyer/home";
     }
 
-//    ------------------------------------------------------------------------------------------------
-    
+
     // buyer profile
     @GetMapping("/profile")
     public String viewProfile(@RequestParam(defaultValue = "false") boolean edit,
@@ -68,11 +88,11 @@ public class BuyerController {
 
         String email = authentication.getName();
 
-        // 1️⃣ Existing profile logic (KEEP THIS)
+        // Existing profile logic
         BuyerDetails buyerDetails =
                 buyerService.getBuyerDetailsByEmail(email);
 
-        // 2️⃣ New stats logic (ADD THIS)
+        // New stats logic
         List<Order> orders =
                 orderService.getOrdersByBuyer(email);
 
@@ -83,7 +103,7 @@ public class BuyerController {
             totalSpending += order.getTotalAmount();
         }
 
-        // 3️⃣ Add everything to model (KEEP + ADD)
+        // Add everything to model (KEEP + ADD)
         model.addAttribute("buyerDetails", buyerDetails);
         model.addAttribute("editMode", edit);
         model.addAttribute("totalOrders", totalOrders);
@@ -103,13 +123,13 @@ public class BuyerController {
         return "redirect:/buyer/profile";
     }
 
-    //  view all products exist in RevShop
+    //  View all products exist in RevShop
     @GetMapping("/products")
-    public String viewProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
-            @RequestParam(defaultValue = "default") String sort,
-            Model model) {
+    public String viewProducts(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "8") int size,
+                               @RequestParam(defaultValue = "default") String sort,
+                               Authentication authentication,
+                               Model model) {
 
         Sort sorting = Sort.unsorted();
 
@@ -122,12 +142,22 @@ public class BuyerController {
         }
 
         PageRequest pageable = PageRequest.of(page, size, sorting);
-
         Page<Product> productPage = productService.getActiveProducts(pageable);
+
+        String email = authentication.getName();
+        User buyer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Favourite> favourites = favouriteRepository.findByBuyer(buyer);
+
+        Set<Long> favouriteProductIds = favourites.stream()
+                .map(fav -> fav.getProduct().getProductId())
+                .collect(Collectors.toSet());
 
         model.addAttribute("productPage", productPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("sort", sort);
+        model.addAttribute("favouriteProductIds", favouriteProductIds);
 
         return "buyer/products";
     }
@@ -146,7 +176,7 @@ public class BuyerController {
         return "buyer/product-details";
     }
 
-    // add item to cart
+    // ADD ITEM TO CART
     @GetMapping("/cart/add/{id}")
     public String addToCart(@PathVariable Long id,
                             Authentication authentication) {
@@ -157,7 +187,7 @@ public class BuyerController {
         return "redirect:/buyer/products";
     }
 
-    // see cart
+    // SEE CART
     @GetMapping("/cart")
     public String viewCart(Model model,
                            Authentication authentication) {
@@ -180,7 +210,7 @@ public class BuyerController {
         return "redirect:/buyer/cart";
     }
 
-    // decrease the cart items quantity
+    // DECREASE THE CART ITEMS QUANTITY
     @GetMapping("/cart/decrease/{id}")
     public String decreaseQty(@PathVariable Long id) {
 
@@ -190,13 +220,13 @@ public class BuyerController {
     }
 
 
-    // checkout page render's
+    // CHECKOUT PAGE RENDER'S
     @GetMapping("/cart/checkout")
     public String checkoutPage() {
         return "buyer/checkout";
     }
 
-    // checkout the cart items
+    // CHECKOUT THE CART ITEMS
     @PostMapping("/cart/checkout")
     public String checkout(Authentication authentication,
                            @RequestParam String fullName,
@@ -205,7 +235,9 @@ public class BuyerController {
                            @RequestParam String addressLine2,
                            @RequestParam String city,
                            @RequestParam String state,
-                           @RequestParam String pincode) {
+                           @RequestParam String pincode,
+                           @RequestParam String paymentMethod,
+                           RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
 
@@ -217,13 +249,18 @@ public class BuyerController {
                 addressLine2,
                 city,
                 state,
-                pincode
+                pincode,
+                paymentMethod
         );
+
+        redirectAttributes.addAttribute(
+                "successMessage",
+                "Order places successfully");
 
         return "redirect:/buyer/orders";
     }
 
-    // see all order's of buyer
+    // SEE ALL ORDER'S OF BUYER
     @GetMapping("/orders")
     public String viewOrders(Authentication authentication, Model model) {
 
@@ -231,8 +268,28 @@ public class BuyerController {
 
         List<Order> orders = orderService.getOrdersByBuyer(buyerEmail);
 
+        Map<Long, String> paymentStatusMap = new HashMap<>();
+
+        if (orders != null && !orders.isEmpty()) {
+
+            List<Long> orderIds = orders.stream()
+                    .map(Order::getOrderId)
+                    .toList();
+
+            List<Payment> payments = paymentRepository.findByOrder_OrderIdIn(orderIds);
+
+            if (payments != null) {
+                paymentStatusMap = payments.stream()
+                        .collect(Collectors.toMap(
+                                p -> p.getOrder().getOrderId(),
+                                Payment::getPaymentStatus
+                        ));
+            }
+        }
+
         model.addAttribute("orders", orders);
         model.addAttribute("buyerEmail", buyerEmail);
+        model.addAttribute("paymentStatusMap", paymentStatusMap); // ALWAYS NON-NULL
 
         return "buyer/orders";
     }
@@ -253,5 +310,58 @@ public class BuyerController {
         );
 
         return "redirect:/buyer/orders";
+    }
+
+
+    @GetMapping("/favourites")
+    public String viewFavourites(Authentication authentication, Model model) {
+
+        String email = authentication.getName();
+
+        User buyer = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found"));
+
+        List<Favourite> favourites = favouriteRepository.findByBuyer(buyer);
+
+        model.addAttribute("favourites", favourites);
+
+        return "buyer/favourites";
+    }
+
+    @PostMapping("/favourite/toggle/{productId}")
+    public String toggleFavourite(@PathVariable Long productId,
+                                  @RequestParam(defaultValue = "products") String redirectTo,
+                                  Authentication authentication) {
+
+        String email = authentication.getName();
+
+        User buyer = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found"));
+
+        Product product = productService.getProductById(productId);
+
+        Optional<Favourite> existing =
+                favouriteRepository.findByBuyerAndProduct(buyer, product);
+
+        if (existing.isPresent()) {
+            favouriteRepository.delete(existing.get());
+
+        } else {
+
+            Favourite favourite = new Favourite();
+            favourite.setBuyer(buyer);
+            favourite.setProduct(product);
+            favourite.setAddedAt(LocalDateTime.now());
+            favouriteRepository.save(favourite);
+
+        }
+
+        if ("favourites".equals(redirectTo)) {
+            return "redirect:/buyer/favourites";
+        }
+
+        return "redirect:/buyer/products";
     }
 }
