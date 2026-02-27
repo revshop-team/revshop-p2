@@ -78,7 +78,14 @@ public class OrderServiceImpl implements OrderService {
 
         // CONVERT CARTITEMS → ORDERITEMS
         for (CartItem cartItem : cart.getCartItems()) {
+            Product product = cartItem.getProduct();
 
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for: " + product.getProductName());
+            }
+
+            product.setStock(product.getStock() - cartItem.getQuantity());
+            productRepository.save(product);
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(cartItem.getProduct());

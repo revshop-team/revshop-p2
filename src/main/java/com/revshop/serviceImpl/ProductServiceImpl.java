@@ -6,6 +6,7 @@ import com.revshop.exceptions.ProductNotFoundException;
 import com.revshop.repo.ProductRepository;
 import com.revshop.serviceInterfaces.ProductService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +58,34 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+    @Override
+    public List<Product> searchProducts(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.findByProductNameContainingIgnoreCase(keyword);
+    }
 
+    @Override
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategory_CategoryId(categoryId);
+    }
+
+    @Override
+    public List<Product> getAllActiveProducts() {
+        return productRepository.findByIsActiveTrue();
+    }
+    @Override
+    public Page<Product> searchActiveProducts(String keyword, PageRequest pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productRepository.findByIsActiveTrue(pageable);
+        }
+        return productRepository.searchActiveProducts(keyword.trim(), pageable);
+    }
+
+    @Override
+    public Page<Product> getActiveProductsByCategory(Long categoryId, PageRequest pageable) {
+        return productRepository
+                .findByIsActiveTrueAndCategory_CategoryId(categoryId, pageable);
+    }
 }

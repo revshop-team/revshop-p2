@@ -124,10 +124,13 @@ public class BuyerController {
     }
 
     //  View all products exist in RevShop
+    // View all products with Search + Category + Sorting + Pagination (SAFE UPGRADE)
     @GetMapping("/products")
     public String viewProducts(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "8") int size,
                                @RequestParam(defaultValue = "default") String sort,
+                               @RequestParam(required = false) String keyword,
+                               @RequestParam(required = false) Long categoryId,
                                Authentication authentication,
                                Model model) {
 
@@ -140,10 +143,26 @@ public class BuyerController {
         } else if (sort.equals("newest")) {
             sorting = Sort.by("createdAt").descending();
         }
+        // Prevent negative page crash
+        int safePage = Math.max(page, 0);
+        PageRequest pageable = PageRequest.of(safePage, size, sorting);
 
-        PageRequest pageable = PageRequest.of(page, size, sorting);
-        Page<Product> productPage = productService.getActiveProducts(pageable);
+        Page<Product> productPage;
 
+        // 🔎 PRIORITY 1: Search by keyword
+        if (keyword != null && !keyword.isBlank()) {
+            productPage = productService.searchActiveProducts(keyword, pageable);
+
+            // 📂 PRIORITY 2: Filter by category
+        } else if (categoryId != null) {
+            productPage = productService.getActiveProductsByCategory(categoryId, pageable);
+
+            // 🛒 DEFAULT: All active products
+        } else {
+            productPage = productService.getActiveProducts(pageable);
+        }
+
+        // ⭐ EXISTING FAVOURITE LOGIC (UNCHANGED)
         String email = authentication.getName();
         User buyer = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -154,9 +173,15 @@ public class BuyerController {
                 .map(fav -> fav.getProduct().getProductId())
                 .collect(Collectors.toSet());
 
+        // 📂 ADD categories for UI filter (NEW)
+        List<Category> categories = categoryService.getAllCategories();
+
         model.addAttribute("productPage", productPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("sort", sort);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("categories", categories); // NEW
         model.addAttribute("favouriteProductIds", favouriteProductIds);
 
         return "buyer/products";
@@ -164,14 +189,23 @@ public class BuyerController {
 
     // view product details
     @GetMapping("/product/{id}")
-    public String viewProductDetails(@PathVariable Long id, Model model) {
+    public String viewProduct(@PathVariable Long id, Model model) {
 
         Product product = productService.getProductById(id);
+
         List<Review> reviews =
                 reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(id);
 
+        Double avgRating =
+                reviewRepository.getAverageRatingByProductId(id);
+
+        Long reviewCount =
+                reviewRepository.countByProduct_ProductId(id);
+
         model.addAttribute("product", product);
         model.addAttribute("reviews", reviews);
+        model.addAttribute("avgRating", avgRating != null ? avgRating : 0);
+        model.addAttribute("reviewCount", reviewCount);
 
         return "buyer/product-details";
     }
@@ -179,10 +213,18 @@ public class BuyerController {
     // ADD ITEM TO CART
     @GetMapping("/cart/add/{id}")
     public String addToCart(@PathVariable Long id,
-                            Authentication authentication) {
+                            Authentication authentication,
+                            RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
-        cartService.addToCart(id, buyerEmail);
+
+        try {
+            cartService.addToCart(id, buyerEmail);
+            redirectAttributes.addFlashAttribute("successMessage", "Product added to cart successfully!");
+
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
 
         return "redirect:/buyer/products";
     }
@@ -240,7 +282,14 @@ public class BuyerController {
                            RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
-
+        Cart cart = cartService.getCartByBuyer(buyerEmail);
+        if (cart == null || cart.getCartItems().isEmpty()) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Your cart is empty. Please add items before checkout."
+            );
+            return "redirect:/buyer/products";
+        }
         orderService.checkout(
                 buyerEmail,
                 fullName,
@@ -253,7 +302,7 @@ public class BuyerController {
                 paymentMethod
         );
 
-        redirectAttributes.addAttribute(
+        redirectAttributes.addFlashAttribute(
                 "successMessage",
                 "Order places successfully");
 
@@ -295,20 +344,39 @@ public class BuyerController {
     }
 
     @PostMapping("/review")
-    public String submitReview(@RequestParam Long orderId,
+    public String submitReview(Authentication authentication,
+                               @RequestParam Long orderId,
                                @RequestParam Long productId,
                                @RequestParam Integer rating,
                                @RequestParam String comment,
-                               java.security.Principal principal) {
+                               RedirectAttributes redirectAttributes) {
 
-        reviewService.addReview(
-                orderId,
-                productId,
-                rating,
-                comment,
-                principal.getName()
-        );
+        try {
+            String userEmail = authentication.getName();
 
+            // 🔥 THIS CALLS YOUR EXISTING SERVICE (NO CHANGE NEEDED THERE)
+            reviewService.addReview(
+                    orderId,
+                    productId,
+                    rating,
+                    comment,
+                    userEmail
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Review submitted successfully!"
+            );
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage()
+            );
+        }
+
+        // ⭐ CRITICAL FIX: NEVER return "buyer/review"
+        // Always redirect back to orders page
         return "redirect:/buyer/orders";
     }
 
@@ -363,5 +431,22 @@ public class BuyerController {
         }
 
         return "redirect:/buyer/products";
+    }
+    // ⚡ BUY NOW - Direct checkout flow (SAFE - uses existing cart logic)
+    @GetMapping("/buy-now/{id}")
+    public String buyNow(@PathVariable Long id,
+                         Authentication authentication,
+                         RedirectAttributes redirectAttributes) {
+
+        String buyerEmail = authentication.getName();
+
+        // Add product to cart (reuse existing logic)
+        cartService.addToCart(id, buyerEmail);
+
+        // Optional success message
+        redirectAttributes.addFlashAttribute("successMessage", "Proceeding to checkout...");
+
+        // Directly go to checkout page (NOT products page)
+        return "redirect:/buyer/cart/checkout";
     }
 }

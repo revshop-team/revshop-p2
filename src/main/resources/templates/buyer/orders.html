@@ -11,24 +11,42 @@
         body {
             background-color: #f5f6f8;
         }
+
         .order-card {
             border: none;
-            border-radius: 16px;
-            transition: 0.2s ease;
+            border-radius: 18px;
+            transition: 0.25s ease;
         }
+
         .order-card:hover {
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 14px 35px rgba(0,0,0,0.08);
         }
-        .order-meta small {
-            color: #6c757d;
+
+        .order-header {
+            background: #f8f9fa;
+            border-radius: 14px;
+            padding: 15px 18px;
         }
+
         .product-row:last-child {
             border-bottom: none !important;
         }
-        .total-section {
-            background: #f8f9fa;
+
+        .total-box {
+            background: #eef2f7;
             border-radius: 12px;
-            padding: 12px 18px;
+            padding: 12px 20px;
+            font-size: 18px;
+        }
+
+        .review-box {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .rating-input {
+            max-width: 90px;
         }
     </style>
 </head>
@@ -41,91 +59,98 @@
 
     <h3 class="fw-bold mb-4">My Orders</h3>
 
-    <!-- Empty -->
+    <!-- Empty State -->
     <div th:if="${orders == null || #lists.isEmpty(orders)}"
-         class="alert alert-info rounded-4">
+         class="alert alert-info rounded-4 text-center">
         You haven’t placed any orders yet.
     </div>
 
-    <!-- Orders -->
+    <!-- Orders Loop -->
     <div th:each="order : ${orders}"
-         class="card order-card mb-4 shadow-sm">
+         class="card order-card shadow-sm mb-4">
 
         <div class="card-body">
 
-            <!-- Top Header -->
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+            <!-- 🔷 Order Header -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 order-header mb-4">
 
-                <div class="order-meta">
-                    <div class="fw-semibold">OrderId: <span th:text="${order.orderId}"></span></div>
-                    <small>
+                <div>
+                    <div class="fw-bold">
+                        Order ID:
+                        <span th:text="${order.orderId}"></span>
+                    </div>
+                    <small class="text-muted">
                         Placed on
                         <span th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, hh:mm a')}"></span>
                     </small>
                 </div>
 
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-3">
 
                     <!-- Order Status -->
                     <div>
-                        <small class="text-muted">Order:</small>
+                        <small class="text-muted">Order</small><br>
                         <span class="badge rounded-pill px-3 py-2 bg-primary"
                               th:text="${order.status}">
-
                         </span>
                     </div>
 
                     <!-- Payment Status -->
                     <div>
-                        <small class="text-muted">Payment:</small>
+                        <small class="text-muted">Payment</small><br>
                         <span class="badge rounded-pill px-3 py-2"
                               th:if="${paymentStatusMap != null and paymentStatusMap[order.orderId] != null}"
                               th:classappend="${paymentStatusMap[order.orderId] == 'SUCCESS'} ? ' bg-success' :
-                                (${paymentStatusMap[order.orderId] == 'PENDING'} ? ' bg-warning text-dark' :
-                                ' bg-danger')"
+                              (${paymentStatusMap[order.orderId] == 'PENDING'} ? ' bg-warning text-dark' : ' bg-danger')"
                               th:text="${paymentStatusMap[order.orderId]}">
                         </span>
                     </div>
 
                 </div>
-
             </div>
 
-            <hr class="mt-2 mb-4">
-
-            <!-- Items -->
+            <!-- 🔹 Order Items -->
             <div th:if="${order.orderItems != null}">
 
                 <div th:each="item : ${order.orderItems}"
-                     class="row align-items-center product-row border-bottom pb-3 mb-3">
+                     class="row align-items-center border-bottom pb-3 mb-3 product-row">
 
-                    <div class="col-md-6 fw-semibold">
-                        <span th:text="${item.product != null ? item.product.productName : 'Product'}"></span>
+                    <!-- Product Name -->
+                    <div class="col-md-5 fw-semibold">
+                        <span th:text="${item.product.productName}"></span>
                     </div>
 
+                    <!-- Price -->
                     <div class="col-md-2 text-muted">
                         ₹ <span th:text="${item.price}"></span>
                     </div>
 
+                    <!-- Quantity -->
                     <div class="col-md-2 text-muted">
                         Qty: <span th:text="${item.quantity}"></span>
                     </div>
 
-                    <div class="col-md-2 text-end fw-semibold">
+                    <!-- Subtotal -->
+                    <div class="col-md-3 text-end fw-bold">
                         ₹ <span th:text="${item.price * item.quantity}"></span>
                     </div>
 
+                    <!-- ⭐ REVIEW SECTION (ONLY IF DELIVERED) -->
+
                     <!-- Review Section -->
                     <div class="col-12 mt-3"
-                         th:if="${order.status == 'DELIVERED'}">
+                         th:if="${order.status == 'PLACED' || order.status == 'DELIVERED'}">
 
-                        <!-- Not Reviewed -->
+                        <!-- If NOT reviewed -->
                         <div th:if="${!@reviewServiceImpl.hasReviewed(order.orderId,
-                                                   item.product.productId,
-                                                   buyerEmail)}"
-                             class="bg-light p-3 rounded-4">
+                                                item.product.productId,
+                                                buyerEmail)}"
+                             class="review-box p-3 mt-2">
 
-                            <h6 class="fw-bold mb-3">Write a Review</h6>
+                            <h6 class="fw-bold mb-3">
+                                ⭐ Write a Review for
+                                <span th:text="${item.product.productName}"></span>
+                            </h6>
 
                             <form th:action="@{/buyer/review}" method="post">
 
@@ -138,23 +163,22 @@
                                        th:value="${item.product.productId}" />
 
                                 <div class="row g-3">
-
                                     <div class="col-md-3">
                                         <input type="number"
                                                name="rating"
                                                min="1"
                                                max="5"
                                                class="form-control"
-                                               placeholder="Rating"
+                                               placeholder="1-5"
                                                required />
                                     </div>
 
                                     <div class="col-md-7">
-                                        <textarea name="comment"
-                                                  class="form-control"
-                                                  rows="2"
-                                                  placeholder="Write your review..."
-                                                  required></textarea>
+            <textarea name="comment"
+                      class="form-control"
+                      rows="2"
+                      placeholder="Share your experience..."
+                      required></textarea>
                                     </div>
 
                                     <div class="col-md-2">
@@ -163,30 +187,26 @@
                                             Submit
                                         </button>
                                     </div>
-
                                 </div>
-
                             </form>
-
                         </div>
 
-                        <!-- Already Reviewed -->
+                        <!-- If ALREADY reviewed -->
                         <div th:if="${@reviewServiceImpl.hasReviewed(order.orderId,
-                                                 item.product.productId,
-                                                 buyerEmail)}"
-                             class="alert alert-success rounded-4 mt-2">
+                                                item.product.productId,
+                                                buyerEmail)}"
+                             class="alert alert-success mt-2 rounded-4">
                             ✔ You have already reviewed this product.
                         </div>
 
                     </div>
 
                 </div>
-
             </div>
 
-            <!-- Total -->
-            <div class="d-flex justify-content-end mt-3">
-                <div class="total-section fw-semibold">
+            <!-- 🔸 Total Section -->
+            <div class="d-flex justify-content-end mt-4">
+                <div class="total-box fw-bold">
                     Total: ₹ <span th:text="${order.totalAmount}"></span>
                 </div>
             </div>

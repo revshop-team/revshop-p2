@@ -58,7 +58,10 @@ public class CartServiceImpl implements CartService {
         // GET PRODUCT
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
-
+        // ⭐ STOCK CHECK (ADD THIS BLOCK)
+        if (product.getStock() <= 0) {
+            throw new RuntimeException("Product is out of stock");
+        }
         //  CHECK IF PRODUCT ALREADY IN CART
         Optional<CartItem> existingItem =
                 cartItemRepository.findByCartAndProduct(cart, product);
@@ -66,6 +69,14 @@ public class CartServiceImpl implements CartService {
         if (existingItem.isPresent()) {
 
             CartItem item = existingItem.get();
+
+            // ⭐ PREVENT EXCEEDING STOCK (ADD THIS)
+            if (item.getQuantity() + 1 > product.getStock()) {
+                throw new RuntimeException("Cannot add more than available stock");
+            }
+
+            item.setQuantity(item.getQuantity() + 1);
+            cartItemRepository.save(item);
             item.setQuantity(item.getQuantity() + 1);
             cartItemRepository.save(item);
 
@@ -94,13 +105,19 @@ public class CartServiceImpl implements CartService {
                         return cartRepository.save(newCart);
                 });
     }
-
     @Override
     @Transactional
     public void increaseQuantity(Long cartItemId) {
 
         CartItem item = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new CartItemNotFoundException("Cart item not found"));
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        Product product = item.getProduct();
+
+        // 🚨 CRITICAL STOCK VALIDATION (THIS WAS MISSING)
+        if (item.getQuantity() >= product.getStock()) {
+            throw new RuntimeException("Maximum stock limit reached for: " + product.getProductName());
+        }
 
         item.setQuantity(item.getQuantity() + 1);
         cartItemRepository.save(item);
