@@ -63,6 +63,41 @@
     </a>
 </nav>
 
+<!-- 🟢 TOAST NOTIFICATION (NEW - PROFESSIONAL) -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+
+    <!-- Success Toast -->
+    <div th:if="${successMessage}"
+         class="toast align-items-center text-white bg-success border-0 show shadow">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    onclick="this.closest('.toast').remove()">
+            </button>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div th:if="${errorMessage}"
+         class="toast align-items-center text-white bg-danger border-0 show shadow">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    onclick="this.closest('.toast').remove()">
+            </button>
+        </div>
+    </div>
+
+</div>
+
 <div class="container py-5">
 
     <div class="row g-5">
@@ -77,20 +112,31 @@
         <!-- 🔹 RIGHT SIDE: PRODUCT DETAILS -->
         <div class="col-lg-6">
 
+            <!-- Product Name -->
             <h2 class="fw-bold mb-2"
                 th:text="${product.productName}"></h2>
 
-            <!-- Fake Rating UI -->
-            <div class="rating mb-3">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <span class="text-muted ms-2">(124 reviews)</span>
-            </div>
+            <!-- ⭐ REAL DYNAMIC RATING (FROM DATABASE) -->
+            <div class="rating mb-3 d-flex align-items-center gap-2">
 
-            <!-- PRICE SECTION -->
+                <!-- Star Icon -->
+                <span class="fs-5 text-warning">
+        <i class="bi bi-star-fill"></i>
+    </span>
+
+                <!-- Average Rating -->
+                <span class="fw-semibold fs-5"
+                      th:text="${#numbers.formatDecimal(avgRating, 1, 1)} + ' / 5'">
+        0 / 5
+    </span>
+
+                <!-- Review Count -->
+                <span class="text-muted">
+        (<span th:text="${reviewCount}">0</span> reviews)
+    </span>
+
+            </div>
+            <!-- 💰 PRICE SECTION -->
             <div class="mb-3">
                 <span class="price">
                     ₹ <span th:text="${product.sellingPrice}"></span>
@@ -105,22 +151,32 @@
                 </span>
             </div>
 
-            <!-- STOCK STATUS -->
+            <!-- 📦 SMART STOCK STATUS -->
             <div class="mb-3">
-                <span class="badge bg-success"
-                      th:if="${product.stock > 0}">
+
+                <!-- 🟢 In Stock -->
+                <span class="badge bg-success fs-6"
+                      th:if="${product.stock > product.stockThreshold}">
                     In Stock
                 </span>
 
-                <span class="badge bg-danger"
-                      th:if="${product.stock <= 0}">
+                <!-- 🟡 Low Stock -->
+                <span class="badge bg-warning text-dark fs-6"
+                      th:if="${product.stock <= product.stockThreshold and product.stock > 0}">
+                    Low Stock - Only <span th:text="${product.stock}"></span> left!
+                </span>
+
+                <!-- 🔴 Out of Stock -->
+                <span class="badge bg-danger fs-6"
+                      th:if="${product.stock == 0}">
                     Out of Stock
                 </span>
+
             </div>
 
             <div class="divider"></div>
 
-            <!-- PRODUCT INFO -->
+            <!-- 📄 PRODUCT INFO -->
             <div class="info-box">
 
                 <p>
@@ -138,37 +194,56 @@
                     <span th:text="${product.stock}"></span>
                 </p>
 
+                <!-- ⚠ LOW STOCK ALERT BOX -->
+                <div th:if="${product.stock <= product.stockThreshold and product.stock > 0}"
+                     class="alert alert-warning mt-3 mb-0">
+                    ⚠ Hurry! Only <strong th:text="${product.stock}"></strong> items left in stock.
+                </div>
+
+                <!-- ❌ OUT OF STOCK ALERT -->
+                <div th:if="${product.stock == 0}"
+                     class="alert alert-danger mt-3 mb-0">
+                    This product is currently out of stock.
+                </div>
+
             </div>
 
             <hr class="mt-5">
-
+            <!-- ⭐ CUSTOMER REVIEWS SECTION (NEW) -->
             <h4 class="fw-bold mb-4">Customer Reviews</h4>
 
+            <!-- No Reviews -->
             <div th:if="${reviews == null || #lists.isEmpty(reviews)}"
                  class="alert alert-info rounded-4">
                 No reviews yet for this product.
             </div>
 
+            <!-- Review List -->
             <div th:each="review : ${reviews}"
                  class="card mb-3 shadow-sm rounded-4">
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
 
+                        <!-- Reviewer Email -->
                         <div class="fw-semibold">
-                            <span th:text="${review.buyer.email}"></span>
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span th:text="${review.buyer.email}">user@email.com</span>
                         </div>
 
+                        <!-- Rating -->
                         <div class="text-warning fw-bold">
                             ⭐ <span th:text="${review.rating}"></span>/5
                         </div>
 
                     </div>
 
+                    <!-- Comment -->
                     <p class="mt-2 mb-1"
                        th:text="${review.reviewComment}"></p>
 
+                    <!-- Date -->
                     <small class="text-muted"
                            th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}">
                     </small>
@@ -176,20 +251,33 @@
                 </div>
 
             </div>
-
-            <!-- ACTION BUTTONS -->
+            <!-- 🛒 ACTION BUTTONS -->
             <div class="d-grid gap-3 mt-4">
 
-                <button class="btn btn-success btn-lg">
+                <!-- Add to Cart -->
+                <a th:if="${product.stock > 0}"
+                   th:href="@{/buyer/cart/add/{id}(id=${product.productId})}"
+                   class="btn btn-success btn-lg">
                     <i class="bi bi-cart-fill me-2"></i>
                     Add to Cart
+                </a>
+
+                <!-- Disabled Out of Stock -->
+                <button th:if="${product.stock == 0}"
+                        class="btn btn-secondary btn-lg" disabled>
+                    Out of Stock
                 </button>
 
-                <button class="btn btn-outline-primary btn-lg">
+                <!-- Buy Now -->
+                <!-- ⚡ Buy Now (DIRECT CHECKOUT - CORRECT LOGIC) -->
+                <a th:if="${product.stock > 0}"
+                   th:href="@{/buyer/buy-now/{id}(id=${product.productId})}"
+                   class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-lightning-fill me-2"></i>
                     Buy Now
-                </button>
+                </a>
 
+                <!-- Back -->
                 <a th:href="@{/buyer/products}"
                    class="btn btn-link text-decoration-none">
                     ← Back to Products
@@ -201,6 +289,17 @@
     </div>
 
 </div>
+
+<!-- 🟢 AUTO HIDE TOAST SCRIPT -->
+<script>
+    setTimeout(() => {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        });
+    }, 3000);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

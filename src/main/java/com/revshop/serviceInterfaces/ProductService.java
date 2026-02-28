@@ -25,4 +25,9 @@ public interface ProductService {
     Product saveOrUpdateProduct(Product updatedProduct);
 
     void deleteProductById(Long id);
+    List<Product> searchProducts(String keyword);
+    List<Product> getProductsByCategory(Long categoryId);
+    List<Product> getAllActiveProducts();
+    Page<Product> searchActiveProducts(String keyword, PageRequest pageable);
+    Page<Product> getActiveProductsByCategory(Long categoryId, PageRequest pageable);
 }

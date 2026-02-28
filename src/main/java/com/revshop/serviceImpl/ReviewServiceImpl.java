@@ -56,13 +56,11 @@ public class ReviewServiceImpl implements ReviewService {
 
         boolean validPurchase =
                 orderItemRepository
-                        .existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductIdAndOrder_Status(
+                        .existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductId(
                                 orderId,
                                 buyer.getUserId(),
-                                productId,
-                                "DELIVERED"
+                                productId
                         );
-
         if (!validPurchase) {
             throw new ReviewRestrictedException("You cannot review this product.");
         }

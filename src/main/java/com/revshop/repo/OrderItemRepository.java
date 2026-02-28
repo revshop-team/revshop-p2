@@ -12,13 +12,13 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
      * @param orderId
      * @param buyerId
      * @param productId
-     * @param status
+//     * @param status
      * @return boolean
      */
-    boolean existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductIdAndOrder_Status(
+    boolean existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductId(
             Long orderId,
             Long buyerId,
-            Long productId,
-            String status
+            Long productId
     );
+
 }

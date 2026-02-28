@@ -1,7 +1,10 @@
 package com.revshop.config;
 
 import com.revshop.entity.SecurityQuestion;
+import com.revshop.entity.Category;
 import com.revshop.repo.SecurityQuestionRepository;
+import com.revshop.repo.CategoryRepository;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,14 +13,11 @@ import org.springframework.context.annotation.Configuration;
 public class DataInitializer {
 
     /**
-     *
-     * @param repository
-     * @return add the security questions to DB if security questions table is EMPTY
+     * Add default security questions if table is empty
      */
     @Bean
     CommandLineRunner initQuestions(SecurityQuestionRepository repository) {
         return args -> {
-
             if (repository.count() == 0) {
 
                 SecurityQuestion q1 = new SecurityQuestion();
@@ -31,6 +31,57 @@ public class DataInitializer {
                 SecurityQuestion q3 = new SecurityQuestion();
                 q3.setQuestionText("In which city were you born?");
                 repository.save(q3);
+
+                System.out.println("✅ Default Security Questions Inserted");
+            }
+        };
+    }
+
+    /**
+     * Add default categories if table is empty
+     */
+    @Bean
+    CommandLineRunner initCategories(CategoryRepository categoryRepository) {
+        return args -> {
+
+            if (categoryRepository.count() == 0) {
+
+                categoryRepository.save(
+                        Category.builder()
+                                .categoryName("Electronics")
+                                .description("Electronic Items")
+                                .build()
+                );
+
+                categoryRepository.save(
+                        Category.builder()
+                                .categoryName("Fashion")
+                                .description("Clothing & Accessories")
+                                .build()
+                );
+
+                categoryRepository.save(
+                        Category.builder()
+                                .categoryName("Books")
+                                .description("Books & Study")
+                                .build()
+                );
+
+                categoryRepository.save(
+                        Category.builder()
+                                .categoryName("Home & Kitchen")
+                                .description("Home Products")
+                                .build()
+                );
+
+                categoryRepository.save(
+                        Category.builder()
+                                .categoryName("Groceries")
+                                .description("Daily Essentials")
+                                .build()
+                );
+
+                System.out.println("✅ Default Categories Inserted");
             }
         };
     }
