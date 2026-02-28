@@ -7,4 +7,6 @@ public interface UserService {
     void registerUser(User user);
 
     User findByEmail(String email);
+
+    User getUserById(Long userId);
 }

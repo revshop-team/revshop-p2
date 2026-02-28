@@ -71,6 +71,9 @@ public class Product {
     @Column(name = "is_active")
     private Integer isActive = 1;
 
+    @Column(name = "image_name")
+    private String imageName;
+
     public Long getProductId() {
         return productId;
     }
@@ -165,5 +168,13 @@ public class Product {
 
     public void setIsActive(Integer isActive) {
         this.isActive = isActive;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 }

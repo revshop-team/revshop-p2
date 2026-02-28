@@ -5,6 +5,7 @@ import com.revshop.entity.User;
 import com.revshop.exceptions.ProductNotFoundException;
 import com.revshop.repo.ProductRepository;
 import com.revshop.serviceInterfaces.ProductService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -56,6 +58,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    // Save or update product
+    @Override
+    public Product saveOrUpdateProduct(Product product) {
+
+        return productRepository.save(product);
+    }
+
+    @Override
+    public void deleteProductById(Long id) {
+        productRepository.deleteById(id);
     }
 
 }

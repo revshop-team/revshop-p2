@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <a class="navbar-brand" th:href="@{/seller/dashboard}">RevShop - Seller</a>
+    <a class="navbar-brand me-4" th:href="@{/seller/dashboard}">Dashboard</a>
+
+    <div class="ms-auto dropdown">
+        <button class="btn btn-light btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown">
+            My Account
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" th:href="@{/seller/profile}">Profile</a></li>
+            <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+<div class="container mt-5">
+    <h3>Edit Product</h3>
+
+    <form th:action="@{'/seller/update/' + ${product.productId}}" th:object="${product}" method="post">
+        <div class="mb-3">
+            <label>Product Name</label>
+            <input type="text" th:field="*{productName}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Manufacturer</label>
+            <input type="text" th:field="*{manufacturer}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea th:field="*{description}" class="form-control" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>MRP</label>
+            <input type="number" step="0.01" id="mrp" th:field="*{mrp}" class="form-control" required oninput="updateSellingPrice()">
+        </div>
+
+        <div class="mb-3">
+            <label>Discount (%)</label>
+            <input type="number" step="0.01" id="discount" value="0" class="form-control" oninput="updateSellingPrice()">
+        </div>
+
+        <div class="mb-3">
+            <label>Selling Price</label>
+            <input type="number" step="0.01" id="sellingPrice" th:field="*{sellingPrice}" class="form-control" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label>Stock</label>
+            <input type="number" th:field="*{stock}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Threshold</label>
+            <input type="number" th:field="*{stockThreshold}" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <a th:href="@{/seller/my-products}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+    function updateSellingPrice() {
+        const mrp = parseFloat(document.getElementById('mrp').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        document.getElementById('sellingPrice').value = (mrp - (mrp * discount / 100)).toFixed(2);
+    }
+
+    window.onload = updateSellingPrice;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
