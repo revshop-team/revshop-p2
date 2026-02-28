@@ -13,30 +13,9 @@
     <div class="ms-auto d-flex align-items-center">
 
         <!-- Notification Icon -->
-        <div class="dropdown me-3">
-            <button class="btn btn-dark position-relative"
-                    type="button"
-                    id="notifDropdown"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                <i class="bi bi-bell" style="font-size: 1.5rem;"></i>
-                <span th:if="${unreadCount > 0}"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                      th:text="${unreadCount}">0</span>
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown">
-                <li th:if="${notifications.size() == 0}" class="dropdown-item text-muted">No new notifications</li>
-                <li th:each="notif : ${notifications}">
-                    <a class="dropdown-item"
-                       th:href="@{'/seller/notifications/read/' + ${notif.id}}">
-                        <small th:text="${#dates.format(notif.createdAt, 'dd MMM HH:mm')}"></small>
-                        <br/>
-                        <span th:text="${notif.message}"></span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <a th:href="@{/seller/notifications}" class="text-decoration-none me-3">
+            <i class="bi bi-bell fs-4 text-light"></i>
+        </a>
 
         <!-- Account Dropdown -->
         <div class="dropdown">

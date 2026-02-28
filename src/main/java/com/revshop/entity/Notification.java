@@ -38,6 +38,11 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Link to Order
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
     public Long getNotificationId() {
         return notificationId;
     }
@@ -55,6 +60,10 @@ public class Notification {
     }
 
     public String getMessage() {
+        if (order != null && order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            String productName = order.getOrderItems().get(0).getProduct().getProductName();
+            return "Order placed for " + productName;
+        }
         return message;
     }
 
@@ -76,5 +85,13 @@ public class Notification {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public Order getOrder() {
+        return order;
     }
 }

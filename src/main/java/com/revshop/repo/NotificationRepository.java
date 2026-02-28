@@ -9,6 +9,10 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findByUserAndIsReadFalseOrderByCreatedAtDesc(User user);
+    // Fetch unread notifications for a user
+    List<Notification> findByUserAndIsRead(User user, String isRead);
+
+    // Fetch all notifications for a user, newest first
+    List<Notification> findByUserOrderByCreatedAtDesc(User user);
 
 }

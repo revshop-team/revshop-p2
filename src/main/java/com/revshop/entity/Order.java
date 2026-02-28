@@ -26,7 +26,7 @@ public class Order {
     private Long orderId;
 
     // Buyer who placed the order
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
@@ -40,7 +40,7 @@ public class Order {
     private String status; // PLACED, SHIPPED, DELIVERED, CANCELLED
 
     // ONE ORDER -> MANY ORDER ITEMS
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> orderItems;
 
 

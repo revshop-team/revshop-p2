@@ -5,12 +5,9 @@ import com.revshop.entity.Product;
 import com.revshop.entity.SellerDetails;
 import com.revshop.entity.User;
 import com.revshop.repo.CategoryRepository;
-import com.revshop.serviceInterfaces.NotificationService;
 import com.revshop.serviceInterfaces.ProductService;
 import com.revshop.serviceInterfaces.SellerService;
 import com.revshop.serviceInterfaces.UserService;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Controller
@@ -31,17 +27,15 @@ public class SellerController {
     private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final SellerService sellerService;
-    private final NotificationService notificationService;
 
     public SellerController(ProductService productService,
                             UserService userService,
-                            CategoryRepository categoryRepository, SellerService sellerService, NotificationService notificationService) {
+                            CategoryRepository categoryRepository, SellerService sellerService) {
 
         this.productService = productService;
         this.userService = userService;
         this.categoryRepository = categoryRepository;
         this.sellerService = sellerService;
-        this.notificationService = notificationService;
     }
 
     // RENDER SELLER'S DASHBOARD
@@ -265,7 +259,10 @@ public class SellerController {
         User seller = userService.findByEmail(email);
 
         model.addAttribute("products",
-                productService.getProductBySeller(seller));
+                productService.getProductBySeller(seller)
+                        .stream()
+                        .filter(p -> p.getIsActive() == 1)
+                        .toList());
 
         return "seller/my-products";
     }
@@ -317,28 +314,7 @@ public class SellerController {
     }
 
 
-    // List unread notifications
-    @GetMapping("/notifications")
-    public String viewNotifications(Model model, Authentication authentication) {
-        User seller = userService.findByEmail(authentication.getName());
-        model.addAttribute("notifications", notificationService.getUnreadNotifications(seller));
-        return "seller/notifications";
-    }
 
-    // Mark notification as read and redirect to orders page
-    @GetMapping("/notifications/read/{id}")
-    public String markNotificationRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
-        return "redirect:/seller/orders";
-    }
 
-    @ModelAttribute
-    public void addNotificationsToModel(Model model, Authentication authentication) {
-        if(authentication != null) {
-            User seller = userService.findByEmail(authentication.getName());
-            var notifications = notificationService.getUnreadNotifications(seller);
-            model.addAttribute("notifications", notifications);
-            model.addAttribute("unreadCount", notifications.size());
-        }
-    }
+
 }
