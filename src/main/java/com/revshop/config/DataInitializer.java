@@ -40,46 +40,82 @@ public class DataInitializer {
     /**
      * Add default categories if table is empty
      */
+//    @Bean
+//    CommandLineRunner initCategories(CategoryRepository categoryRepository) {
+//        return args -> {
+//
+//            if (categoryRepository.count() == 0) {
+//
+//                categoryRepository.save(
+//                        Category.builder()
+//                                .categoryName("Electronics")
+//                                .description("Electronic Items")
+//                                .build()
+//                );
+//
+//                categoryRepository.save(
+//                        Category.builder()
+//                                .categoryName("Fashion")
+//                                .description("Clothing & Accessories")
+//                                .build()
+//                );
+//
+//                categoryRepository.save(
+//                        Category.builder()
+//                                .categoryName("Books")
+//                                .description("Books & Study")
+//                                .build()
+//                );
+//
+//                categoryRepository.save(
+//                        Category.builder()
+//                                .categoryName("Home & Kitchen")
+//                                .description("Home Products")
+//                                .build()
+//                );
+//
+//                categoryRepository.save(
+//                        Category.builder()
+//                                .categoryName("Groceries")
+//                                .description("Daily Essentials")
+//                                .build()
+//                );
+//
+//                System.out.println("✅ Default Categories Inserted");
+//            }
+//        };
+//    }
+
     @Bean
     CommandLineRunner initCategories(CategoryRepository categoryRepository) {
         return args -> {
 
             if (categoryRepository.count() == 0) {
 
-                categoryRepository.save(
-                        Category.builder()
-                                .categoryName("Electronics")
-                                .description("Electronic Items")
-                                .build()
-                );
+                Category c1 = new Category();
+                c1.setCategoryName("Electronics");
+                c1.setDescription("Electronic Items");
+                categoryRepository.save(c1);
 
-                categoryRepository.save(
-                        Category.builder()
-                                .categoryName("Fashion")
-                                .description("Clothing & Accessories")
-                                .build()
-                );
+                Category c2 = new Category();
+                c2.setCategoryName("Fashion");
+                c2.setDescription("Clothing & Accessories");
+                categoryRepository.save(c2);
 
-                categoryRepository.save(
-                        Category.builder()
-                                .categoryName("Books")
-                                .description("Books & Study")
-                                .build()
-                );
+                Category c3 = new Category();
+                c3.setCategoryName("Books");
+                c3.setDescription("Books & Study");
+                categoryRepository.save(c3);
 
-                categoryRepository.save(
-                        Category.builder()
-                                .categoryName("Home & Kitchen")
-                                .description("Home Products")
-                                .build()
-                );
+                Category c4 = new Category();
+                c4.setCategoryName("Home & Kitchen");
+                c4.setDescription("Home Products");
+                categoryRepository.save(c4);
 
-                categoryRepository.save(
-                        Category.builder()
-                                .categoryName("Groceries")
-                                .description("Daily Essentials")
-                                .build()
-                );
+                Category c5 = new Category();
+                c5.setCategoryName("Groceries");
+                c5.setDescription("Daily Essentials");
+                categoryRepository.save(c5);
 
                 System.out.println("✅ Default Categories Inserted");
             }

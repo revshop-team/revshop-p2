@@ -6,6 +6,7 @@ import com.revshop.exceptions.ProductNotFoundException;
 import com.revshop.repo.ProductRepository;
 import com.revshop.serviceInterfaces.ProductService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +70,20 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(Long id) {
         productRepository.deleteById(id);
     }
+
+    @Override
+    public List<Product> searchProducts(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.findByProductNameContainingIgnoreCase(keyword);
+    }
+
+    @Override
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategory_CategoryId(categoryId);
+    }
+
 
     @Override
     public List<Product> getAllActiveProducts() {
