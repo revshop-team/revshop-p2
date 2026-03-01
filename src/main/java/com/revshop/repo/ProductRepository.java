@@ -65,4 +65,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 """)
     Page<Product> searchActiveProducts(@Param("keyword") String keyword,
                                        Pageable pageable);
+    @Query("""
+           SELECT p FROM Product p
+           WHERE p.seller = :seller
+           AND p.stock <= p.stockThreshold
+           AND p.isActive = 1
+           """)
+    List<Product> findLowStockProductsBySeller(User seller);
 }
+

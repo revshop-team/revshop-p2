@@ -3,6 +3,7 @@ package com.revshop.serviceImpl;
 import com.revshop.entity.*;
 import com.revshop.exceptions.BuyerNotFoundException;
 import com.revshop.repo.*;
+import com.revshop.serviceInterfaces.NotificationService;
 import com.revshop.serviceInterfaces.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderAddressRepository orderAddressRepository;
     private final BuyerDetailsRepository buyerDetailsRepository;
     private final PaymentRepository paymentRepository;
-
+    private final NotificationService  notificationService;
+    private final NotificationRepository notificationRepository;
     public OrderServiceImpl(UserRepository userRepository,
                             CartRepository cartRepository,
                             CartItemRepository cartItemRepository,
@@ -32,7 +34,9 @@ public class OrderServiceImpl implements OrderService {
                             OrderRepository orderRepository,
                             OrderAddressRepository orderAddressRepository,
                             BuyerDetailsRepository buyerDetailsRepository,
-                            PaymentRepository paymentRepository) {
+                            PaymentRepository paymentRepository,
+                            NotificationService notificationService,
+                            NotificationRepository notificationRepository) {
 
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
@@ -42,6 +46,8 @@ public class OrderServiceImpl implements OrderService {
         this.orderAddressRepository = orderAddressRepository;
         this.buyerDetailsRepository = buyerDetailsRepository;
         this.paymentRepository = paymentRepository;
+        this.notificationService=notificationService;
+        this.notificationRepository=notificationRepository;
     }
 
     @Override
@@ -87,10 +93,23 @@ public class OrderServiceImpl implements OrderService {
 
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
+
+            if (product.getStock() <= product.getStockThreshold()) {
+                Notification lowStockNotification = new Notification();
+                lowStockNotification.setUser(product.getSeller());
+                lowStockNotification.setMessage(
+                        "Low stock alert: " + product.getProductName() +
+                                " only " + product.getStock() + " left!"
+                );
+                lowStockNotification.setIsRead("N");
+                lowStockNotification.setCreatedAt(java.time.LocalDateTime.now());
+
+                notificationRepository.save(lowStockNotification);
+            }
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(cartItem.getProduct());
-            orderItem.setSeller(cartItem.getSeller());
+            orderItem.setSeller(product.getSeller());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getProduct().getSellingPrice());
 
@@ -103,7 +122,8 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderItems(orderItems);
 
         orderRepository.save(order);
-
+        // 🔔 NOTIFY SELLERS
+        notificationService.notifySellerOrderPlaced(order.getOrderId());
         // Save address
         OrderAddress address = new OrderAddress();
         address.setOrder(order);
@@ -141,7 +161,15 @@ public class OrderServiceImpl implements OrderService {
         }
 
         paymentRepository.save(payment);
+        Notification buyerNotification = new Notification();
+        buyerNotification.setUser(buyer); // Buyer receives notification
+        buyerNotification.setOrder(order);
+        buyerNotification.setIsRead("N");
 
+// Optional custom message (your entity auto-generates too)
+        buyerNotification.setMessage("Your order #" + order.getOrderId() + " has been placed successfully!");
+
+        notificationRepository.save(buyerNotification);
         // CLEAR CART PROPERLY
         cart.getCartItems().clear();
         cartRepository.save(cart);
@@ -176,7 +204,4 @@ public class OrderServiceImpl implements OrderService {
 
         buyerDetailsRepository.save(existing);
     }
-
-
-
 }

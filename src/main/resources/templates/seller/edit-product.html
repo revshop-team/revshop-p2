@@ -24,7 +24,18 @@
 </nav>
 <div class="container mt-5">
     <h3>Edit Product</h3>
+    <div th:if="${successMessage}"
+         class="alert alert-success alert-dismissible fade show mt-3">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
+    <!-- ❌ ERROR MESSAGE -->
+    <div th:if="${errorMessage}"
+         class="alert alert-danger alert-dismissible fade show mt-3">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <form th:action="@{'/seller/update/' + ${product.productId}}" th:object="${product}" method="post">
         <div class="mb-3">
             <label>Product Name</label>

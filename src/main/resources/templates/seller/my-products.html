@@ -19,13 +19,13 @@
         height: 2px;
         bottom: -2px;
         left: 0;
-        background-color: #0d6efd; /* underline color */
+        background-color: #0d6efd;
         transition: width 0.3s ease;
     }
 
     .nav-link-hover:hover {
         color: #0d6efd;
-        background-color: rgba(255, 255, 255, 0.1); /* subtle bg highlight */
+        background-color: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
         padding: 2px 6px;
     }
@@ -33,9 +33,18 @@
     .nav-link-hover:hover::after {
         width: 100%;
     }
+
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body class="bg-light">
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
   <a class="navbar-brand" th:href="@{/seller/dashboard}">RevShop - Seller</a>
   <a class="nav-link nav-link-hover" th:href="@{/seller/dashboard}">Dashboard</a>
@@ -53,9 +62,26 @@
     </ul>
   </div>
 </nav>
+
 <div class="container mt-5">
-  <h3>My Products</h3>
-  <table class="table table-bordered table-striped mt-3">
+
+  <!-- ✅ SUCCESS MESSAGE -->
+  <div th:if="${successMessage}"
+       class="alert alert-success alert-dismissible fade show text-center fw-semibold">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- ❌ ERROR MESSAGE -->
+  <div th:if="${errorMessage}"
+       class="alert alert-danger alert-dismissible fade show text-center fw-semibold">
+    <span th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <h3 class="fw-bold">My Products</h3>
+
+  <table class="table table-bordered table-striped mt-3 align-middle">
     <thead class="table-dark">
     <tr>
       <th>Image</th>
@@ -67,40 +93,81 @@
       <th>Action</th>
     </tr>
     </thead>
+
     <tbody>
     <tr th:each="product : ${products}">
+
+      <!-- 🔥 FIXED IMAGE PATH (STATIC IMAGES FOLDER) -->
       <td>
-        <img th:src="@{'/product-images/' + ${product.imageName}}" width="60" height="60" class="img-thumbnail"/>
+        <img th:src="${product.imageName != null}
+                     ? @{/images/{img}(img=${product.imageName})}
+                     : @{/images/default.png}"
+             class="product-img"
+             alt="Product Image"/>
       </td>
-      <td th:text="${product.productName}"></td>
-      <td th:text="${product.category != null ? product.category.categoryName : 'N/A'}"></td>
+
+      <td class="fw-semibold"
+          th:text="${product.productName}"></td>
+
+      <td th:text="${product.category != null
+                    ? product.category.categoryName
+                    : 'N/A'}"></td>
+
       <td th:text="${product.stock}"></td>
+
       <td th:text="${product.stockThreshold}"></td>
+
+      <!-- 🔥 STOCK STATUS -->
       <td>
-        <span th:if="${product.stock <= product.stockThreshold}" class="badge bg-danger">Low Stock</span>
-        <span th:if="${product.stock > product.stockThreshold}" class="badge bg-success">In Stock</span>
+        <span th:if="${product.stock == 0}" class="badge bg-dark">
+          Out of Stock
+        </span>
+
+        <span th:if="${product.stock > 0 and product.stock <= product.stockThreshold}"
+              class="badge bg-danger">
+          Low Stock
+        </span>
+
+        <span th:if="${product.stock > product.stockThreshold}"
+              class="badge bg-success">
+          In Stock
+        </span>
       </td>
 
       <td>
-        <a th:href="@{'/seller/edit-product/' + ${product.productId}}" class="btn btn-primary btn-sm">Edit</a>
+        <a th:href="@{'/seller/edit-product/' + ${product.productId}}"
+           class="btn btn-primary btn-sm">
+          Edit
+        </a>
+
         <button class="btn btn-danger btn-sm"
-                th:onclick="'confirmDelete(' + ${product.productId} + ')'" type="button">
+                th:onclick="'confirmDelete(' + ${product.productId} + ')'"
+                type="button">
           Delete
         </button>
       </td>
+
     </tr>
+
+    <!-- EMPTY STATE -->
+    <tr th:if="${#lists.isEmpty(products)}">
+      <td colspan="7" class="text-center text-muted">
+        No products added yet.
+      </td>
+    </tr>
+
     </tbody>
   </table>
 </div>
+
 <script>
   function confirmDelete(productId) {
       if (confirm("Do you want to delete this product?")) {
-          // redirect to delete endpoint
           window.location.href = '/seller/delete-product/' + productId;
       }
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

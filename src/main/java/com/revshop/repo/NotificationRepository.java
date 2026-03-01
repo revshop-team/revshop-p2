@@ -10,8 +10,7 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     // Fetch unread notifications for a user
-    List<Notification> findByUserAndIsRead(User user, String isRead);
-
+    long countByUserAndIsRead(User user, String isRead);
     // Fetch all notifications for a user, newest first
     List<Notification> findByUserOrderByCreatedAtDesc(User user);
 

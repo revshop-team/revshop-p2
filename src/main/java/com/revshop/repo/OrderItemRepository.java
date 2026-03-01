@@ -1,6 +1,7 @@
 package com.revshop.repo;
 
 import com.revshop.entity.OrderItem;
+import com.revshop.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +14,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     /**
      * @param orderId
      * @param buyerId
-     * @param productId
-//     * @param status
+     * @param productId //     * @param status
      * @return boolean
      */
     boolean existsByOrder_OrderIdAndOrder_Buyer_UserIdAndProduct_ProductId(
@@ -22,7 +22,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             Long buyerId,
             Long productId
     );
-
-    List<OrderItem> findByOrderOrderIdAndSellerUserId(Long orderId, Long sellerId);
-
+    List<OrderItem> findBySeller(User seller);
+    List<OrderItem> findByProduct_Seller_UserIdOrderByOrder_OrderDateDesc(Long sellerId);
 }

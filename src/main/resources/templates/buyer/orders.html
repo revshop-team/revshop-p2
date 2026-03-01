@@ -53,11 +53,24 @@
 
 <body>
 
+<!-- Navbar -->
 <div th:replace="buyer/fragments/navbar :: navbar"></div>
 
 <div class="container py-5">
 
     <h3 class="fw-bold mb-4">My Orders</h3>
+
+    <!-- ✅ SUCCESS FLASH MESSAGE (AUTO HIDE ONLY THIS) -->
+    <div th:if="${successMessage}"
+         class="alert alert-success rounded-4 text-center fw-semibold flash-message">
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <!-- ❌ ERROR FLASH MESSAGE -->
+    <div th:if="${errorMessage}"
+         class="alert alert-danger rounded-4 text-center fw-semibold flash-message">
+        <span th:text="${errorMessage}"></span>
+    </div>
 
     <!-- Empty State -->
     <div th:if="${orders == null || #lists.isEmpty(orders)}"
@@ -135,9 +148,7 @@
                         ₹ <span th:text="${item.price * item.quantity}"></span>
                     </div>
 
-                    <!-- ⭐ REVIEW SECTION (ONLY IF DELIVERED) -->
-
-                    <!-- Review Section -->
+                    <!-- ⭐ REVIEW SECTION -->
                     <div class="col-12 mt-3"
                          th:if="${order.status == 'PLACED' || order.status == 'DELIVERED'}">
 
@@ -174,11 +185,11 @@
                                     </div>
 
                                     <div class="col-md-7">
-            <textarea name="comment"
-                      class="form-control"
-                      rows="2"
-                      placeholder="Share your experience..."
-                      required></textarea>
+                                        <textarea name="comment"
+                                                  class="form-control"
+                                                  rows="2"
+                                                  placeholder="Share your experience..."
+                                                  required></textarea>
                                     </div>
 
                                     <div class="col-md-2">
@@ -191,7 +202,7 @@
                             </form>
                         </div>
 
-                        <!-- If ALREADY reviewed -->
+                        <!-- If ALREADY reviewed (WILL NOT DISAPPEAR NOW) -->
                         <div th:if="${@reviewServiceImpl.hasReviewed(order.orderId,
                                                 item.product.productId,
                                                 buyerEmail)}"
@@ -215,6 +226,21 @@
     </div>
 
 </div>
+
+<!-- ✅ CORRECT SCRIPT (Only hides flash messages, NOT review alerts) -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const flashMessages = document.querySelectorAll('.flash-message');
+
+        if (flashMessages.length > 0) {
+            setTimeout(() => {
+                flashMessages.forEach(msg => {
+                    msg.style.display = 'none';
+                });
+            }, 3000); // 3 seconds
+        }
+    });
+</script>
 
 </body>
 </html>

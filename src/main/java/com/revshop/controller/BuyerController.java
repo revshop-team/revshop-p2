@@ -35,13 +35,14 @@ public class BuyerController {
     private final FavouriteRepository favouriteRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
+    private NotificationService notificationService;
 
 
     public BuyerController(ProductService productService, CartService cartService,
                            OrderService orderService, CategoryService categoryService,
                            BuyerService buyerService, ReviewService reviewService,
                            ReviewRepository reviewRepository, FavouriteRepository favouriteRepository,
-                           UserRepository userRepository, PaymentRepository paymentRepository) {
+                           UserRepository userRepository, PaymentRepository paymentRepository,NotificationService notificationService) {
 
         this.productService = productService;
         this.cartService = cartService;
@@ -53,6 +54,7 @@ public class BuyerController {
         this.favouriteRepository = favouriteRepository;
         this.userRepository = userRepository;
         this.paymentRepository = paymentRepository;
+        this.notificationService=notificationService;
     }
 
     // buyer's home page
@@ -304,7 +306,7 @@ public class BuyerController {
 
         redirectAttributes.addFlashAttribute(
                 "successMessage",
-                "Order places successfully");
+                "Order placed successfully!!!");
 
         return "redirect:/buyer/orders";
     }
@@ -448,5 +450,36 @@ public class BuyerController {
 
         // Directly go to checkout page (NOT products page)
         return "redirect:/buyer/cart/checkout";
+    }
+    // 🔔 BUYER NOTIFICATIONS PAGE
+    @GetMapping("/notifications")
+    public String viewBuyerNotifications(Authentication authentication, Model model) {
+
+        String email = authentication.getName();
+
+        List<Notification> notifications =
+                notificationService.getUserNotifications(email);
+
+        model.addAttribute("notifications", notifications);
+
+        return "buyer/notifications";
+    }
+    @GetMapping("/notifications/read/{id}")
+    public String markBuyerNotificationAsRead(@PathVariable Long id,
+                                              Authentication authentication) {
+
+        // Security check (optional but best practice)
+        notificationService.markAsRead(id);
+
+        return "redirect:/buyer/notifications";
+    }
+    // 🔴 UNREAD COUNT FOR BELL BADGE (AUTO REFRESH)
+    @GetMapping("/notifications/unread-count")
+    @ResponseBody
+    public long getBuyerUnreadCount(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return notificationService.getUnreadCount(email);
     }
 }
