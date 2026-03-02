@@ -57,7 +57,7 @@
                 <input class="form-control"
                        type="search"
                        name="keyword"
-                       placeholder="Search premium products...">
+                       placeholder="Search products...">
                 <button class="btn btn-warning mx-2">Search</button>
             </form>
 
@@ -99,7 +99,7 @@
                         <small class="text-muted">Signed in as</small><br>
                         <span class="fw-semibold small"
                               th:text="${#authentication.name}">
-            </span>
+                        </span>
                     </li>
 
                     <li><hr class="dropdown-divider"></li>
@@ -186,7 +186,7 @@
                         Low Stock
                     </span>
 
-                    <a th:href="@{/product/{id}(id=${product.productId})}"
+                    <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
                        class="btn btn-dark btn-sm mt-auto">
                         View Details
                     </a>
