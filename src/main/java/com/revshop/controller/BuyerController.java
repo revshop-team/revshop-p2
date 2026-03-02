@@ -271,7 +271,13 @@ public class BuyerController {
 
     // CHECKOUT PAGE RENDER'S
     @GetMapping("/cart/checkout")
-    public String checkoutPage() {
+    public String checkoutPage(Authentication authentication,
+                               Model model) {
+
+        String buyerEmail = authentication.getName();
+        Cart cart = cartService.getCartByBuyer(buyerEmail);
+        model.addAttribute("cart", cart);
+
         return "buyer/checkout";
     }
 

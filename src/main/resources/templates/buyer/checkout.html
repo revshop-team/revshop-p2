@@ -9,7 +9,7 @@
 
     <style>
         body {
-            background-color: #f5f7fa;
+            background-color: #f4f6f9;
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -20,16 +20,14 @@
 
         .checkout-card {
             border: none;
-            border-radius: 18px;
+            border-radius: 16px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.08);
         }
 
-        .section-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #6c757d;
-            letter-spacing: 0.5px;
-            margin-bottom: 15px;
+        .order-summary {
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            background: #ffffff;
         }
 
         .form-control,
@@ -44,11 +42,17 @@
             border-color: #198754;
         }
 
-        .order-summary {
-            background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-            padding: 30px;
+        .btn-place {
+            border-radius: 14px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.3s ease;
+        }
+
+        .btn-place:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(25,135,84,0.3);
         }
 
         .summary-row {
@@ -62,29 +66,12 @@
             font-weight: 700;
         }
 
-        .btn-place-order {
-            border-radius: 14px;
-            padding: 12px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: 0.3s ease;
-        }
-
-        .btn-place-order:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(25,135,84,0.3);
-        }
-
-        .checkout-container {
-            max-width: 1100px;
-        }
-
     </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="container checkout-container py-5">
+<div class="container py-5">
 
     <h3 class="checkout-title mb-4">Secure Checkout</h3>
 
@@ -95,55 +82,62 @@
 
             <div class="card checkout-card p-4">
 
-                <div class="section-title">Shipping Information</div>
+                <h5 class="mb-4">Shipping Details</h5>
 
                 <form th:action="@{/buyer/cart/checkout}" method="post">
 
                     <div class="row g-3">
 
                         <div class="col-md-6">
-                            <input type="text" name="fullName"
+                            <input type="text"
+                                   name="fullName"
                                    class="form-control"
                                    placeholder="Full Name"
                                    required>
                         </div>
 
                         <div class="col-md-6">
-                            <input type="text" name="phone"
+                            <input type="text"
+                                   name="phone"
                                    class="form-control"
                                    placeholder="Phone Number"
                                    required>
                         </div>
 
                         <div class="col-12">
-                            <input type="text" name="addressLine1"
+                            <input type="text"
+                                   name="addressLine1"
                                    class="form-control"
                                    placeholder="Address Line 1"
                                    required>
                         </div>
 
                         <div class="col-12">
-                            <input type="text" name="addressLine2"
+                            <input type="text"
+                                   name="addressLine2"
                                    class="form-control"
                                    placeholder="Address Line 2 (Optional)">
                         </div>
 
                         <div class="col-md-4">
-                            <input type="text" name="city"
+                            <input type="text"
+                                   name="city"
                                    class="form-control"
                                    placeholder="City"
                                    required>
                         </div>
 
                         <div class="col-md-4">
-                            <input type="text" name="state"
+                            <input type="text"
+                                   name="state"
                                    class="form-control"
                                    placeholder="State"
                                    required>
                         </div>
 
                         <div class="col-md-4">
-                            <input type="text" name="pincode"
+                            <input type="text"
+                                   name="pincode"
                                    class="form-control"
                                    placeholder="Pincode"
                                    required>
@@ -153,8 +147,7 @@
 
                     <hr class="my-4">
 
-                    <div class="section-title">Payment Method</div>
-
+                    <label class="form-label fw-semibold">Payment Method</label>
                     <select class="form-select mb-4"
                             name="paymentMethod"
                             required>
@@ -165,8 +158,8 @@
                     </select>
 
                     <button type="submit"
-                            class="btn btn-success w-100 btn-place-order">
-                        Place Order Securely
+                            class="btn btn-success w-100 btn-place">
+                        Place Order
                     </button>
 
                 </form>
@@ -178,35 +171,55 @@
         <!-- RIGHT SIDE - ORDER SUMMARY -->
         <div class="col-lg-5">
 
-            <div class="order-summary">
+            <div class="order-summary p-4">
 
-                <h5 class="mb-4 fw-semibold">Order Summary</h5>
+                <h5 class="mb-4">Order Summary</h5>
 
-                <!-- Example Static Summary (Can Connect to Backend Later) -->
-                <div class="summary-row">
-                    <span>Items</span>
-                    <span>3</span>
+                <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
+
+                    <!-- Item Count -->
+                    <div class="summary-row">
+                        <span>Items</span>
+                        <span th:text="${#lists.size(cart.cartItems)}"></span>
+                    </div>
+
+                    <!-- Subtotal -->
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>
+                            ₹
+                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Shipping -->
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span class="text-success">Free</span>
+                    </div>
+
+                    <hr>
+
+                    <!-- Total -->
+                    <div class="summary-row summary-total">
+                        <span>Total</span>
+                        <span>
+                            ₹
+                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
+                            </span>
+                        </span>
+                    </div>
+
+                    <div class="mt-3 small text-muted">
+                        🔒 Your payment information is processed securely.
+                    </div>
+
                 </div>
 
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>₹ 3,499</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Shipping</span>
-                    <span class="text-success">Free</span>
-                </div>
-
-                <hr>
-
-                <div class="summary-row summary-total">
-                    <span>Total</span>
-                    <span>₹ 3,499</span>
-                </div>
-
-                <div class="mt-4 small text-muted">
-                    🔒 Your payment information is processed securely.
+                <div th:if="${cart == null || #lists.isEmpty(cart.cartItems)}"
+                     class="text-muted text-center">
+                    Your cart is empty.
                 </div>
 
             </div>
