@@ -31,4 +31,6 @@ public interface ProductService {
     List<Product> getAllActiveProducts();
     Page<Product> searchActiveProducts(String keyword, PageRequest pageable);
     Page<Product> getActiveProductsByCategory(Long categoryId, PageRequest pageable);
+
+//    List<Product> getProductsBySeller(User seller);
 }

@@ -190,6 +190,11 @@ public class OrderServiceImpl implements OrderService {
         return orders;
     }
 
+//    @Override
+//    public void updateOrderStatus(Long orderId, String status) {
+//
+//    }
+
     public void updateBuyerDetails(String email, BuyerDetails updatedDetails) {
 
         BuyerDetails existing =
@@ -203,5 +208,27 @@ public class OrderServiceImpl implements OrderService {
         existing.setPhone(updatedDetails.getPhone());
 
         buyerDetailsRepository.save(existing);
+    }
+    @Override
+    public void markAsDelivered(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if ("PLACED".equals(order.getStatus())) {
+
+            // 1️⃣ Update Order Status
+            order.setStatus("DELIVERED");
+            orderRepository.save(order);
+
+            // 2️⃣ CREATE BUYER NOTIFICATION (🔥 NEW)
+            Notification notification = new Notification();
+            notification.setUser(order.getBuyer()); // send to buyer
+            notification.setOrder(order);
+            notification.setMessage("Your order #" + order.getOrderId() + " has been delivered.");
+            notification.setIsRead("N");
+
+            notificationRepository.save(notification);
+        }
     }
 }

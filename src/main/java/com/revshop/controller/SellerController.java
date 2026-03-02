@@ -14,9 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/seller")
@@ -32,6 +30,7 @@ public class SellerController {
     private final ReviewRepository reviewRepository;
     private final LowStockService lowStockService;
     private final NotificationService notificationService;
+    private final OrderService orderService;
     public SellerController(ProductService productService,
                             UserService userService,
                             CategoryRepository categoryRepository,
@@ -39,7 +38,8 @@ public class SellerController {
                             OrderItemRepository orderItemRepository,
                             PaymentRepository paymentRepository,
                             OrderAddressRepository orderAddressRepository, ReviewRepository reviewRepository, LowStockService lowStockService,
-                            NotificationService notificationService) {
+                            NotificationService notificationService,
+                            OrderService orderservice) {
 
         this.productService = productService;
         this.userService = userService;
@@ -51,6 +51,7 @@ public class SellerController {
         this.reviewRepository = reviewRepository;
         this.lowStockService = lowStockService;
         this.notificationService=notificationService;
+        this.orderService=orderservice;
 
     }
 
@@ -67,10 +68,10 @@ public class SellerController {
     }
 
     // SELLER'S SALES
-    @GetMapping("/sales")
-    public String sellerSales() {
-        return "seller/sales";
-    }
+//    @GetMapping("/sales")
+//    public String sellerSales() {
+//        return "seller/sales";
+//    }
 
     // show add product page
     @GetMapping("/add-product")
@@ -326,7 +327,9 @@ public class SellerController {
 
     // VIEW ORDERS FOR SELLER PRODUCTS (NEW - CRITICAL)
     @GetMapping("/orders")
-    public String sellerOrders(Authentication authentication, Model model) {
+    public String sellerOrders(@RequestParam(value = "status", required = false) String status,
+                               Authentication authentication,
+                               Model model) {
 
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
@@ -334,13 +337,22 @@ public class SellerController {
         // 1. Get all order items of this seller
         List<OrderItem> orderItems = orderItemRepository.findBySeller(seller);
 
-        // 2. Extract unique orders
+        // 🔥 2. FILTER LOGIC (All / Pending / Delivered)
+        if (status != null && !status.isEmpty()) {
+            orderItems = orderItems.stream()
+                    .filter(item -> item.getOrder() != null
+                            && status.equalsIgnoreCase(item.getOrder().getStatus()))
+                    .toList();
+        }
+
+        // 3. Extract unique orders (for payment & address mapping)
         List<Order> orders = orderItems.stream()
                 .map(OrderItem::getOrder)
+                .filter(Objects::nonNull)
                 .distinct()
                 .toList();
 
-        // 3. Fetch payments for these orders
+        // 4. Fetch payments map (OrderId -> Payment)
         Map<Long, Payment> paymentMap = new HashMap<>();
         if (!orders.isEmpty()) {
             List<Long> orderIds = orders.stream()
@@ -348,12 +360,12 @@ public class SellerController {
                     .toList();
 
             List<Payment> payments = paymentRepository.findByOrder_OrderIdIn(orderIds);
-            for (Payment p : payments) {
-                paymentMap.put(p.getOrder().getOrderId(), p);
+            for (Payment payment : payments) {
+                paymentMap.put(payment.getOrder().getOrderId(), payment);
             }
         }
 
-        // 4. Fetch addresses
+        // 5. Fetch address map (OrderId -> Address)
         Map<Long, OrderAddress> addressMap = new HashMap<>();
         if (!orders.isEmpty()) {
             for (Order order : orders) {
@@ -364,9 +376,11 @@ public class SellerController {
             }
         }
 
+        // 6. Send data to UI
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("paymentMap", paymentMap);
         model.addAttribute("addressMap", addressMap);
+        model.addAttribute("selectedStatus", status); // for active tab highlight
 
         return "seller/orders";
     }
@@ -376,24 +390,32 @@ public class SellerController {
 
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
-        // 🔥 FETCH REVIEWS WITH PRODUCT + BUYER (FIXED)
+
         List<Review> reviews = reviewRepository.findReviewsForSellerProducts(seller);
 
-        // Calculate average rating per product (Map)
+        // 🔥 GROUP BY PRODUCT
+        Map<Product, List<Review>> productReviewsMap = new LinkedHashMap<>();
         Map<Long, Double> avgRatingMap = new HashMap<>();
         Map<Long, Long> reviewCountMap = new HashMap<>();
 
         for (Review review : reviews) {
-            Long productId = review.getProduct().getProductId();
+            Product product = review.getProduct();
+            Long productId = product.getProductId();
 
+            // Group reviews
+            productReviewsMap
+                    .computeIfAbsent(product, k -> new ArrayList<>())
+                    .add(review);
+
+            // Add avg + count only once per product
             avgRatingMap.putIfAbsent(productId,
                     reviewRepository.getAverageRatingByProductId(productId));
 
-            reviewCountMap.put(productId,
+            reviewCountMap.putIfAbsent(productId,
                     reviewRepository.countByProduct_ProductId(productId));
         }
 
-        model.addAttribute("reviews", reviews);
+        model.addAttribute("productReviewsMap", productReviewsMap);
         model.addAttribute("avgRatingMap", avgRatingMap);
         model.addAttribute("reviewCountMap", reviewCountMap);
 
@@ -440,5 +462,107 @@ public class SellerController {
 
         notificationService.markAsRead(id);
         return "redirect:/seller/notifications";
+    }
+    @PostMapping("/orders/deliver/{orderId}")
+    public String markOrderDelivered(@PathVariable Long orderId,
+                                     RedirectAttributes redirectAttributes) {
+
+        orderService.markAsDelivered(orderId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Order marked as DELIVERED successfully!"
+        );
+
+        return "redirect:/seller/orders";
+    }
+    @GetMapping("/sales")
+    public String sellerAnalytics(Authentication authentication, Model model) {
+
+        String email = authentication.getName();
+        User seller = userService.findByEmail(email);
+        System.out.println("LOGGED SELLER ID: " + seller.getUserId());
+        // 🔥 FETCH ALL ORDER ITEMS (Reliable)
+        List<OrderItem> allItems = orderItemRepository.findAll();
+        System.out.println("TOTAL ITEMS IN DB: " + allItems.size());
+        // 🔥 FILTER BY SELLER ID (100% MATCH WITH DB seller_id column)
+        List<OrderItem> orderItems = allItems.stream()
+                .filter(item -> item.getSeller() != null
+                        && item.getSeller().getUserId().equals(seller.getUserId()))
+                .toList();
+        System.out.println("SELLER FILTERED ITEMS: " + orderItems.size());
+
+        long totalOrders = 0;
+        long pendingOrders = 0;
+        long deliveredOrders = 0;
+        double totalRevenue = 0.0;
+        double averageOrderValue = 0.0;
+
+        Map<String, Double> monthlyRevenue = new LinkedHashMap<>();
+        Map<String, Integer> productSalesMap = new HashMap<>();
+
+        // Unique orders for correct counting
+        List<Order> uniqueOrders = orderItems.stream()
+                .map(OrderItem::getOrder)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        totalOrders = uniqueOrders.size();
+
+        for (OrderItem item : orderItems) {
+            Order order = item.getOrder();
+            if (order == null) continue;
+
+            String status = order.getStatus();
+
+            if ("PLACED".equalsIgnoreCase(status)) {
+                pendingOrders++;
+            }
+
+            if ("DELIVERED".equalsIgnoreCase(status)) {
+                deliveredOrders++;
+
+                double itemTotal = item.getPrice() * item.getQuantity();
+                totalRevenue += itemTotal;
+
+                // Monthly revenue (for chart)
+                if (order.getOrderDate() != null) {
+                    String month = order.getOrderDate().getMonth().toString();
+                    monthlyRevenue.put(month,
+                            monthlyRevenue.getOrDefault(month, 0.0) + itemTotal);
+                }
+            }
+
+            // Top selling product
+            String productName = item.getProduct().getProductName();
+            productSalesMap.put(productName,
+                    productSalesMap.getOrDefault(productName, 0) + item.getQuantity());
+        }
+
+        if (deliveredOrders > 0) {
+            averageOrderValue = totalRevenue / deliveredOrders;
+        }
+
+        // Find top product
+        String topProduct = "No Sales Yet";
+        int maxQty = 0;
+        for (Map.Entry<String, Integer> entry : productSalesMap.entrySet()) {
+            if (entry.getValue() > maxQty) {
+                maxQty = entry.getValue();
+                topProduct = entry.getKey();
+            }
+        }
+
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("pendingOrders", pendingOrders);
+        model.addAttribute("deliveredOrders", deliveredOrders);
+        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("averageOrderValue", averageOrderValue);
+        model.addAttribute("topProduct", topProduct);
+        model.addAttribute("months", new ArrayList<>(monthlyRevenue.keySet()));
+        model.addAttribute("revenues", new ArrayList<>(monthlyRevenue.values()));
+
+        return "seller/sales";
     }
 }

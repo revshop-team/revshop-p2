@@ -4,71 +4,141 @@
     <title>Product Reviews | RevShop</title>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .product-card {
+            border-radius: 14px;
+            border: none;
+        }
+
+        .review-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .avg-badge {
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .star {
+            font-size: 16px;
+            color: #ffc107;
+        }
+
+        .star-muted {
+            color: #dee2e6;
+        }
+
+        .low-rating {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+    </style>
 </head>
+
 <body class="bg-light">
 
 <nav class="navbar navbar-dark bg-dark px-3">
-    <a class="navbar-brand" th:href="@{/seller/dashboard}">
+    <a class="navbar-brand fw-bold" th:href="@{/seller/dashboard}">
         RevShop - Seller
     </a>
 </nav>
 
 <div class="container mt-5">
 
-    <h3 class="fw-bold mb-4">Product Reviews & Ratings</h3>
+    <h3 class="fw-bold mb-4">⭐ Product Reviews & Ratings</h3>
 
-    <!-- Empty State -->
-    <div th:if="${reviews == null || #lists.isEmpty(reviews)}"
-         class="alert alert-info text-center rounded-3">
+    <!-- EMPTY STATE -->
+    <div th:if="${productReviewsMap == null || #maps.isEmpty(productReviewsMap)}"
+         class="alert alert-info text-center rounded-3 shadow-sm">
         No reviews received for your products yet.
     </div>
 
-    <!-- Reviews List -->
-    <div th:each="review : ${reviews}" class="card shadow-sm mb-4">
+    <!-- 🔥 GROUPED PRODUCT CARDS -->
+    <div th:each="entry : ${productReviewsMap}" class="card product-card shadow-sm mb-4">
         <div class="card-body">
 
-            <!-- HEADER -->
+            <!-- PRODUCT HEADER -->
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="fw-bold mb-1"
-                        th:text="${review.product.productName}">
+                    <h4 class="fw-bold mb-1"
+                        th:text="${entry.key.productName}">
                         Product Name
-                    </h5>
+                    </h4>
 
                     <small class="text-muted">
-                        Reviewed on:
-                        <span th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}"></span>
+                        Total Reviews:
+                        <span th:text="${reviewCountMap[entry.key.productId]}"></span>
                     </small>
+
+                    <!-- ⚠ LOW RATING ALERT (NEW) -->
+                    <div th:if="${avgRatingMap[entry.key.productId] != null and avgRatingMap[entry.key.productId] < 3}"
+                         class="low-rating">
+                        ⚠ Low customer satisfaction for this product
+                    </div>
                 </div>
 
-                <!--  Rating Badge -->
-                <span class="badge bg-warning text-dark fs-6">
-                    ⭐ <span th:text="${review.rating}"></span> / 5
+                <!-- ⭐ AVERAGE RATING BADGE -->
+                <span class="badge bg-warning text-dark avg-badge shadow-sm fw-bold">
+                    ⭐
+                    <span th:text="${#numbers.formatDecimal(avgRatingMap[entry.key.productId], 1, 1)}"></span>
+                    / 5
                 </span>
             </div>
 
-            <hr>
+            <hr/>
 
-            <!--  Buyer -->
-            <p class="mb-2">
-                <strong>Buyer:</strong>
-                <span th:text="${review.buyer.email}"></span>
-            </p>
+            <!-- 📝 LATEST 2 REVIEWS (CLEAN UI) -->
+            <div th:each="review, stat : ${entry.value}"
+                 th:if="${stat.index < 2}"
+                 class="review-box mb-3">
+                <span class="badge bg-success mb-2">Recent Review</span>
+                <!-- ⭐ STAR RATING (NEW PROFESSIONAL UI) -->
+                <div class="fw-semibold mb-2">
+                    <span th:each="i : ${#numbers.sequence(1,5)}">
+                        <span th:text="${i <= review.rating ? '★' : '☆'}"
+                              th:class="${i <= review.rating} ? 'star' : 'star star-muted'"></span>
+                    </span>
+                    <span class="ms-2"
+                          th:text="${review.rating} + ' / 5'"></span>
+                </div>
 
-            <!--  Comment -->
-            <p class="mb-3">
-                <strong>Review:</strong><br>
-                <span th:text="${review.reviewComment}"></span>
-            </p>
+                <!-- 👤 BUYER EMAIL (SAFE FOR YOUR ENTITY) -->
+                <div class="text-muted mb-1">
+                    Buyer:
+                    <span class="fw-semibold"
+                          th:text="${review.buyer.email}">
+                        buyer@email.com
+                    </span>
+                </div>
 
-            <!-- Product Rating Summary -->
-            <div class="bg-light p-3 rounded">
-                <strong>Average Rating:</strong>
-                ⭐ <span th:text="${#numbers.formatDecimal(avgRatingMap[review.product.productId], 1, 1)}"></span>
-                / 5
-                <br>
-                <strong>Total Reviews:</strong>
-                <span th:text="${reviewCountMap[review.product.productId]}"></span>
+                <!-- 💬 REVIEW COMMENT -->
+                <div class="mb-2 text-dark"
+                     th:text="${review.reviewComment}">
+                    Review comment
+                </div>
+
+                <!-- 📅 REVIEW DATE -->
+                <small class="text-secondary">
+                    Reviewed on:
+                    <span th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}"></span>
+                </small>
+
+            </div>
+
+            <!-- 🔗 VIEW ALL REVIEWS BUTTON (SCALABLE FEATURE) -->
+            <div th:if="${entry.value.size() > 2}" class="text-end">
+                <a th:href="@{/seller/reviews/product/{id}(id=${entry.key.productId})}"
+                   class="btn btn-sm btn-outline-primary">
+                    View All Reviews
+                </a>
             </div>
 
         </div>

@@ -19,5 +19,6 @@ public interface OrderService {
     List<Order> getOrdersByBuyer(String email);
 
 
-
+//    void updateOrderStatus(Long orderId, String status);
+    void markAsDelivered(Long orderId);
 }

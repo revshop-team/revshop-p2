@@ -150,7 +150,7 @@
 
                     <!-- ⭐ REVIEW SECTION -->
                     <div class="col-12 mt-3"
-                         th:if="${order.status == 'PLACED' || order.status == 'DELIVERED'}">
+                         th:if="${order.status == 'DELIVERED'}">
 
                         <!-- If NOT reviewed -->
                         <div th:if="${!@reviewServiceImpl.hasReviewed(order.orderId,

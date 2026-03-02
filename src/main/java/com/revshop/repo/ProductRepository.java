@@ -71,6 +71,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            AND p.stock <= p.stockThreshold
            AND p.isActive = 1
            """)
+
     List<Product> findLowStockProductsBySeller(User seller);
 }
 
