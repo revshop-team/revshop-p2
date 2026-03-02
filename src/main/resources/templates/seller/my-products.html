@@ -1,39 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>My Products</title>
+  <title>My Products | RevShop</title>
+  <meta charset="UTF-8">
+
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Bootstrap Icons (REQUIRED) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
-    .nav-link-hover {
-        color: #fff;
-        position: relative;
-        font-weight: 500;
-        transition: color 0.3s ease;
-    }
-
-    .nav-link-hover::after {
-        content: "";
-        position: absolute;
-        width: 0%;
-        height: 2px;
-        bottom: -2px;
-        left: 0;
-        background-color: #0d6efd;
-        transition: width 0.3s ease;
-    }
-
-    .nav-link-hover:hover {
-        color: #0d6efd;
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        padding: 2px 6px;
-    }
-
-    .nav-link-hover:hover::after {
-        width: 100%;
-    }
-
     .product-img {
         width: 60px;
         height: 60px;
@@ -43,36 +20,77 @@
     }
   </style>
 </head>
+
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-  <a class="navbar-brand" th:href="@{/seller/dashboard}">RevShop - Seller</a>
-  <a class="nav-link nav-link-hover" th:href="@{/seller/dashboard}">Dashboard</a>
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
 
-  <div class="ms-auto dropdown">
-    <button class="btn btn-light btn-sm dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown">
-      My Account
-    </button>
+  <a class="navbar-brand fw-bold d-flex align-items-center"
+     th:href="@{/seller/dashboard}">
+    <i class="bi bi-shop me-2"></i>
+    RevShop <span class="fw-light ms-1">Seller</span>
+  </a>
 
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" th:href="@{/seller/profile}">Profile</a></li>
-      <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
-    </ul>
+  <button class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#sellerNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="sellerNavbar">
+    <div class="ms-auto d-flex align-items-center gap-4">
+
+      <!-- Notifications -->
+      <a th:href="@{/seller/notifications}"
+         class="position-relative text-light text-decoration-none">
+        <i class="bi bi-bell fs-5"></i>
+
+        <span id="notificationCount"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+          0
+        </span>
+      </a>
+
+      <!-- Account Dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-outline-light btn-sm dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i>
+          My Account
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow">
+          <li>
+            <a class="dropdown-item" th:href="@{/seller/profile}">
+              <i class="bi bi-person me-2"></i>
+              Profile
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item text-danger" th:href="@{/logout}">
+              <i class="bi bi-box-arrow-right me-2"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 </nav>
 
+<!-- ================= PAGE CONTENT ================= -->
 <div class="container mt-5">
 
-  <!-- SUCCESS MESSAGE -->
   <div th:if="${successMessage}"
        class="alert alert-success alert-dismissible fade show text-center fw-semibold">
     <span th:text="${successMessage}"></span>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 
-  <!--  ERROR MESSAGE -->
   <div th:if="${errorMessage}"
        class="alert alert-danger alert-dismissible fade show text-center fw-semibold">
     <span th:text="${errorMessage}"></span>
@@ -95,43 +113,40 @@
     </thead>
 
     <tbody>
-    <tr th:each="product : ${products}">
 
-      <!-- FIXED IMAGE PATH (STATIC IMAGES FOLDER) -->
+    <tr th:each="product : ${products}">
       <td>
         <img th:src="${product.imageName != null}
-                     ? @{/images/{img}(img=${product.imageName})}
-                     : @{/images/default.png}"
+                       ? @{/images/{img}(img=${product.imageName})}
+                       : @{/images/default.png}"
              class="product-img"
              alt="Product Image"/>
       </td>
 
-      <td class="fw-semibold"
-          th:text="${product.productName}"></td>
+      <td class="fw-semibold" th:text="${product.productName}"></td>
 
       <td th:text="${product.category != null
-                    ? product.category.categoryName
-                    : 'N/A'}"></td>
+                      ? product.category.categoryName
+                      : 'N/A'}"></td>
 
       <td th:text="${product.stock}"></td>
 
       <td th:text="${product.stockThreshold}"></td>
 
-      <!-- STOCK STATUS -->
       <td>
-        <span th:if="${product.stock == 0}" class="badge bg-dark">
-          Out of Stock
-        </span>
+          <span th:if="${product.stock == 0}" class="badge bg-dark">
+            Out of Stock
+          </span>
 
         <span th:if="${product.stock > 0 and product.stock <= product.stockThreshold}"
               class="badge bg-danger">
-          Low Stock
-        </span>
+            Low Stock
+          </span>
 
         <span th:if="${product.stock > product.stockThreshold}"
               class="badge bg-success">
-          In Stock
-        </span>
+            In Stock
+          </span>
       </td>
 
       <td>
@@ -146,10 +161,8 @@
           Delete
         </button>
       </td>
-
     </tr>
 
-    <!-- EMPTY STATE -->
     <tr th:if="${#lists.isEmpty(products)}">
       <td colspan="7" class="text-center text-muted">
         No products added yet.
@@ -160,6 +173,7 @@
   </table>
 </div>
 
+<!-- ================= DELETE CONFIRM ================= -->
 <script>
   function confirmDelete(productId) {
       if (confirm("Do you want to delete this product?")) {
@@ -168,6 +182,31 @@
   }
 </script>
 
+<!-- ================= NOTIFICATION COUNT ================= -->
+<script>
+  function loadNotificationCount() {
+      fetch('/seller/notifications/unread-count')
+          .then(res => res.text())
+          .then(count => {
+              const badge = document.getElementById('notificationCount');
+              const num = parseInt(count);
+
+              if (!isNaN(num) && num > 0) {
+                  badge.classList.remove('d-none');
+                  badge.textContent = num;
+              } else {
+                  badge.classList.add('d-none');
+              }
+          })
+          .catch(err => console.error("Notification error:", err));
+  }
+
+  loadNotificationCount();
+  setInterval(loadNotificationCount, 5000);
+</script>
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
