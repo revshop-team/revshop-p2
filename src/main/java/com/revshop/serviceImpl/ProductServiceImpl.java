@@ -55,8 +55,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<Product> get12Products() {
+        return productRepository
+                .findByIsActiveTrue()
+                .stream()
+                .limit(12)
+                .toList();
     }
 
     // Save or update product

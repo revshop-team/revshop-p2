@@ -1,5 +1,6 @@
 package com.revshop.controller;
 
+import com.revshop.entity.Product;
 import com.revshop.entity.User;
 import com.revshop.repo.SecurityQuestionRepository;
 import com.revshop.repo.UserRepository;
@@ -12,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Controller
@@ -49,7 +52,8 @@ public class AuthController {
     // default / home page
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
+
+        model.addAttribute("products", productService.get12Products());
         model.addAttribute("categories", categoryService.getAllCategories());
         return "public-home";
     }

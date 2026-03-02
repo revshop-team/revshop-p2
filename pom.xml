@@ -30,6 +30,16 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+
+<!--		extra dependency for thymeleaf security to show login/logout
+			based on if user is login logout-->
+
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>

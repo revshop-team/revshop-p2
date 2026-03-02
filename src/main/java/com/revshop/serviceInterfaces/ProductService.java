@@ -21,7 +21,7 @@ public interface ProductService {
 
     Product getProductById(Long id);
 
-    List<Product> getAllProducts();
+    List<Product> get12Products();
 
     Product saveOrUpdateProduct(Product updatedProduct);
 

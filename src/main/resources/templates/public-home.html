@@ -1,20 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <title>RevShop | Premium Shopping</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; }
+
+        .navbar-brand span { color: #ffc107; }
+
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #ffc107;
+            color: #000;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            transition: 0.3s ease;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
     <div class="container">
-        <a class="navbar-brand fw-bold" th:href="@{/}">RevShop</a>
+
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
+            Rev<span>Shop</span>
+        </a>
 
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse"
@@ -23,13 +51,71 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <form class="d-flex ms-auto me-3" th:action="@{/products}">
-                <input class="form-control me-2" type="search" placeholder="Search products">
-                <button class="btn btn-outline-light">Search</button>
+
+            <!-- Search -->
+            <form class="d-flex mx-auto w-50" th:action="@{/buyer/products}">
+                <input class="form-control"
+                       type="search"
+                       name="keyword"
+                       placeholder="Search premium products...">
+                <button class="btn btn-warning mx-2">Search</button>
             </form>
 
-            <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
-            <a th:href="@{/register}" class="btn btn-warning">Register</a>
+            <!-- NOT LOGGED IN -->
+            <div sec:authorize="isAnonymous()" class="d-flex align-items-center">
+                <a th:href="@{/login}" class="btn btn-outline-light me-3 px-4">
+                    Login
+                </a>
+                <a th:href="@{/register}" class="btn btn-warning px-4 fw-semibold">
+                    Register
+                </a>
+            </div>
+
+            <!-- LOGGED IN -->
+            <!-- LOGGED IN -->
+            <div sec:authorize="isAuthenticated()" class="dropdown ms-3">
+
+                <a class="d-flex align-items-center text-white text-decoration-none"
+                   href="#"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+
+                    <!-- Avatar -->
+                    <div class="rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center"
+                         style="width:32px;height:32px;font-size:14px;font-weight:600;">
+                        <span th:text="${#authentication.name.substring(0,1).toUpperCase()}">U</span>
+                    </div>
+
+                    <!-- Small Dropdown Arrow -->
+                    <span class="ms-1 small" style="opacity:0.8;">▾</span>
+
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2"
+                    style="min-width:220px; border-radius:8px;">
+
+                    <li class="px-3 py-2">
+                        <small class="text-muted">Signed in as</small><br>
+                        <span class="fw-semibold small"
+                              th:text="${#authentication.name}">
+            </span>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit"
+                                    class="dropdown-item text-danger small">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+
+                </ul>
+            </div>
+
         </div>
     </div>
 </nav>
@@ -39,26 +125,26 @@
     <div class="container">
         <h1 class="fw-bold">Welcome to RevShop</h1>
         <p class="lead">Discover premium products curated for you</p>
-        <a th:href="@{/products}" class="btn btn-warning btn-lg mt-3">
+        <a th:href="@{/buyer/products}" class="btn btn-warning btn-lg mt-3">
             Shop Now
         </a>
     </div>
 </section>
 
 <!-- CATEGORIES -->
-<section class="container my-5">
-    <h3 class="text-center mb-4">Shop by Category</h3>
+<!--<section class="container my-5">-->
+<!--    <h3 class="text-center mb-4">Shop by Category</h3>-->
 
-    <div class="row g-3">
-        <div class="col-6 col-md-3" th:each="cat : ${categories}">
-            <div class="card text-center shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="fw-bold" th:text="${cat.name}">Category</h6>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<!--    <div class="row g-3">-->
+<!--        <div class="col-6 col-md-3" th:each="cat : ${categories}">-->
+<!--            <div class="card text-center shadow-sm h-100">-->
+<!--                <div class="card-body">-->
+<!--                    <h6 class="fw-bold" th:text="${cat.name}">Category</h6>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</section>-->
 
 <!-- PRODUCTS -->
 <section class="container my-5">
@@ -68,7 +154,6 @@
         <div class="col-6 col-md-3" th:each="product : ${products}">
             <div class="card h-100 shadow-sm border-0">
 
-                <!-- Placeholder Image -->
                 <img src="https://via.placeholder.com/300x200"
                      class="card-img-top"
                      style="height:200px; object-fit:cover;">
@@ -85,26 +170,22 @@
                         Manufacturer
                     </small>
 
-                    <!-- Pricing -->
                     <div class="mb-2">
                         <span class="text-decoration-line-through text-muted"
                               th:if="${product.mrp != null}"
                               th:text="'₹ ' + ${product.mrp}">
-                            ₹ 1200
                         </span>
+
                         <span class="fw-bold text-success ms-2"
                               th:text="'₹ ' + ${product.sellingPrice}">
-                            ₹ 999
                         </span>
                     </div>
 
-                    <!-- Stock Badge -->
                     <span class="badge bg-danger mb-2"
                           th:if="${product.stock != null and product.stock <= product.stockThreshold}">
                         Low Stock
                     </span>
 
-                    <!-- View Button -->
                     <a th:href="@{/product/{id}(id=${product.productId})}"
                        class="btn btn-dark btn-sm mt-auto">
                         View Details

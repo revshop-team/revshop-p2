@@ -1,78 +1,15 @@
-<nav class="navbar navbar-expand-lg custom-navbar"
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3"
      th:fragment="navbar">
 
-    <!-- Bootstrap Icons (REQUIRED FOR BELL ICON) -->
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        .custom-navbar {
-            background: #0f172a;
-            padding: 18px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .custom-navbar .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #ffffff !important;
-        }
-
-        .custom-navbar .nav-link {
-            color: #cbd5e1 !important;
-            font-weight: 500;
-            margin-right: 18px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .custom-navbar .nav-link:hover {
-            color: #ffffff !important;
-        }
-
-        .custom-navbar .nav-link::after {
-            content: "";
-            position: absolute;
-            width: 0%;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: #38bdf8;
-            transition: 0.3s ease;
-        }
-
-        .custom-navbar .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .btn-logout {
-            border-radius: 20px;
-            padding: 6px 18px;
-            border: 1px solid #38bdf8;
-            color: #38bdf8;
-            transition: all 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background-color: #38bdf8;
-            color: #0f172a;
-        }
-
-        .notification-badge {
-            font-size: 10px;
-        }
-
-        .navbar-toggler {
-            border-color: rgba(255,255,255,0.2);
-        }
-    </style>
 
     <div class="container">
 
         <!-- LOGO -->
-        <a class="navbar-brand"
+        <a class="navbar-brand fw-semibold fs-5"
            th:href="@{/buyer/home}">
-            RevShop
+            Rev<span class="text-warning">Shop</span>
         </a>
 
         <button class="navbar-toggler"
@@ -82,67 +19,93 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse"
-             id="navbarContent">
+        <div class="collapse navbar-collapse" id="navbarContent">
 
             <!-- LEFT MENU -->
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/home}">Home</a>
+                    <a class="nav-link" th:href="@{/buyer/home}">Home</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/products}">Products</a>
+                    <a class="nav-link" th:href="@{/buyer/products}">Products</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/cart}">Cart</a>
+                    <a class="nav-link" th:href="@{/buyer/cart}">Cart</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/orders}">Orders</a>
+                    <a class="nav-link" th:href="@{/buyer/orders}">Orders</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/favourites}">Favourites</a>
+                    <a class="nav-link" th:href="@{/buyer/favourites}">Favourites</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link"
-                       th:href="@{/buyer/profile}">Profile</a>
+                    <a class="nav-link" th:href="@{/buyer/profile}">Profile</a>
                 </li>
 
             </ul>
 
-            <!-- RIGHT SIDE (BELL + LOGOUT) -->
-            <div class="d-flex align-items-center">
+            <!-- RIGHT SIDE -->
+            <div class="d-flex align-items-center gap-4">
 
-                <!-- 🔔 NOTIFICATION BELL (FIXED POSITION) -->
+                <!-- 🔔 NOTIFICATIONS -->
                 <a th:href="@{/buyer/notifications}"
-                   class="text-decoration-none me-4 position-relative"
+                   class="position-relative text-light"
                    title="Notifications">
 
-                    <i class="bi bi-bell fs-4 text-light"></i>
+                    <i class="bi bi-bell fs-5"></i>
 
-                    <!-- 🔴 UNREAD COUNT BADGE -->
+                    <!-- Badge -->
                     <span id="buyerNotificationCount"
-                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger small"
                           style="display:none;">
                         0
                     </span>
                 </a>
 
-                <!-- LOGOUT BUTTON -->
-                <a th:href="@{/logout}"
-                   class="btn btn-logout">
-                    Logout
-                </a>
+                <!-- 👤 USER DROPDOWN -->
+                <div class="dropdown">
+
+                    <a href="#"
+                       class="d-flex align-items-center text-light text-decoration-none"
+                       data-bs-toggle="dropdown">
+
+                        <div class="rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center"
+                             style="width:30px;height:30px;font-size:13px;font-weight:600;">
+                            <span th:text="${#authentication.name.substring(0,1).toUpperCase()}">U</span>
+                        </div>
+
+                        <i class="bi bi-chevron-down ms-1 small"></i>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                        <li class="px-3 py-2">
+                            <small class="text-muted">Signed in as</small><br>
+                            <span class="fw-semibold small"
+                                  th:text="${#authentication.name}">
+                            </span>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="m-0">
+                                <button type="submit"
+                                        class="dropdown-item text-danger small">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+
+                    </ul>
+
+                </div>
 
             </div>
 
@@ -156,7 +119,6 @@
                 .then(res => res.text())
                 .then(count => {
                     const badge = document.getElementById('buyerNotificationCount');
-
                     if (!badge) return;
 
                     if (count > 0) {
@@ -166,13 +128,10 @@
                         badge.style.display = 'none';
                     }
                 })
-                .catch(err => console.error("Buyer notification error:", err));
+                .catch(err => console.error("Notification error:", err));
         }
 
-        // Load immediately
         loadBuyerNotificationCount();
-
-        // Auto refresh every 5 seconds (LIVE updates)
         setInterval(loadBuyerNotificationCount, 5000);
     </script>
 

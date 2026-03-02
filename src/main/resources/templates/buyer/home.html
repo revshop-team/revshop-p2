@@ -6,46 +6,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(180deg,#f8fafc,#eef2f7);
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg,#0f172a,#1e293b);
+            color: white;
+            border-radius: 16px;
+        }
+
+        .welcome-card .btn-light {
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .product-card {
+            border: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .product-card img {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .price {
+            font-size: 1.1rem;
+        }
+
+        footer {
+            background: transparent;
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
 <!-- Navbar -->
 <div th:replace="buyer/fragments/navbar :: navbar"></div>
 
-<div class="container py-4">
+<div class="container py-5">
 
-    <!-- Welcome Card -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+    <!-- Welcome Hero Card -->
+    <div class="welcome-card p-4 p-md-5 shadow-lg mb-5">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
 
             <div>
-                <h4 class="fw-bold mb-1">
+                <h3 class="fw-bold mb-2">
                     Welcome back,
-                    <span class="text-primary" th:text="${buyerEmail}"></span>
-                </h4>
-                <p class="text-muted mb-0">
-                    Explore new arrivals and trending products.
+                    <span class="text-warning"
+                          th:text="${buyerEmail}"></span>
+                </h3>
+                <p class="mb-0 text-light opacity-75">
+                    Discover fresh arrivals curated just for you.
                 </p>
             </div>
 
-            <div class="mt-3 mt-md-0">
-                <a th:href="@{/buyer/products}" class="btn btn-dark me-2">
+            <div class="mt-4 mt-md-0">
+                <a th:href="@{/buyer/products}"
+                   class="btn btn-warning px-4 me-2 shadow-sm">
                     Browse Products
                 </a>
-                <a th:href="@{/buyer/orders}" class="btn btn-outline-secondary">
+
+                <a th:href="@{/buyer/orders}"
+                   class="btn btn-outline-light px-4">
                     My Orders
                 </a>
             </div>
 
         </div>
+
     </div>
 
-    <!-- Latest Products Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-semibold mb-0">Latest Products</h5>
-        <a th:href="@{/buyer/products}" class="text-decoration-none small">
-            View All
+    <!-- Section Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="section-title mb-0">Latest Products</h4>
+        <a th:href="@{/buyer/products}"
+           class="text-decoration-none fw-semibold text-primary">
+            View All →
         </a>
     </div>
 
@@ -55,37 +107,37 @@
         <div class="col-xl-3 col-lg-4 col-md-6"
              th:each="product : ${latestProducts}">
 
-            <div class="card h-100 shadow-sm">
+            <div class="card product-card shadow-sm h-100">
 
-                <!-- Static Image -->
                 <img src="/images/default-product.png"
                      class="card-img-top"
-                     style="height:200px; object-fit:cover;">
+                     style="height:220px; object-fit:cover;">
 
-                <div class="card-body d-flex flex-column">
+                <div class="card-body d-flex flex-column p-4">
 
-                    <h6 class="fw-semibold"
-                        th:text="${product.productName}"></h6>
+                    <h6 class="fw-semibold mb-2"
+                        th:text="${product.productName}">
+                    </h6>
 
-                    <p class="text-success fw-bold mb-1"
-                       th:text="'₹ ' + ${product.sellingPrice}"></p>
+                    <p class="price text-success fw-bold mb-2"
+                       th:text="'₹ ' + ${product.sellingPrice}">
+                    </p>
 
-                    <!-- Stock Badge -->
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <span th:if="${product.stock > 0}"
-                              class="badge bg-success">
+                              class="badge bg-success-subtle text-success">
                             In Stock
                         </span>
 
                         <span th:if="${product.stock == 0}"
-                              class="badge bg-danger">
+                              class="badge bg-danger-subtle text-danger">
                             Out of Stock
                         </span>
                     </div>
 
                     <div class="mt-auto">
                         <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
-                           class="btn btn-sm btn-outline-dark w-100">
+                           class="btn btn-dark w-100 rounded-pill">
                             View Details
                         </a>
                     </div>
@@ -101,10 +153,8 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-white border-top py-3 mt-5">
-    <div class="container text-center small text-muted">
-        © 2026 RevShop. All rights reserved.
-    </div>
+<footer class="py-4 mt-5 text-center text-muted small">
+    © 2026 RevShop. Crafted with precision.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
