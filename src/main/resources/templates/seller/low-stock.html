@@ -16,13 +16,13 @@
 <div class="container mt-5">
 
     <h3 class="fw-bold mb-4 text-danger">
-        ⚠ Low Stock Alerts
+        Low Stock Alerts
     </h3>
 
     <!-- Empty State -->
     <div th:if="${lowStockProducts == null || #lists.isEmpty(lowStockProducts)}"
          class="alert alert-success text-center rounded-3">
-        🎉 All products are well stocked!
+        All products are well stocked!
     </div>
 
     <!-- Low Stock Table -->

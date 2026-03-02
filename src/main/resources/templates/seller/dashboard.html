@@ -43,7 +43,7 @@
 </head>
 <body class="bg-light">
 
-<!-- 🔷 NAVBAR -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
     <a class="navbar-brand fw-bold" th:href="@{/seller/dashboard}">
         RevShop - Seller
@@ -51,14 +51,14 @@
 
     <div class="ms-auto d-flex align-items-center">
 
-        <!-- 🔔 Notification Bell (Orders) -->
+        <!-- Notification Bell (Orders) -->
         <a th:href="@{/seller/notifications}"
            class="text-decoration-none me-4 position-relative"
            title="Order Notifications">
 
             <i class="bi bi-bell fs-4 text-light"></i>
 
-            <!-- 🔴 Unread Badge -->
+            <!--  Unread Badge -->
             <span id="notificationCount"
                   class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
                   style="display: none;">
@@ -66,7 +66,7 @@
             </span>
         </a>
 
-        <!-- 👤 Account Dropdown -->
+        <!--Account Dropdown -->
         <div class="dropdown">
             <button class="btn btn-light btn-sm dropdown-toggle"
                     type="button"
@@ -92,14 +92,14 @@
 
 <div class="container py-5">
 
-    <!-- 🔶 PAGE TITLE -->
+    <!--  PAGE TITLE -->
     <h2 class="text-center mb-5 section-title">
         Seller Dashboard
     </h2>
 
     <div class="row g-4 justify-content-center">
 
-        <!-- ➕ ADD PRODUCT -->
+        <!--  ADD PRODUCT -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/add-product}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -114,7 +114,7 @@
             </a>
         </div>
 
-        <!-- 📦 MANAGE PRODUCTS -->
+        <!--  MANAGE PRODUCTS -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/my-products}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -129,7 +129,7 @@
             </a>
         </div>
 
-        <!-- 🛒 VIEW ORDERS (CORE FEATURE) -->
+        <!--VIEW ORDERS (CORE FEATURE) -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/orders}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -144,7 +144,7 @@
             </a>
         </div>
 
-        <!-- 📊 SALES ANALYTICS -->
+        <!-- SALES ANALYTICS -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/sales}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -159,7 +159,7 @@
             </a>
         </div>
 
-        <!-- ⚠ LOW STOCK ALERT -->
+        <!-- LOW STOCK ALERT -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/my-products}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -174,7 +174,7 @@
             </a>
         </div>
 
-        <!-- ⭐ PRODUCT REVIEWS -->
+        <!-- PRODUCT REVIEWS -->
         <div class="col-lg-3 col-md-6">
             <a th:href="@{/seller/reviews}" class="text-decoration-none">
                 <div class="card dashboard-card text-center shadow-sm p-4">
@@ -194,7 +194,7 @@
 </div>
 
 <script>
-    // 🔔 Notification Count Auto Fetch
+    //  Notification Count Auto Fetch
     function loadNotificationCount() {
         fetch('/seller/notifications/unread-count')
             .then(res => res.text())

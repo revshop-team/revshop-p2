@@ -65,14 +65,14 @@
 
 <div class="container mt-5">
 
-  <!-- ✅ SUCCESS MESSAGE -->
+  <!-- SUCCESS MESSAGE -->
   <div th:if="${successMessage}"
        class="alert alert-success alert-dismissible fade show text-center fw-semibold">
     <span th:text="${successMessage}"></span>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 
-  <!-- ❌ ERROR MESSAGE -->
+  <!--  ERROR MESSAGE -->
   <div th:if="${errorMessage}"
        class="alert alert-danger alert-dismissible fade show text-center fw-semibold">
     <span th:text="${errorMessage}"></span>
@@ -97,7 +97,7 @@
     <tbody>
     <tr th:each="product : ${products}">
 
-      <!-- 🔥 FIXED IMAGE PATH (STATIC IMAGES FOLDER) -->
+      <!-- FIXED IMAGE PATH (STATIC IMAGES FOLDER) -->
       <td>
         <img th:src="${product.imageName != null}
                      ? @{/images/{img}(img=${product.imageName})}
@@ -117,7 +117,7 @@
 
       <td th:text="${product.stockThreshold}"></td>
 
-      <!-- 🔥 STOCK STATUS -->
+      <!-- STOCK STATUS -->
       <td>
         <span th:if="${product.stock == 0}" class="badge bg-dark">
           Out of Stock

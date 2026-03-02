@@ -27,7 +27,7 @@
     <div th:each="item : ${orderItems}" class="card shadow-sm mb-4">
         <div class="card-body">
 
-            <!-- 🔷 HEADER -->
+            <!--  HEADER -->
             <div class="d-flex justify-content-between">
                 <div>
                     <h5 class="fw-bold">
@@ -45,7 +45,7 @@
 
             <hr>
 
-            <!-- 🛒 PRODUCT INFO -->
+            <!--  PRODUCT INFO -->
             <h6 class="fw-bold mb-2">Product Details</h6>
             <p class="mb-1">
                 <strong>Name:</strong>
@@ -62,7 +62,7 @@
 
             <hr>
 
-            <!-- 💳 PAYMENT INFO -->
+            <!-- PAYMENT INFO -->
             <h6 class="fw-bold mb-2">Payment Details</h6>
             <div th:if="${paymentMap[item.order.orderId] != null}">
                 <p class="mb-1">
@@ -82,7 +82,7 @@
 
             <hr>
 
-            <!-- 📍 ADDRESS -->
+            <!--  ADDRESS -->
             <h6 class="fw-bold mb-2">Shipping Address</h6>
             <div th:if="${addressMap[item.order.orderId] != null}">
                 <p class="mb-0">
@@ -100,7 +100,7 @@
 
             <hr>
 
-            <!-- 👤 BUYER -->
+            <!--  BUYER -->
             <p class="mb-0">
                 <strong>Buyer:</strong>
                 <span th:text="${item.order.buyer.email}"></span>

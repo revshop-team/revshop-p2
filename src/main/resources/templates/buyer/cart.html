@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- 🔥 INTERNAL CSS (Since you don’t have CSS file) -->
+    <!-- INTERNAL CSS -->
     <style>
         body {
             background-color: #f8f9fa;
@@ -41,7 +41,7 @@
 
     <div class="row g-4">
 
-        <!-- 🛒 CART ITEMS -->
+        <!-- CART ITEMS -->
         <div class="col-lg-8">
 
             <h4 class="fw-bold mb-4">Shopping Cart</h4>
@@ -75,7 +75,7 @@
                                 <small class="text-muted d-block"
                                        th:text="${item.product.description}"></small>
 
-                                <!-- 🔥 Stock Info (NEW UX) -->
+                                <!-- Stock Info (NEW UX) -->
                                 <small class="text-muted">
                                     Available Stock:
                                     <span th:text="${item.product.stock}"></span>
@@ -121,13 +121,26 @@
 
                                 </div>
 
-                                <!-- 🚨 Stock Limit Warning (SINGLE & CLEAN) -->
+                                <!-- Stock Limit Warning (SINGLE & CLEAN) -->
                                 <div class="stock-warning mt-1"
                                      th:if="${item.quantity >= item.product.stock}">
                                     Maximum stock reached (Only
                                     <span th:text="${item.product.stock}"></span> available)
                                 </div>
 
+                                <!-- Remove From Cart -->
+                                <div class="mt-2">
+                                    <form th:action="@{/buyer/cart/remove/{id}(id=${item.cartItemId})}"
+                                          method="post"
+                                          style="display:inline;">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger w-100">
+                                            Remove
+                                        </button>
+
+                                    </form>
+                                </div>
                             </div>
 
                             <!-- Total -->
@@ -147,7 +160,7 @@
 
         </div>
 
-        <!-- 💳 ORDER SUMMARY -->
+        <!-- ORDER SUMMARY -->
         <div class="col-lg-4">
 
             <div class="card shadow-sm cart-card">

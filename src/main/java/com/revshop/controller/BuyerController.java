@@ -263,6 +263,11 @@ public class BuyerController {
         return "redirect:/buyer/cart";
     }
 
+    @PostMapping("/cart/remove/{id}")
+    public String removeFromCart(@PathVariable("id") Long id) {
+        cartService.removeCartItem(id);
+        return "redirect:/buyer/cart";
+    }
 
     // CHECKOUT PAGE RENDER'S
     @GetMapping("/cart/checkout")

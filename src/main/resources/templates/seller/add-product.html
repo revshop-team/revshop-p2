@@ -231,21 +231,21 @@
         document.getElementById("categoryError").innerText = "";
         document.getElementById("imageError").innerText = "";
 
-        // 🔥 PRICE VALIDATION (VERY IMPORTANT)
+        // PRICE VALIDATION (VERY IMPORTANT)
         if (sellingPrice > mrp) {
             document.getElementById("priceError").innerText =
                 "Selling price cannot be greater than MRP.";
             isValid = false;
         }
 
-        // 🔥 STOCK VALIDATION
+        //  STOCK VALIDATION
         if (stock < 0) {
             document.getElementById("stockError").innerText =
                 "Stock cannot be negative.";
             isValid = false;
         }
 
-        // 🔥 THRESHOLD VALIDATION
+        // THRESHOLD VALIDATION
         if (threshold > stock) {
             document.getElementById("thresholdError").innerText =
                 "Threshold cannot be greater than stock.";

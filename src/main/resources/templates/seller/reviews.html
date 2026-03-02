@@ -27,7 +27,7 @@
     <div th:each="review : ${reviews}" class="card shadow-sm mb-4">
         <div class="card-body">
 
-            <!-- 🔷 HEADER -->
+            <!-- HEADER -->
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="fw-bold mb-1"
@@ -41,7 +41,7 @@
                     </small>
                 </div>
 
-                <!-- ⭐ Rating Badge -->
+                <!--  Rating Badge -->
                 <span class="badge bg-warning text-dark fs-6">
                     ⭐ <span th:text="${review.rating}"></span> / 5
                 </span>
@@ -49,19 +49,19 @@
 
             <hr>
 
-            <!-- 👤 Buyer -->
+            <!--  Buyer -->
             <p class="mb-2">
                 <strong>Buyer:</strong>
                 <span th:text="${review.buyer.email}"></span>
             </p>
 
-            <!-- 💬 Comment -->
+            <!--  Comment -->
             <p class="mb-3">
                 <strong>Review:</strong><br>
                 <span th:text="${review.reviewComment}"></span>
             </p>
 
-            <!-- 📊 Product Rating Summary -->
+            <!-- Product Rating Summary -->
             <div class="bg-light p-3 rounded">
                 <strong>Average Rating:</strong>
                 ⭐ <span th:text="${#numbers.formatDecimal(avgRatingMap[review.product.productId], 1, 1)}"></span>
