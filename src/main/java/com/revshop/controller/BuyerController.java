@@ -250,13 +250,24 @@ public class BuyerController {
                             RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
+        Product product = productService.getProductById(id);
+
 
         try {
+
             cartService.addToCart(id, buyerEmail);
-            redirectAttributes.addFlashAttribute("successMessage", "Product added to cart successfully!");
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    product.getProductName() + " added to cart 🛒"
+            );
 
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    e.getMessage()
+            );
         }
 
         return "redirect:/buyer/products";
@@ -445,7 +456,8 @@ public class BuyerController {
     @PostMapping("/favourite/toggle/{productId}")
     public String toggleFavourite(@PathVariable Long productId,
                                   @RequestParam(defaultValue = "products") String redirectTo,
-                                  Authentication authentication) {
+                                  Authentication authentication,
+                                  RedirectAttributes redirectAttributes) {
 
         String email = authentication.getName();
 
@@ -459,7 +471,13 @@ public class BuyerController {
                 favouriteRepository.findByBuyerAndProduct(buyer, product);
 
         if (existing.isPresent()) {
+
             favouriteRepository.delete(existing.get());
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Removed from favourites ❤️"
+            );
 
         } else {
 
@@ -469,6 +487,10 @@ public class BuyerController {
             favourite.setAddedAt(LocalDateTime.now());
             favouriteRepository.save(favourite);
 
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Added to favourites ❤️"
+            );
         }
 
         if ("favourites".equals(redirectTo)) {
