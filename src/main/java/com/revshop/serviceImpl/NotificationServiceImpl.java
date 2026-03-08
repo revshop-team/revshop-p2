@@ -60,6 +60,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             notificationRepository.save(notification);
         }
+
     }
 
     @Override
@@ -88,5 +89,12 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return notificationRepository.countByUserAndIsRead(user, "N");
+    }
+    public void clearAllNotifications(String email) {
+
+        List<Notification> notifications =
+                notificationRepository.findByUserEmail(email);
+
+        notificationRepository.deleteAll(notifications);
     }
 }
