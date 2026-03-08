@@ -94,7 +94,12 @@
 
         <div class="mb-3">
             <label>Discount (%)</label>
-            <input type="number" step="0.01" id="discount" value="0" class="form-control" oninput="updateSellingPrice()">
+            <input type="number"
+                   step="0.01"
+                   id="discount"
+                   th:field="*{discount}"
+                   class="form-control"
+                   oninput="updateSellingPrice()">
         </div>
 
         <div class="mb-3">

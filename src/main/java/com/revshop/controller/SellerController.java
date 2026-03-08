@@ -103,15 +103,31 @@ public class SellerController {
 
     @PostMapping("/profile")
     public String updateProfile(@ModelAttribute SellerDetails details,
-                                Authentication authentication) {
+                                Authentication authentication,Model model) {
 
-        String email = authentication.getName(); // logged-in user email
 
-        User user = userService.findByEmail(email);
 
-        sellerService.saveOrUpdateSeller(user, details);
+        try {
 
-        return "redirect:/seller/profile?success";
+            String email = authentication.getName();
+
+            User user = userService.findByEmail(email);
+
+            sellerService.saveOrUpdateSeller(user, details);
+
+            return "redirect:/seller/profile?success";
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            model.addAttribute("error",
+                    "Business name / GST / Phone already exists");
+
+            model.addAttribute("sellerDetails", details);
+
+            return "seller/seller-profile";
+        }
     }
 
     // SAVE PRODUCTS (STATIC IMAGE VERSION - FINAL)
@@ -182,6 +198,15 @@ public class SellerController {
             if (product.getMrp() != null && product.getSellingPrice() != null) {
                 if (product.getSellingPrice() > product.getMrp()) {
                     model.addAttribute("error", "Selling price cannot be greater than MRP.");
+                    model.addAttribute("categories", categoryRepository.findAll());
+                    return "seller/add-product";
+                }
+            }
+
+            // Discount validation
+            if (product.getDiscount() != null) {
+                if (product.getDiscount() < 0 || product.getDiscount() > 100) {
+                    model.addAttribute("error", "Discount must be between 0 and 100.");
                     model.addAttribute("categories", categoryRepository.findAll());
                     return "seller/add-product";
                 }
@@ -274,6 +299,7 @@ public class SellerController {
                                 @RequestParam String description,
                                 @RequestParam String manufacturer,
                                 @RequestParam Double mrp,
+                                @RequestParam Double discount,
                                 @RequestParam Double sellingPrice,
                                 @RequestParam Integer stock,
                                 @RequestParam Integer stockThreshold,
@@ -295,6 +321,7 @@ public class SellerController {
         product.setDescription(description);
         product.setManufacturer(manufacturer);
         product.setMrp(mrp);
+        product.setDiscount(discount);
         product.setSellingPrice(sellingPrice);
         product.setStock(stock);
         product.setStockThreshold(stockThreshold);
