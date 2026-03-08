@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class AuthController {
 
         model.addAttribute("products", productService.get12Products());
         model.addAttribute("categories", categoryService.getAllCategories());
+
         return "public-home";
     }
 
@@ -74,11 +76,18 @@ public class AuthController {
 //    }
 
     @PostMapping("/register-user")
-    public String register(User user, Model model) {
+    public String register(User user,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
 
         try {
 
             userService.registerUser(user);
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Registration successful 🎉 Please login"
+            );
 
             return "redirect:/login";
 
@@ -86,8 +95,11 @@ public class AuthController {
 
             model.addAttribute("error",
                     "Email already registered");
+
             model.addAttribute("user", user);
-            model.addAttribute("questions", securityQuestionRepository.findAll());
+            model.addAttribute("questions",
+                    securityQuestionRepository.findAll());
+
             return "register";
         }
     }

@@ -111,6 +111,10 @@
             margin: 25px 0;
         }
 
+        .alert {
+            border-radius: 12px;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -125,16 +129,25 @@
             <div class="tagline">Premium Shopping Experience</div>
         </div>
 
-        <!-- Error -->
-        <div th:if="${param.error}" class="alert alert-danger text-center">
-            Invalid username or password
+        <!-- SUCCESS MESSAGE -->
+        <div th:if="${successMessage}"
+             class="alert alert-success text-center">
+            <span th:text="${successMessage}"></span>
         </div>
 
-        <!-- Logout -->
-        <div th:if="${param.logout}" class="alert alert-success text-center">
-            You have been logged out
+        <!-- LOGIN ERROR -->
+        <div th:if="${param.error}"
+             class="alert alert-danger text-center">
+            Invalid email or password
         </div>
 
+        <!-- LOGOUT MESSAGE -->
+        <div th:if="${param.logout}"
+             class="alert alert-info text-center">
+            Logged out successfully
+        </div>
+
+        <!-- Login Form -->
         <form th:action="@{/login}" method="post">
 
             <!-- Email -->
@@ -198,7 +211,9 @@
 </div>
 
 <script>
+
     function togglePassword() {
+
         const password = document.getElementById("password");
         const icon = document.querySelector(".password-toggle");
 
@@ -211,7 +226,9 @@
             icon.classList.remove("bi-eye-slash");
             icon.classList.add("bi-eye");
         }
+
     }
+
 </script>
 
 </body>
