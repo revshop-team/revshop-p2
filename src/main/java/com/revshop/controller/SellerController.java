@@ -570,22 +570,28 @@ public class SellerController {
 
         if (reviews.isEmpty()) {
             model.addAttribute("reviews", reviews);
+            model.addAttribute("avgRating", 0.0);
+            model.addAttribute("totalReviews", 0);
+            model.addAttribute("ratingCount", new HashMap<Integer, Long>());
             return "seller/product-reviews";
         }
 
         Product product = reviews.get(0).getProduct();
 
-        double avgRating =
+        Double avgRating =
                 reviewRepository.getAverageRatingByProductId(id);
+
+        if (avgRating == null) avgRating = 0.0;
 
         long totalReviews =
                 reviewRepository.countByProduct_ProductId(id);
 
-        // ⭐ rating breakdown
         Map<Integer, Long> ratingCount = new HashMap<>();
 
         for (int i = 1; i <= 5; i++) {
+
             int rating = i;
+
             long count = reviews.stream()
                     .filter(r -> r.getRating() == rating)
                     .count();
