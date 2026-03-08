@@ -2,10 +2,7 @@ package com.revshop.controller;
 
 import com.revshop.entity.*;
 import com.revshop.exceptions.UserNotFoundException;
-import com.revshop.repo.FavouriteRepository;
-import com.revshop.repo.PaymentRepository;
-import com.revshop.repo.ReviewRepository;
-import com.revshop.repo.UserRepository;
+import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,13 +33,14 @@ public class BuyerController {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
     private NotificationService notificationService;
+    private OrderRepository orderRepository;
 
 
     public BuyerController(ProductService productService, CartService cartService,
                            OrderService orderService, CategoryService categoryService,
                            BuyerService buyerService, ReviewService reviewService,
                            ReviewRepository reviewRepository, FavouriteRepository favouriteRepository,
-                           UserRepository userRepository, PaymentRepository paymentRepository,NotificationService notificationService) {
+                           UserRepository userRepository, OrderRepository orderRepository,PaymentRepository paymentRepository,NotificationService notificationService) {
 
         this.productService = productService;
         this.cartService = cartService;
@@ -55,6 +53,7 @@ public class BuyerController {
         this.userRepository = userRepository;
         this.paymentRepository = paymentRepository;
         this.notificationService=notificationService;
+        this.orderRepository=orderRepository;
     }
 
     // buyer's home page
@@ -303,7 +302,7 @@ public class BuyerController {
             );
             return "redirect:/buyer/products";
         }
-        orderService.checkout(
+        Order order=orderService.checkout(
                 buyerEmail,
                 fullName,
                 phone,
@@ -315,11 +314,13 @@ public class BuyerController {
                 paymentMethod
         );
 
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Order placed successfully!!!");
-
-        return "redirect:/buyer/orders";
+//        redirectAttributes.addFlashAttribute(
+//                "successMessage",
+//                "Order placed successfully!!!");
+        if("COD".equals(paymentMethod)){
+            return "redirect:/buyer/orders-success/" + order.getOrderId();
+        }
+        return "redirect:/buyer/payment/" + order.getOrderId();
     }
 
     // SEE ALL ORDER'S OF BUYER
@@ -392,7 +393,6 @@ public class BuyerController {
         // Always redirect back to orders page
         return "redirect:/buyer/orders";
     }
-
 
     @GetMapping("/favourites")
     public String viewFavourites(Authentication authentication, Model model) {
@@ -492,5 +492,15 @@ public class BuyerController {
         String email = authentication.getName();
 
         return notificationService.getUnreadCount(email);
+    }
+    @GetMapping("/orders-success/{orderId}")
+    public String orderSuccess(@PathVariable Long orderId, Model model){
+
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId);
+
+        model.addAttribute("order", order);
+        model.addAttribute("payment",payment);
+        return "buyer/orders-success";
     }
 }

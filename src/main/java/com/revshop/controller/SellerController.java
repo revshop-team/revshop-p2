@@ -469,10 +469,7 @@ public class SellerController {
 
         orderService.markAsDelivered(orderId);
 
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Order marked as DELIVERED successfully!"
-        );
+
 
         return "redirect:/seller/orders";
     }

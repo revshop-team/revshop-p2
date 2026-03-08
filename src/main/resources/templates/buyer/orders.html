@@ -61,9 +61,12 @@
     <h3 class="fw-bold mb-4">My Orders</h3>
 
     <!-- ✅ SUCCESS FLASH MESSAGE (AUTO HIDE ONLY THIS) -->
-    <div th:if="${successMessage}"
-         class="alert alert-success rounded-4 text-center fw-semibold flash-message">
-        <span th:text="${successMessage}"></span>
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+
+        ✔ <span th:text="${successMessage}"></span>
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
     </div>
 
     <!-- ❌ ERROR FLASH MESSAGE -->

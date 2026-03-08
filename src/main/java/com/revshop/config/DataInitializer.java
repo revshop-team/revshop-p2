@@ -90,35 +90,31 @@ public class DataInitializer {
     CommandLineRunner initCategories(CategoryRepository categoryRepository) {
         return args -> {
 
-            if (categoryRepository.count() == 0) {
+            insertCategoryIfNotExists(categoryRepository, "Electronics", "Electronic Items");
+            insertCategoryIfNotExists(categoryRepository, "Fashion", "Clothing & Accessories");
+            insertCategoryIfNotExists(categoryRepository, "Books", "Books & Study");
+            insertCategoryIfNotExists(categoryRepository, "Home & Kitchen", "Home Products");
+            insertCategoryIfNotExists(categoryRepository, "Groceries", "Daily Essentials");
+            insertCategoryIfNotExists(categoryRepository, "Mobiles", "Smartphones & Accessories");
+            insertCategoryIfNotExists(categoryRepository, "Laptops", "Laptop & Computer Accessories");
+            insertCategoryIfNotExists(categoryRepository, "Furniture", "Home Furniture");
+            insertCategoryIfNotExists(categoryRepository, "Beauty", "Beauty & Personal Care");
+            insertCategoryIfNotExists(categoryRepository, "Sports", "Sports Equipment");
+            insertCategoryIfNotExists(categoryRepository, "Toys", "Kids Toys");
 
-                Category c1 = new Category();
-                c1.setCategoryName("Electronics");
-                c1.setDescription("Electronic Items");
-                categoryRepository.save(c1);
-
-                Category c2 = new Category();
-                c2.setCategoryName("Fashion");
-                c2.setDescription("Clothing & Accessories");
-                categoryRepository.save(c2);
-
-                Category c3 = new Category();
-                c3.setCategoryName("Books");
-                c3.setDescription("Books & Study");
-                categoryRepository.save(c3);
-
-                Category c4 = new Category();
-                c4.setCategoryName("Home & Kitchen");
-                c4.setDescription("Home Products");
-                categoryRepository.save(c4);
-
-                Category c5 = new Category();
-                c5.setCategoryName("Groceries");
-                c5.setDescription("Daily Essentials");
-                categoryRepository.save(c5);
-
-                System.out.println("✅ Default Categories Inserted");
-            }
+            System.out.println("✅ Default Categories Inserted");
         };
+    }
+
+    private void insertCategoryIfNotExists(CategoryRepository repo, String name, String desc) {
+
+        if (!repo.existsByCategoryName(name)) {
+
+            Category category = new Category();
+            category.setCategoryName(name);
+            category.setDescription(desc);
+
+            repo.save(category);
+        }
     }
 }

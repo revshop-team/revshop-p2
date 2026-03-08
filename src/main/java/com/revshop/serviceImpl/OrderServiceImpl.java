@@ -9,7 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -52,15 +52,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @jakarta.transaction.Transactional
-    public void checkout(String buyerEmail,
-                         String fullName,
-                         String phone,
-                         String addressLine1,
-                         String addressLine2,
-                         String city,
-                         String state,
-                         String pincode,
-                         String paymentMethod) {
+    public Order checkout(String buyerEmail,
+                          String fullName,
+                          String phone,
+                          String addressLine1,
+                          String addressLine2,
+                          String city,
+                          String state,
+                          String pincode,
+                          String paymentMethod) {
 
         // GET BUYER
         User buyer = userRepository.findByEmail(buyerEmail)
@@ -145,18 +145,18 @@ public class OrderServiceImpl implements OrderService {
         payment.setPaymentMethod(paymentMethod);
         payment.setAmount(totalAmount);
 
+        // Payment will be processed later in payment page
         if ("COD".equals(paymentMethod)) {
 
-            // ORDER IS PLACED BUT PAYMENT NOT YET COLLECTED
+            // COD → Order placed immediately
             payment.setPaymentStatus("PENDING");
             order.setStatus("PLACED");
 
         } else {
 
-            // SIMULATING ONLINE PAYMENT SUCCESS
-            payment.setPaymentStatus("SUCCESS");
-            payment.setPaidAt(java.time.LocalDateTime.now());
-            order.setStatus("PLACED");
+            // Online payment → wait for gateway
+            payment.setPaymentStatus("PENDING");
+            order.setStatus("PENDING_PAYMENT");
 
         }
 
@@ -173,6 +173,7 @@ public class OrderServiceImpl implements OrderService {
         // CLEAR CART PROPERLY
         cart.getCartItems().clear();
         cartRepository.save(cart);
+        return order;
     }
 
     @Override
@@ -217,9 +218,21 @@ public class OrderServiceImpl implements OrderService {
 
         if ("PLACED".equals(order.getStatus())) {
 
-            // 1️⃣ Update Order Status
+            // 1️⃣ Update order status
             order.setStatus("DELIVERED");
             orderRepository.save(order);
+
+            // 2️⃣ UPDATE PAYMENT STATUS FOR COD
+            Payment payment = paymentRepository
+                    .findByOrder_OrderId(orderId);
+
+            if (payment != null && "PENDING".equals(payment.getPaymentStatus())) {
+
+                payment.setPaymentStatus("SUCCESS");
+                payment.setPaidAt(LocalDateTime.now());
+
+                paymentRepository.save(payment);
+            }
 
             // 2️⃣ CREATE BUYER NOTIFICATION (🔥 NEW)
             Notification notification = new Notification();
@@ -227,6 +240,7 @@ public class OrderServiceImpl implements OrderService {
             notification.setOrder(order);
             notification.setMessage("Your order #" + order.getOrderId() + " has been delivered.");
             notification.setIsRead("N");
+            notification.setCreatedAt(LocalDateTime.now());
 
             notificationRepository.save(notification);
         }

@@ -18,14 +18,14 @@
         .form-label { font-weight: 600; }
 
         .image-preview {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px dashed #dee2e6;
-            margin-top: 10px;
-            display: none;
-        }
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+    margin-top: 10px;
+    display: none;
+}
 
         .error-text {
             color: red;
@@ -166,21 +166,21 @@
             </div>
 
             <!-- Image -->
+            <!-- Product Image -->
             <div class="mb-3">
-                <label class="form-label">Product Image</label>
-                <select class="form-select"
-                        id="imageName"
-                        th:field="*{imageName}"
-                        onchange="previewStaticImage(this.value)"
-                        required>
-                    <option value="">-- Select Image --</option>
-                    <option value="mobile.png">Mobile</option>
-                    <option value="tshirt.png">T-Shirt</option>
-                    <option value="book.png">Book</option>
-                    <option value="default.png">Default</option>
-                </select>
+                <label class="form-label">
+                    Product Image
+                    <small class="text-muted">(auto selected based on category)</small>
+                </label>
+                <img id="imagePreview"
+                     class="image-preview"
+                     src="/images/default.png"
+                     alt="Preview"
+                     style="display:block;">
 
-                <img id="imagePreview" class="image-preview" alt="Preview"/>
+                <input type="hidden"
+                       id="imageName"
+                       th:field="*{imageName}">
             </div>
 
             <button type="submit" class="btn btn-success w-100">
@@ -193,36 +193,64 @@
 
 <!-- ================= IMAGE PREVIEW ================= -->
 <script>
-    function previewStaticImage(imageName) {
-        const preview = document.getElementById("imagePreview");
-        if (imageName) {
-            preview.src = "/images/" + imageName;
-            preview.style.display = "block";
-        } else {
-            preview.style.display = "none";
+
+    document.addEventListener("DOMContentLoaded", function(){
+
+        function loadNotificationCount() {
+            fetch('/seller/notifications/unread-count')
+                .then(res => res.text())
+                .then(count => {
+
+                    const badge = document.getElementById('notificationCount');
+                    const num = parseInt(count);
+
+                    if (!isNaN(num) && num > 0) {
+                        badge.classList.remove('d-none');
+                        badge.textContent = num;
+                    } else {
+                        badge.classList.add('d-none');
+                    }
+
+                });
         }
-    }
-</script>
 
-<!-- ================= NOTIFICATION COUNT ================= -->
-<script>
-    function loadNotificationCount() {
-        fetch('/seller/notifications/unread-count')
-            .then(res => res.text())
-            .then(count => {
-                const badge = document.getElementById('notificationCount');
-                const num = parseInt(count);
-                if (!isNaN(num) && num > 0) {
-                    badge.classList.remove('d-none');
-                    badge.textContent = num;
-                } else {
-                    badge.classList.add('d-none');
-                }
-            });
-    }
+        loadNotificationCount();
+        setInterval(loadNotificationCount, 5000);
 
-    loadNotificationCount();
-    setInterval(loadNotificationCount, 5000);
+
+        const category = document.getElementById("category");
+
+        category.addEventListener("change", function(){
+
+            const selectedCategory = this.options[this.selectedIndex].text;
+
+            const imageMap = {
+
+                "Electronics": "electronics.png",
+                "Mobiles": "mobile.png",
+                "Laptops": "laptop.png",
+                "Books": "books.png",
+                "Fashion": "fashion.png",
+                "Home & Kitchen": "home_kitchen.png",
+                "Furniture": "furniture.png",
+                "Groceries": "groceries.png",
+                "Beauty": "beauty.png",
+                "Sports": "sports.png",
+                "Toys": "toys.png"
+
+            };
+
+            let image = imageMap[selectedCategory] || "default.png";
+
+            document.getElementById("imagePreview").src = "/images/" + image;
+            document.getElementById("imagePreview").style.display = "block";
+
+            document.getElementById("imageName").value = image;
+
+        });
+
+    });
+
 </script>
 
 <!-- Bootstrap JS -->
