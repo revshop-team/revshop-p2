@@ -1,33 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Low Stock Alerts | RevShop</title>
-    <meta charset="UTF-8">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Stock Alerts | RevShop</title>
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-
-        body{
-            background:#f4f6f9;
+        body {
+            background: #f4f6f9;
         }
 
-        .alert-card{
-            border-left:5px solid #dc3545;
-            transition:0.2s;
+        .alert-card {
+            border-left: 5px solid #dc3545;
+            border-radius: 10px;
+            transition: 0.2s;
         }
 
-        .alert-card:hover{
-            transform:translateY(-3px);
-            box-shadow:0 4px 12px rgba(0,0,0,0.15);
+        .alert-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
         }
 
-        .stock-badge{
-            font-size:14px;
+        .stock-badge {
+            font-size: 14px;
         }
 
+        .product-img {
+            max-height: 100px;
+            object-fit: contain;
+        }
     </style>
-
 </head>
 
 <body>
@@ -39,78 +45,75 @@
     </a>
 </nav>
 
+<!-- MAIN CONTENT -->
 <div class="container mt-5">
 
+    <!-- PAGE TITLE -->
     <h3 class="fw-bold text-danger mb-4">
         ⚠ Low Stock Alerts
     </h3>
 
     <!-- EMPTY STATE -->
-
     <div th:if="${#lists.isEmpty(lowStockProducts)}"
          class="alert alert-success text-center">
-
         All products are well stocked 🎉
-
     </div>
 
-    <!-- ALERT CARDS -->
+    <!-- PRODUCT LIST -->
+    <div class="row g-4" th:if="${!#lists.isEmpty(lowStockProducts)}">
 
-    <div class="row g-4"
-         th:if="${!#lists.isEmpty(lowStockProducts)}">
-
-        <div class="col-md-4"
+        <!-- PRODUCT CARD -->
+        <div class="col-md-6 col-lg-4"
              th:each="product : ${lowStockProducts}">
 
-            <div class="card alert-card shadow-sm">
+            <div class="card alert-card shadow-sm h-100">
 
                 <div class="card-body">
 
                     <div class="row align-items-center">
 
                         <!-- PRODUCT IMAGE -->
-
-                        <div class="col-md-3 text-center">
-
-                            <img th:src="@{'/images/' + ${product.imageName}}"
+                        <div class="col-4 text-center">
+                            <img th:src="@{'/images/products/' + ${product.imageName}}"
+                                 onerror="this.src='/images/products/default.jpg'"
                                  alt="Product Image"
-                                 class="img-fluid rounded"
-                                 style="max-height:120px;">
-
+                                 class="img-fluid rounded product-img">
                         </div>
 
                         <!-- PRODUCT DETAILS -->
-
-                        <div class="col-md-9">
+                        <div class="col-8">
 
                             <h5 class="fw-bold"
                                 th:text="${product.productName}">
+                                Product Name
                             </h5>
 
                             <p class="text-muted mb-2">
                                 Category:
-                                <span th:text="${product.category.categoryName}"></span>
+                                <span th:text="${product.category.categoryName}">
+                                    Category Name
+                                </span>
                             </p>
 
                             <p>
                                 Stock:
-                                <span class="badge bg-danger"
+                                <span class="badge bg-danger stock-badge"
                                       th:text="${product.stock}">
-                    </span>
+                                    0
+                                </span>
                             </p>
 
                             <p>
                                 Threshold:
-                                <span class="badge bg-secondary"
+                                <span class="badge bg-secondary stock-badge"
                                       th:text="${product.stockThreshold}">
-                    </span>
+                                    0
+                                </span>
                             </p>
 
                             <a th:href="@{/seller/edit-product/{id}(id=${product.productId})}"
                                class="btn btn-outline-primary w-100">
-
                                 Restock / Edit Product
-
                             </a>
 
                         </div>
@@ -120,6 +123,15 @@
                 </div>
 
             </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
