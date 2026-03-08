@@ -63,8 +63,10 @@
                 <div>
 
 <span th:each="i : ${#numbers.sequence(1,5)}">
-<span th:text="${i <= avgRating ? '★' : '☆'}"
+
+<span th:text="${i <= T(java.lang.Math).round(avgRating) ? '★' : '☆'}"
       class="star"></span>
+
 </span>
 
                 </div>
@@ -93,13 +95,13 @@
 
                         <div class="progress-bar bg-warning"
                              role="progressbar"
-                             th:style="'width:' + (${ratingCount[i]} * 100 / totalReviews) + '%'">
+                             th:style="'width:' + (${totalReviews > 0 ? (ratingCount.get(i) * 100 / totalReviews) : 0}) + '%'">
                         </div>
 
                     </div>
 
                     <div style="width:40px"
-                         th:text="${ratingCount[i]}"></div>
+                         th:text="${ratingCount.get(i)}"></div>
 
                 </div>
 
@@ -121,8 +123,10 @@
             <div class="mb-2">
 
 <span th:each="i : ${#numbers.sequence(1,5)}">
+
 <span th:text="${i <= review.rating ? '★' : '☆'}"
       class="star"></span>
+
 </span>
 
                 <span class="ms-2"
