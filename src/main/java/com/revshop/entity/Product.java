@@ -44,6 +44,9 @@ public class Product {
     @Column(name = "mrp")
     private Double mrp;
 
+    @Column(name = "discount")
+    private Double discount;
+
     @Column(name = "selling_price")
     private Double sellingPrice;
 
@@ -176,5 +179,13 @@ public class Product {
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public Double getDiscount() {
+        return discount;
     }
 }

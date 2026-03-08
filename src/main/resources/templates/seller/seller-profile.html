@@ -90,6 +90,11 @@
                 Profile updated successfully!
             </div>
 
+            <div th:if="${error}"
+                 class="alert alert-danger">
+                <span th:text="${error}"></span>
+            </div>
+
             <form th:action="@{/seller/profile}"
                   th:object="${sellerDetails}"
                   method="post">
@@ -98,14 +103,23 @@
 
                 <div class="mb-3">
                     <label class="form-label">Business Name</label>
-                    <input type="text" class="form-control"
-                           th:field="*{businessName}" required>
+                    <input type="text"
+                           class="form-control"
+                           th:field="*{businessName}"
+                           required
+                           minlength="3"
+                           title="Business name must be at least 3 characters">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">GST Number</label>
-                    <input type="text" class="form-control"
-                           th:field="*{gstNumber}">
+                    <input type="text"
+                           class="form-control"
+                           th:field="*{gstNumber}"
+                           pattern="[A-Za-z0-9]{15}"
+                           maxlength="15"
+                           minlength="15"
+                           title="GST must be exactly 15 letters or numbers">
                 </div>
 
                 <div class="mb-3">
@@ -116,8 +130,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
-                    <input type="text" class="form-control"
-                           th:field="*{phone}">
+                    <input type="text"
+                           class="form-control"
+                           th:field="*{phone}"
+                           pattern="[0-9]{10}"
+                           maxlength="10"
+                           minlength="10"
+                           title="Phone number must be 10 digits"
+                           required>
                 </div>
 
                 <button type="submit" class="btn btn-success">

@@ -115,14 +115,46 @@ public class BuyerController {
 
     @PostMapping("/profile/update")
     public String updateProfile(Authentication authentication,
-                                @ModelAttribute BuyerDetails buyerDetails) {
+                                @ModelAttribute BuyerDetails buyerDetails,Model model) {
 
-        String email = authentication.getName();
+          String  email = authentication.getName();
+        try {
 
-        buyerService.updateBuyerDetails(email, buyerDetails);
 
-        return "redirect:/buyer/profile";
-    }
+            buyerService.updateBuyerDetails(email, buyerDetails);
+
+            return "redirect:/buyer/profile";
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            List<Order> orders =
+                    orderService.getOrdersByBuyer(email);
+
+            int totalOrders = orders.size();
+
+            double totalSpending = 0;
+            for (Order order : orders) {
+                totalSpending += order.getTotalAmount();
+            }
+
+            model.addAttribute("editMode", true);
+            model.addAttribute("buyerDetails", buyerDetails);
+            model.addAttribute("error",
+                    "Phone already exists or invalid data");
+            model.addAttribute("totalOrders", totalOrders);
+            model.addAttribute("totalSpending", totalSpending);
+
+            return "buyer/profile";
+        }
+
+
+
+
+
+        }
+
 
     //  View all products exist in RevShop
     // View all products with Search + Category + Sorting + Pagination (SAFE UPGRADE)

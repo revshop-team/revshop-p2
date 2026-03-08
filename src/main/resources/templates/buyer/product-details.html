@@ -104,7 +104,7 @@
 
         <!-- 🔹 LEFT SIDE: PRODUCT IMAGE -->
         <div class="col-lg-6">
-            <img src="https://via.placeholder.com/600x500"
+            <img th:src="@{/images/{img}(img=${product.imageName})}"
                  class="img-fluid product-image"
                  alt="Product Image">
         </div>

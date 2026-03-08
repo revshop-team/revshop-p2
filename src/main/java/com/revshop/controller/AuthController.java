@@ -67,10 +67,29 @@ public class AuthController {
     }
 
     // register the user
+//    @PostMapping("/register-user")
+//    public String register(User user) {
+//        userService.registerUser(user);
+//        return "redirect:/login";
+//    }
+
     @PostMapping("/register-user")
-    public String register(User user) {
-        userService.registerUser(user);
-        return "redirect:/login";
+    public String register(User user, Model model) {
+
+        try {
+
+            userService.registerUser(user);
+
+            return "redirect:/login";
+
+        } catch (Exception e) {
+
+            model.addAttribute("error",
+                    "Email already registered");
+            model.addAttribute("user", user);
+            model.addAttribute("questions", securityQuestionRepository.findAll());
+            return "register";
+        }
     }
 
     // login form render's
