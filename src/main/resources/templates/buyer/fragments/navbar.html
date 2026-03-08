@@ -1,138 +1,328 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3"
-     th:fragment="navbar">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm py-2 classic-navbar" th:fragment="navbar">
 
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    <div class="container">
+    <style>
+        .classic-navbar {
+            background-color: #0A192F;
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            border-bottom: 1px solid #060f1d;
+            z-index: 1050;
+        }
 
-        <!-- LOGO -->
-        <a class="navbar-brand fw-semibold fs-5"
-           th:href="@{/}">
-            Rev<span class="text-warning">Shop</span>
+        /* ✨ Brand Styling ✨ */
+        .brand-text {
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .brand-subtext {
+            font-size: 0.65rem;
+            font-style: italic;
+            margin-top: 1px;
+            color: #e2e8f0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Gold Glow Animation */
+        /* Gold Glow Animation */
+        .brand-accent {
+            background: linear-gradient(90deg, #D4AF37, #f5d76e, #bfa132, #D4AF37);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gold-gradient-move 4s linear infinite;
+            padding-bottom: 4px; /* ✨ FIXES THE CUT 'p' ✨ */
+            display: inline-block;
+        }
+
+        .floating-gem {
+            display: inline-block;
+            color: #D4AF37;
+            animation: ambient-float 2.5s ease-in-out infinite;
+        }
+
+        @keyframes ambient-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* Search Bar Styling */
+        .search-input {
+            border-radius: 4px 0 0 4px !important;
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border: 1px solid #ffffff;
+            box-shadow: none !important;
+            /* Upgraded to smoother easing */
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .search-input:focus {
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25) !important;
+        }
+
+        .search-btn {
+            border-radius: 0 4px 4px 0 !important;
+            background-color: #D4AF37;
+            color: #0A192F;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .search-btn:hover {
+            background-color: #f5d76e;
+            color: #0A192F;
+        }
+
+        /* Nav Links */
+        .nav-link-custom {
+            color: #f8fafc !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 0.8rem !important;
+            position: relative;
+            transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-link-custom::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: #D4AF37;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-link-custom:hover { color: #D4AF37 !important; }
+        .nav-link-custom:hover::after { width: 75%; }
+        .nav-link-custom i { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .nav-link-custom:hover i { transform: translateY(-2px); color: #D4AF37; }
+
+        /* Notifications */
+        .notification-icon {
+            color: #ffffff;
+            transition: color 0.3s ease;
+            display: inline-block;
+            transform-origin: top center;
+        }
+
+        .nav-item:hover .notification-icon {
+            color: #D4AF37;
+            animation: bell-ring 0.6s ease-in-out;
+        }
+
+        @keyframes bell-ring {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(15deg); }
+            30% { transform: rotate(-12deg); }
+            45% { transform: rotate(10deg); }
+            60% { transform: rotate(-8deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0); }
+        }
+
+        .notification-badge-custom {
+            transform: translate(-50%, 20%) !important;
+            font-size: 0.65rem;
+        }
+
+        /* Profile Pill */
+        .profile-pill {
+            display: flex; align-items: center; gap: 8px;
+            background-color: transparent; padding: 4px 10px 4px 8px;
+            border-radius: 50px; color: #ffffff; font-size: 0.85rem;
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .profile-pill:hover, .profile-pill[aria-expanded="true"] {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: #D4AF37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+
+        .buyer-tag {
+            font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px;
+            background-color: #D4AF37; color: #0A192F; padding: 2px 6px; border-radius: 12px; margin-left: 2px;
+        }
+
+        /* ✨ Navy & Gold Dropdown ✨ */
+      .custom-dropdown-menu {
+    background-color: #0A192F;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-top: 3px solid #D4AF37;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    margin-top: 12px;
+    min-width: 220px;
+    padding: 0;
+    overflow: hidden;
+    display: none;
+}
+
+        /* The Smooth Slide & Fade Animation for Dropdown */
+        .custom-dropdown-menu.show {
+            display: block;
+            animation: slideFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .dropdown-item-lux {
+            color: #e2e8f0 !important;
+            font-size: 0.9rem;
+            padding: 12px 20px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background-color: transparent;
+        }
+
+        .dropdown-item-lux:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: #D4AF37 !important;
+            padding-left: 26px; /* Smooth slide to the right on hover */
+        }
+
+        .dropdown-item-lux i {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dropdown-item-lux:hover i {
+            transform: scale(1.15);
+        }
+
+        .dropdown-divider-lux { border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 0; }
+
+        /* Logout Button specific styling */
+        .logout-btn {
+            color: #ff4d4d !important;
+            width: 100%;
+            border: none;
+            text-align: left;
+        }
+        .logout-btn i { color: #ff4d4d; }
+        .logout-btn:hover {
+            background-color: rgba(255, 77, 77, 0.1);
+            color: #ff6b6b !important;
+            padding-left: 26px;
+        }
+    </style>
+
+    <div class="container">
+        <a class="navbar-brand d-flex flex-column align-items-start me-4 text-decoration-none" th:href="@{/}">
+            <span class="fst-italic fw-bold text-white brand-text">Rev<span class="brand-accent">Shop</span></span>
+            <span class="brand-subtext">
+                <span class="text-white">Shop</span> <span class="brand-accent fw-bold">Smart</span>
+                <i class="bi bi-gem floating-gem ms-1" style="font-size: 8px;"></i>
+            </span>
         </a>
 
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler border-0 shadow-none text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list fs-2"></i>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
 
-            <!-- LEFT MENU -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <form class="d-flex mx-auto w-100 my-3 my-lg-0 px-lg-4" style="max-width: 500px;" th:action="@{/buyer/products}" method="get">
+                <div class="input-group shadow-sm">
+                    <input class="form-control border-0 search-input" type="search" name="keyword" placeholder="Search products..." aria-label="Search">
+                    <button class="btn search-btn border-0 px-3" type="submit"><i class="bi bi-search fs-6"></i></button>
+                </div>
+            </form>
 
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/home}">Home</a>
+            <ul class="navbar-nav ms-auto align-items-center mb-2 mb-lg-0 gap-3">
+                <li class="nav-item"><a class="nav-link nav-link-custom" th:href="@{/buyer/products}"><i class="bi bi-shop fs-6"></i> Shop</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-custom" th:href="@{/buyer/favourites}"><i class="bi bi-heart fs-6"></i> Favourites</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-custom" th:href="@{/buyer/orders}"><i class="bi bi-box-seam fs-6"></i> Orders</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-custom" th:href="@{/buyer/cart}"><i class="bi bi-cart3 fs-6"></i> Cart</a></li>
+
+                <li class="nav-item ms-lg-1">
+                    <a th:href="@{/buyer/notifications}" class="nav-link position-relative text-decoration-none" title="Notifications">
+                        <i class="bi bi-bell-fill fs-6 notification-icon"></i>
+                        <span id="buyerNotificationCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge-custom" style="display:none;">0</span>
+                    </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/products}">Products</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/cart}">Cart</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/orders}">Orders</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/favourites}">Favourites</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/buyer/profile}">Profile</a>
-                </li>
-
-            </ul>
-
-            <!-- RIGHT SIDE -->
-            <div class="d-flex align-items-center gap-4">
-
-                <!-- 🔔 NOTIFICATIONS -->
-                <a th:href="@{/buyer/notifications}"
-                   class="position-relative text-light"
-                   title="Notifications">
-
-                    <i class="bi bi-bell fs-5"></i>
-
-                    <!-- Badge -->
-                    <span id="buyerNotificationCount"
-                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger small"
-                          style="display:none;">
-                        0
-                    </span>
-                </a>
-
-                <!-- 👤 USER DROPDOWN -->
-                <div class="dropdown">
-
-                    <a href="#"
-                       class="d-flex align-items-center text-light text-decoration-none"
-                       data-bs-toggle="dropdown">
-
-                        <div class="rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center"
-                             style="width:30px;height:30px;font-size:13px;font-weight:600;">
-                            <span th:text="${#authentication.name.substring(0,1).toUpperCase()}">U</span>
+                <li class="nav-item dropdown ms-lg-2">
+                    <a href="#" class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                        <div class="profile-pill">
+                            <i class="bi bi-person-circle fs-6 text-white"></i>
+                            <span class="d-inline-block text-truncate fw-semibold text-capitalize" style="max-width: 80px;" th:text="${#strings.contains(#authentication.name, '@') ? #strings.substringBefore(#authentication.name, '@') : #authentication.name}">User</span>
+                            <span class="buyer-tag">BUYER</span>
+                            <i class="bi bi-chevron-down ms-1 text-light" style="font-size: 0.6rem;"></i>
                         </div>
-
-                        <i class="bi bi-chevron-down ms-1 small"></i>
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-
-                        <li class="px-3 py-2">
-                            <small class="text-muted">Signed in as</small><br>
-                            <span class="fw-semibold small"
-                                  th:text="${#authentication.name}">
-                            </span>
+                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu">
+                        <li class="px-4 py-3" style="background-color: rgba(0,0,0,0.25);">
+                            <small class="d-block mb-1 fw-bold" style="color: rgba(255,255,255,0.5); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Buyer Account</small>
+                            <span class="fw-bold text-white d-block text-truncate fs-6" style="max-width: 180px;" th:text="${#authentication.name}">user@email.com</span>
                         </li>
-
-                        <li><hr class="dropdown-divider"></li>
-
+                        <li><hr class="dropdown-divider-lux"></li>
+                        <li><a class="dropdown-item dropdown-item-lux d-flex align-items-center fw-medium" th:href="@{/buyer/profile}"><i class="bi bi-person-circle text-warning me-3 fs-5"></i> My Profile</a></li>
+                        <li><hr class="dropdown-divider-lux"></li>
                         <li>
                             <form th:action="@{/logout}" method="post" class="m-0">
-                                <button type="submit"
-                                        class="dropdown-item text-danger small">
-                                    Logout
+                                <button type="submit" class="dropdown-item dropdown-item-lux logout-btn d-flex align-items-center fw-medium">
+                                    <i class="bi bi-box-arrow-right me-3 fs-5"></i> Logout
                                 </button>
                             </form>
                         </li>
-
                     </ul>
-
-                </div>
-
-            </div>
-
+                </li>
+            </ul>
         </div>
     </div>
-
-    <!-- 🔔 AUTO FETCH UNREAD NOTIFICATION COUNT -->
+</nav>
     <script>
-        function loadBuyerNotificationCount() {
-            fetch('/buyer/notifications/unread-count')
-                .then(res => res.text())
-                .then(count => {
-                    const badge = document.getElementById('buyerNotificationCount');
-                    if (!badge) return;
+        document.addEventListener("DOMContentLoaded", function() {
+            function loadBuyerNotificationCount() {
+                fetch('/buyer/notifications/unread-count')
+                    .then(res => res.text())
+                    .then(count => {
+                        const badge = document.getElementById('buyerNotificationCount');
+                        if (!badge) return;
+                        const numCount = parseInt(count, 10);
+                        if (numCount > 0) {
+                            badge.style.display = 'inline-block';
+                            badge.textContent = numCount > 99 ? '99+' : numCount;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }).catch(err => console.error("Notification fetch error:", err));
+            }
 
-                    if (count > 0) {
-                        badge.style.display = 'inline-block';
-                        badge.textContent = count;
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                })
-                .catch(err => console.error("Notification error:", err));
-        }
-
-        loadBuyerNotificationCount();
-        setInterval(loadBuyerNotificationCount, 5000);
+            loadBuyerNotificationCount();
+            setInterval(loadBuyerNotificationCount, 10000);
+        });
     </script>
 
-</nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

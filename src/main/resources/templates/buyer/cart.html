@@ -1,157 +1,266 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <title>RevShop | Cart</title>
+
     <meta charset="UTF-8">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- INTERNAL CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            background-color: #f8f9fa;
+
+        body{
+
+        font-family:'Poppins',sans-serif;
+
+        background:linear-gradient(135deg,#0A192F,#132a4d,#1b355d);
+
+        background-size:300% 300%;
+
+        animation:bgMove 12s ease infinite;
+
+        color:white;
+
         }
 
-        .qty-btn-group .btn {
-            min-width: 40px;
-            font-weight: 600;
+        @keyframes bgMove{
+
+        0%{background-position:0% 50%;}
+
+        50%{background-position:100% 50%;}
+
+        100%{background-position:0% 50%;}
+
         }
 
-        .stock-warning {
-            font-size: 12px;
-            font-weight: 500;
-            color: #dc3545;
+        .container{
+
+        animation:slideIn .6s ease;
+
         }
 
-        .cart-card {
-            border-radius: 12px;
+        @keyframes slideIn{
+
+        from{opacity:0;transform:translateY(40px);}
+
+        to{opacity:1;transform:translateY(0);}
+
         }
 
-        .price-text {
-            font-size: 18px;
+        /* CART CARD */
+
+        .cart-card{
+
+        border-radius:20px;
+
+        background:rgba(255,255,255,.95);
+
+        color:#0A192F;
+
+        transition:.35s;
+
+        box-shadow:0 15px 35px rgba(0,0,0,.35);
+
+        animation:floatItem 5s ease-in-out infinite;
+
         }
+
+        .cart-card:hover{
+
+        transform:translateY(-6px);
+
+        }
+
+        @keyframes floatItem{
+
+        0%,100%{transform:translateY(0);}
+
+        50%{transform:translateY(-6px);}
+
+        }
+
+        /* QTY BUTTON */
+
+        .qty-btn-group .btn{
+
+        min-width:40px;
+
+        font-weight:600;
+
+        transition:.2s;
+
+        }
+
+        .qty-btn-group .btn:hover{
+
+        transform:scale(1.2);
+
+        }
+
+        /* SUMMARY */
+
+        .summary-card{
+
+        border-radius:20px;
+
+        background:rgba(255,255,255,.95);
+
+        color:#0A192F;
+
+        box-shadow:0 20px 45px rgba(0,0,0,.4);
+
+        animation:floatSummary 6s ease-in-out infinite;
+
+        }
+
+        @keyframes floatSummary{
+
+        0%,100%{transform:translateY(0);}
+
+        50%{transform:translateY(-10px);}
+
+        }
+
+        /* CHECKOUT BUTTON */
+
+        .checkout-btn{
+
+        background:#D4AF37 !important;
+
+        border:2px solid transparent !important;
+
+        color:#0A192F !important;
+
+        font-weight:600;
+
+        border-radius:10px;
+
+        padding: 10px;
+
+        transition:all .35s ease !important;
+
+        }
+
+        /* Fixed the hover state by overriding bootstrap with !important */
+        .checkout-btn:hover{
+
+        background:#0A192F !important;
+
+        border-color:#0A192F !important;
+
+        color:#D4AF37 !important;
+
+        transform:translateY(-3px) scale(1.03);
+
+        box-shadow: 0 10px 25px rgba(10, 25, 47, 0.4) !important;
+
+        }
+
+        /* REMOVE */
+
+        .remove-btn{
+
+        transition:.3s;
+
+        }
+
+        .remove-btn:hover{
+
+        transform:scale(1.1);
+
+        }
+
     </style>
+
 </head>
 
-<body class="bg-light">
+<body>
 
-<!-- Navbar -->
 <div th:replace="~{buyer/fragments/navbar :: navbar}"></div>
 
 <div class="container py-5">
 
     <div class="row g-4">
 
-        <!-- CART ITEMS -->
         <div class="col-lg-8">
 
-            <h4 class="fw-bold mb-4">Shopping Cart</h4>
+            <h4 class="fw-bold mb-4" style="color: #D4AF37;">Shopping Cart</h4>
 
-            <!-- Empty Cart -->
-            <div th:if="${cart == null || #lists.isEmpty(cart.cartItems)}"
-                 class="alert alert-info rounded-4">
-                Your cart is empty.
-            </div>
-
-            <!-- Cart Items -->
             <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
 
-                <div class="card mb-3 shadow-sm cart-card"
-                     th:each="item : ${cart.cartItems}">
+                <div class="card mb-3 cart-card" th:each="item : ${cart.cartItems}">
 
                     <div class="card-body">
+
                         <div class="row align-items-center">
 
-                            <!-- Image -->
                             <div class="col-md-2 text-center">
-                                <img src="https://via.placeholder.com/100"
-                                     class="img-fluid rounded">
+
+                                <img src="https://via.placeholder.com/100" class="img-fluid rounded">
+
                             </div>
 
-                            <!-- Name & Description -->
                             <div class="col-md-4">
-                                <h6 class="fw-semibold mb-1"
+
+                                <h6 class="fw-semibold"
                                     th:text="${item.product.productName}"></h6>
 
                                 <small class="text-muted d-block"
                                        th:text="${item.product.description}"></small>
 
-                                <!-- Stock Info (NEW UX) -->
-                                <small class="text-muted">
-                                    Available Stock:
-                                    <span th:text="${item.product.stock}"></span>
-                                </small>
                             </div>
 
-                            <!-- Price -->
                             <div class="col-md-2 text-center">
-                                <span class="text-success fw-semibold price-text">
-                                    ₹ <span th:text="${item.product.sellingPrice}"></span>
+
+                                <span class="text-success fw-semibold">
+
+                                ₹ <span th:text="${item.product.sellingPrice}"></span>
+
                                 </span>
+
                             </div>
 
-                            <!-- Quantity Controls (FIXED STRUCTURE) -->
                             <div class="col-md-2 text-center">
 
                                 <div class="btn-group btn-group-sm qty-btn-group">
 
-                                    <!-- Decrease -->
-                                    <a th:href="@{/buyer/cart/decrease/{id}(id=${item.cartItemId})}"
-                                       class="btn btn-outline-secondary">
-                                        −
-                                    </a>
+                                    <a th:href="@{/buyer/cart/decrease/{id}(id=${item.cartItemId})}" class="btn btn-outline-secondary">−</a>
 
-                                    <!-- Quantity Display -->
                                     <button class="btn btn-light" disabled
-                                            th:text="${item.quantity}">
+                                            th:text="${item.quantity}"></button>
+
+                                    <a th:href="@{/buyer/cart/increase/{id}(id=${item.cartItemId})}" class="btn btn-outline-secondary">+</a>
+
+                                </div>
+
+                                <form th:action="@{/buyer/cart/remove/{id}(id=${item.cartItemId})}" method="post">
+
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100 mt-2 remove-btn">
+
+                                        Remove
+
                                     </button>
 
-                                    <!-- Increase (ONLY if stock available) -->
-                                    <a th:if="${item.quantity < item.product.stock}"
-                                       th:href="@{/buyer/cart/increase/{id}(id=${item.cartItemId})}"
-                                       class="btn btn-outline-secondary">
-                                        +
-                                    </a>
+                                </form>
 
-                                    <!-- Disabled + when stock limit reached -->
-                                    <button th:if="${item.quantity >= item.product.stock}"
-                                            class="btn btn-outline-secondary"
-                                            disabled>
-                                        +
-                                    </button>
-
-                                </div>
-
-                                <!-- Stock Limit Warning (SINGLE & CLEAN) -->
-                                <div class="stock-warning mt-1"
-                                     th:if="${item.quantity >= item.product.stock}">
-                                    Maximum stock reached (Only
-                                    <span th:text="${item.product.stock}"></span> available)
-                                </div>
-
-                                <!-- Remove From Cart -->
-                                <div class="mt-2">
-                                    <form th:action="@{/buyer/cart/remove/{id}(id=${item.cartItemId})}"
-                                          method="post"
-                                          style="display:inline;">
-
-                                        <button type="submit"
-                                                class="btn btn-sm btn-outline-danger w-100">
-                                            Remove
-                                        </button>
-
-                                    </form>
-                                </div>
                             </div>
 
-                            <!-- Total -->
                             <div class="col-md-2 text-end">
-                                <span class="fw-bold price-text">
-                                    ₹
-                                    <span th:text="${item.product.sellingPrice * item.quantity}"></span>
+
+                                <span class="fw-bold">
+
+                                ₹ <span th:text="${item.product.sellingPrice * item.quantity}"></span>
+
                                 </span>
+
                             </div>
 
                         </div>
+
                     </div>
 
                 </div>
@@ -160,58 +269,61 @@
 
         </div>
 
-        <!-- ORDER SUMMARY -->
         <div class="col-lg-4">
 
-            <div class="card shadow-sm cart-card">
+            <div class="card summary-card">
 
                 <div class="card-body">
 
                     <h5 class="fw-bold mb-4">Order Summary</h5>
 
-                    <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
+                    <div class="d-flex justify-content-between mb-2">
 
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Items</span>
-                            <span th:text="${#lists.size(cart.cartItems)}"></span>
-                        </div>
+                        <span>Items</span>
 
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal</span>
-                            <span>
-                                ₹
-                                <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Shipping</span>
-                            <span class="text-success">Free</span>
-                        </div>
-
-                        <hr>
-
-                        <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
-                            <span>Total</span>
-                            <span>
-                                ₹
-                                <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
-                                </span>
-                            </span>
-                        </div>
-
-                        <a th:href="@{/buyer/cart/checkout}"
-                           class="btn btn-success w-100">
-                            Proceed to Checkout
-                        </a>
+                        <span th:text="${#lists.size(cart.cartItems)}"></span>
 
                     </div>
 
-                    <div th:if="${cart == null || #lists.isEmpty(cart.cartItems)}"
-                         class="text-muted text-center">
-                        Nothing to summarize.
+                    <div class="d-flex justify-content-between mb-2">
+
+                        <span>Subtotal</span>
+
+                        <span>
+
+                        ₹ <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}"></span>
+
+                        </span>
+
                     </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span>Shipping</span>
+
+                        <span class="text-success">Free</span>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+
+                        <span>Total</span>
+
+                        <span>
+
+                        ₹ <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}"></span>
+
+                        </span>
+
+                    </div>
+
+                    <a th:href="@{/buyer/cart/checkout}" class="btn checkout-btn w-100">
+
+                        Proceed to Checkout
+
+                    </a>
 
                 </div>
 
@@ -222,6 +334,6 @@
     </div>
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,132 +1,430 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Edit Product</title>
+    <title>Edit Product | RevShop</title>
+    <meta charset="UTF-8">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(180deg,#0A192F,#112240);
+        min-height:100vh;
+        color:white;
+        }
+
+        /* NAVBAR */
+
+    .classic-navbar{
+    background:#0A192F;
+    border-bottom:1px solid #061022;
+    padding-top:8px;
+    padding-bottom:8px;
+    }
+
+    /* LOGO */
+
+    .navbar-brand{
+    padding-top:4px;
+    padding-bottom:4px;
+    }
+
+    .brand-text{
+    font-size:1.1rem;
+    line-height:1.3;   /* FIXES CUTTING */
+    letter-spacing:.5px;
+    }
+
+    .brand-subtext{
+    font-size:.65rem;
+    line-height:1.3;
+    }
+
+    /* GOLD SHIMMER */
+
+    .brand-accent{
+    background:linear-gradient(90deg,#D4AF37,#f5d76e,#bfa132,#D4AF37);
+    background-size:300% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:goldMove 3s linear infinite;
+    }
+
+    @keyframes goldMove{
+    0%{background-position:0%}
+    100%{background-position:300%}
+    }
+
+    /* DIAMOND ANIMATION */
+
+    .brand-diamond{
+    color:#D4AF37;
+    font-size:11px;
+    margin-left:4px;
+    display:inline-block;
+    animation:diamondSpin 2s infinite linear;
+    }
+
+    @keyframes diamondSpin{
+
+    0%{
+    transform:rotate(0deg) scale(1);
+    }
+
+    50%{
+    transform:rotate(180deg) scale(1.4);
+    }
+
+    100%{
+    transform:rotate(360deg) scale(1);
+    }
+
+    }
+
+    /* PROFILE PILL */
+
+    .profile-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border-radius:40px;
+    color:#fff;
+    font-size:.85rem;
+    border:1px solid rgba(212,175,55,.7);
+    }
+
+    .seller-tag{
+    font-size:.55rem;
+    font-weight:700;
+    background:#D4AF37;
+    color:#0A192F;
+    padding:2px 6px;
+    border-radius:12px;
+    }
+
+    /* BELL */
+
+    .bell-icon{
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+    display:inline-block;
+    transform-origin:top;
+    }
+
+    .bell-icon:hover{
+    color:#D4AF37;
+    animation:bellRing .6s ease;
+    }
+
+    @keyframes bellRing{
+    0%{transform:rotate(0)}
+    20%{transform:rotate(20deg)}
+    40%{transform:rotate(-18deg)}
+    60%{transform:rotate(14deg)}
+    80%{transform:rotate(-10deg)}
+    100%{transform:rotate(0)}
+    }
+
+    /* DROPDOWN */
+
+    .dropdown-menu{
+        background:#0A192F;
+        border:1px solid rgba(212,175,55,.5);
+        border-radius:14px;
+        box-shadow:0 12px 35px rgba(0,0,0,.6);
+        animation:dropdownFade .35s ease;
+        padding-top:8px;
+        }
+
+        @keyframes dropdownFade{
+        0%{opacity:0;transform:translateY(-10px) scale(.95);}
+        100%{opacity:1;transform:translateY(0) scale(1);}
+        }
+
+        .dropdown-item{
+        color:white;
+        font-size:.9rem;
+        transition:.25s;
+        }
+
+        .dropdown-item:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        transform:translateX(5px);
+        }
+
+    .dropdown-account{
+    color:white;
+    font-size:.85rem;
+    }
+      /* FORM CARD */
+
+.form-card{
+background:white;
+color:#0A192F;
+border-radius:20px;
+padding:40px;
+box-shadow:0 30px 70px rgba(0,0,0,.5);
+animation:cardFloat 4s ease-in-out infinite;
+transition:.3s;
+}
+
+/* floating animation like My Products */
+
+@keyframes cardFloat{
+0%{transform:translateY(0)}
+50%{transform:translateY(-8px)}
+100%{transform:translateY(0)}
+}
+
+/* TITLE */
+
+.page-title{
+color:#D4AF37;
+font-weight:700;
+letter-spacing:.5px;
+margin-bottom:25px;
+}
+
+/* LABELS */
+
+.form-card label{
+font-weight:600;
+font-size:.9rem;
+margin-bottom:4px;
+}
+
+/* INPUT FIELDS */
+
+.form-control{
+border-radius:10px;
+padding:10px 12px;
+border:1px solid #dcdcdc;
+font-size:.9rem;
+transition:.25s;
+}
+
+.form-control:focus{
+border-color:#D4AF37;
+box-shadow:0 0 0 2px rgba(212,175,55,.25);
+}
+
+/* TEXTAREA */
+
+textarea.form-control{
+resize:none;
+}
+
+/* BUTTONS */
+
+.btn-success{
+background:#D4AF37;
+border:none;
+color:#0A192F;
+font-weight:600;
+padding:8px 18px;
+border-radius:8px;
+}
+
+.btn-success:hover{
+background:#c79c25;
+}
+
+.btn-secondary{
+border-radius:8px;
+padding:8px 18px;
+}
+
+    </style>
+
 </head>
-<body class="bg-light">
 
+<body>
 
-<nav th:fragment="sellerNavbar"
-     class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
+<!-- NAVBAR -->
 
-    <a class="navbar-brand fw-bold d-flex align-items-center"
-       th:href="@{/seller/dashboard}">
-        <i class="bi bi-shop me-2"></i>
-        RevShop <span class="fw-light ms-1">Seller</span>
-    </a>
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm classic-navbar">
 
-    <div class="ms-auto d-flex align-items-center gap-4">
+    <div class="container">
 
-        <a th:href="@{/seller/notifications}"
-           class="position-relative text-light"
-           title="Order Notifications">
-            <i class="bi bi-bell fs-5"></i>
+        <a class="navbar-brand d-flex flex-column align-items-start text-decoration-none"
+           th:href="@{/seller/dashboard}">
 
-            <span id="notificationCount"
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                0
-            </span>
+<span class="fst-italic fw-bold text-white brand-text">
+Rev<span class="brand-accent">Shop</span>
+</span>
+
+            <span class="brand-subtext text-white">
+Shop <span class="brand-accent fw-bold">Smart</span>
+<i class="bi bi-gem brand-diamond"></i>
+</span>
+
         </a>
 
-        <div class="dropdown">
-            <button class="btn btn-outline-light btn-sm dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-1"></i>
-                My Account
-            </button>
+        <button class="navbar-toggler border-0 text-white"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
 
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li>
-                    <a class="dropdown-item" th:href="@{/seller/profile}">
-                        <i class="bi bi-person me-2"></i>
-                        Profile
+            <i class="bi bi-list fs-2"></i>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item">
+
+                    <a th:href="@{/seller/notifications}"
+                       class="nav-link position-relative text-decoration-none">
+
+                        <i class="bi bi-bell-fill fs-5 bell-icon"></i>
+
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
+
                     </a>
+
                 </li>
-                <li>
-                    <a class="dropdown-item text-danger" th:href="@{/logout}">
-                        <i class="bi bi-box-arrow-right me-2"></i>
-                        Logout
+
+                <li class="nav-item dropdown">
+
+                    <a href="#"
+                       class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <div class="profile-pill">
+
+                            <i class="bi bi-person-circle text-white"></i>
+
+                            <span class="fw-semibold text-capitalize"
+                                  th:text="${#strings.substringBefore(#authentication.name,'@')}">
+Seller
+</span>
+
+                            <span class="seller-tag">SELLER</span>
+
+                        </div>
+
                     </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li class="px-3 py-2 dropdown-account">
+                            Seller Account<br>
+                            <strong th:text="${#authentication.name}"></strong>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/seller/profile}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
                 </li>
+
             </ul>
+
         </div>
 
     </div>
+
 </nav>
 
-<!---->
 <div class="container mt-5">
-    <h3>Edit Product</h3>
-    <div th:if="${successMessage}"
-         class="alert alert-success alert-dismissible fade show mt-3">
-        <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+    <h3 class="page-title">Edit Product</h3>
+
+    <div class="form-card">
+
+        <form th:action="@{'/seller/update/' + ${product.productId}}" th:object="${product}" method="post">
+
+            <div class="mb-3">
+                <label>Product Name</label>
+                <input type="text" th:field="*{productName}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Manufacturer</label>
+                <input type="text" th:field="*{manufacturer}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea th:field="*{description}" class="form-control" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label>MRP</label>
+                <input type="number" step="0.01" id="mrp" th:field="*{mrp}" class="form-control" required oninput="updateSellingPrice()">
+            </div>
+
+            <div class="mb-3">
+                <label>Discount (%)</label>
+                <input type="number" step="0.01" id="discount" value="0" class="form-control" oninput="updateSellingPrice()">
+            </div>
+
+            <div class="mb-3">
+                <label>Selling Price</label>
+                <input type="number" step="0.01" id="sellingPrice" th:field="*{sellingPrice}" class="form-control" readonly>
+            </div>
+
+            <div class="mb-3">
+                <label>Stock</label>
+                <input type="number" th:field="*{stock}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Threshold</label>
+                <input type="number" th:field="*{stockThreshold}" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success">Update</button>
+            <a th:href="@{/seller/my-products}" class="btn btn-secondary">Cancel</a>
+
+        </form>
+
     </div>
 
-    <!--  ERROR MESSAGE -->
-    <div th:if="${errorMessage}"
-         class="alert alert-danger alert-dismissible fade show mt-3">
-        <span th:text="${errorMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    <form th:action="@{'/seller/update/' + ${product.productId}}" th:object="${product}" method="post">
-        <div class="mb-3">
-            <label>Product Name</label>
-            <input type="text" th:field="*{productName}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Manufacturer</label>
-            <input type="text" th:field="*{manufacturer}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea th:field="*{description}" class="form-control" required></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label>MRP</label>
-            <input type="number" step="0.01" id="mrp" th:field="*{mrp}" class="form-control" required oninput="updateSellingPrice()">
-        </div>
-
-        <div class="mb-3">
-            <label>Discount (%)</label>
-            <input type="number" step="0.01" id="discount" value="0" class="form-control" oninput="updateSellingPrice()">
-        </div>
-
-        <div class="mb-3">
-            <label>Selling Price</label>
-            <input type="number" step="0.01" id="sellingPrice" th:field="*{sellingPrice}" class="form-control" readonly>
-        </div>
-
-        <div class="mb-3">
-            <label>Stock</label>
-            <input type="number" th:field="*{stock}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Threshold</label>
-            <input type="number" th:field="*{stockThreshold}" class="form-control" required>
-        </div>
-
-        <button type="submit" class="btn btn-success">Update</button>
-        <a th:href="@{/seller/my-products}" class="btn btn-secondary">Cancel</a>
-    </form>
 </div>
 
 <script>
-    function updateSellingPrice() {
-        const mrp = parseFloat(document.getElementById('mrp').value) || 0;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-        document.getElementById('sellingPrice').value = (mrp - (mrp * discount / 100)).toFixed(2);
+
+    function updateSellingPrice(){
+    const mrp=parseFloat(document.getElementById('mrp').value)||0;
+    const discount=parseFloat(document.getElementById('discount').value)||0;
+    document.getElementById('sellingPrice').value=(mrp-(mrp*discount/100)).toFixed(2);
     }
 
-    window.onload = updateSellingPrice;
+    window.onload=updateSellingPrice;
+
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
+

@@ -2,37 +2,172 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>RevShop | My Profile</title>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+        body{
+        background:#0A192F;
+        color:white;
+        }
+
+        /* PAGE TITLE */
+        .page-title{
+        font-weight:700;
+        color:#D4AF37;
+        animation:titleFloat 4s ease-in-out infinite alternate;
+        }
+
+        /* FLOAT ANIMATION */
+        @keyframes titleFloat{
+        0%{transform:translateY(0)}
+        100%{transform:translateY(-5px)}
+        }
+
+        /* SLIDE ANIMATION */
+        .slide-up{
+        animation:slideUp .8s ease;
+        }
+
+        @keyframes slideUp{
+        from{
+        opacity:0;
+        transform:translateY(30px);
+        }
+        to{
+        opacity:1;
+        transform:translateY(0);
+        }
+        }
+
+        /* CARD STYLE */
+        .card{
+        border-radius:16px;
+        background:#112240;
+        color:white;
+        transition:all .35s ease;
+        }
+
+        /* CARD HOVER */
+        .card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 15px 30px rgba(0,0,0,.35);
+        }
+
+        /* HEADER */
+        .card-header{
+        background:transparent;
+        border-bottom:1px solid rgba(255,255,255,.08);
+        }
+
+        /* LABEL TEXT */
+        .text-muted{
+        color:#9fb3c8 !important;
+        }
+
+        /* INPUT STYLE */
+        .form-control,
+        .form-select{
+        background:#0A192F;
+        border:1px solid rgba(255,255,255,.1);
+        color:white;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+        border-color:#D4AF37;
+        box-shadow:0 0 0 .15rem rgba(212,175,55,.25);
+        background:#0A192F;
+        color:white;
+        }
+
+        /* BUTTON GOLD */
+        .btn-dark{
+        background:#D4AF37;
+        border:none;
+        color:#0A192F;
+        font-weight:600;
+        transition:.3s;
+        }
+
+        .btn-dark:hover{
+        background:#e6c65c;
+        transform:translateY(-2px);
+        }
+
+        /* OUTLINE BUTTON */
+        .btn-outline-secondary{
+        border-color:#D4AF37;
+        color:#D4AF37;
+        }
+
+        .btn-outline-secondary:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        }
+
+        /* STATS NUMBERS */
+        .stat-number{
+        font-size:2rem;
+        font-weight:700;
+        color:#D4AF37;
+        }
+
+        /* HOVER LIFT */
+        .hover-lift{
+        transition:.3s;
+        }
+
+        .hover-lift:hover{
+        transform:translateY(-5px) scale(1.02);
+        }
+
+    </style>
 
 </head>
 
-<body class="bg-light">
+<body>
 
-    <div th:replace="buyer/fragments/navbar :: navbar"></div>
+<div th:replace="buyer/fragments/navbar :: navbar"></div>
 
-    <div class="container py-5">
+<div class="container py-5">
+
+    <!-- TITLE -->
+    <h2 class="page-title mb-4 slide-up">My Profile</h2>
 
     <!-- ================= STATS SECTION ================= -->
-        <div class="row g-4 mb-5 text-center">
+    <div class="row g-4 mb-5 text-center slide-up">
 
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+
                 <div class="card-body py-4">
+
                     <p class="text-muted small mb-2">Total Orders</p>
-                    <h2 class="fw-bold text-dark mb-0"
-                        th:text="${totalOrders}"></h2>
+
+                    <h2 class="stat-number"
+                        th:text="${totalOrders}">
+                    </h2>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
+
                 <div class="card-body py-4">
+
                     <p class="text-muted small mb-2">Total Spending</p>
-                    <h2 class="fw-bold text-success mb-0"
-                        th:text="'₹ ' + ${totalSpending}"></h2>
+
+                    <h2 class="stat-number"
+                        th:text="'₹ ' + ${totalSpending}">
+                    </h2>
+
                 </div>
             </div>
         </div>
@@ -40,16 +175,18 @@
     </div>
 
     <!-- ================= PROFILE CARD ================= -->
-    <div class="card border-0 shadow-sm">
+    <div class="card border-0 shadow-sm slide-up">
 
-        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h5 class="mb-0 fw-semibold">My Profile</h5>
+        <div class="card-header d-flex justify-content-between align-items-center py-3">
+
+            <h5 class="mb-0 fw-semibold page-title">My Profile</h5>
 
             <a th:href="@{/buyer/profile(edit=true)}"
                class="btn btn-dark btn-sm px-3"
                th:if="${!editMode}">
                 Edit Profile
             </a>
+
         </div>
 
         <div class="card-body p-4">
@@ -153,6 +290,6 @@
     </div>
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

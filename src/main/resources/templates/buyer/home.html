@@ -6,112 +6,245 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background: linear-gradient(180deg,#f8fafc,#eef2f7);
+
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(135deg,#0A192F,#132a4d,#1b355d);
+        background-size:300% 300%;
+        animation:bgMove 15s ease infinite;
+        min-height:100vh;
+        color:white;
+        overflow-x:hidden;
         }
 
-        .welcome-card {
-            background: linear-gradient(135deg,#0f172a,#1e293b);
-            color: white;
-            border-radius: 16px;
+        @keyframes bgMove{
+        0%{background-position:0% 50%;}
+        50%{background-position:100% 50%;}
+        100%{background-position:0% 50%;}
         }
 
-        .welcome-card .btn-light {
-            font-weight: 500;
+        /* HERO CARD */
+
+        .welcome-card{
+        background:linear-gradient(135deg,#0A192F,#1e3a66);
+        border-radius:22px;
+        box-shadow:0 30px 70px rgba(0,0,0,.5);
+        animation:heroFloat 6s ease-in-out infinite;
         }
 
-        .section-title {
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        @keyframes heroFloat{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-8px)}
+        100%{transform:translateY(0)}
         }
 
-        .product-card {
-            border: none;
-            border-radius: 16px;
-            transition: all 0.3s ease;
+        /* HERO TEXT */
+
+        .welcome-card h3{
+        font-weight:700;
+        color:#ffffff;
+        letter-spacing:.5px;
         }
 
-        .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        .welcome-card p{
+        color:#d1d5db;
+        font-size:15px;
         }
 
-        .product-card img {
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
+        .welcome-card .text-warning{
+        color:#D4AF37 !important;
         }
 
-        .price {
-            font-size: 1.1rem;
+        /* HERO BUTTONS */
+
+        .hero-btn{
+        font-weight:600;
+        border-radius:30px;
+        padding:10px 24px;
+        transition:.35s ease;
         }
 
-        footer {
-            background: transparent;
+        .hero-btn:hover{
+        transform:translateY(-3px) scale(1.05);
+        box-shadow:0 12px 30px rgba(0,0,0,.4);
         }
+
+        /* SECTION TITLE */
+
+        .section-title{
+        font-weight:600;
+        letter-spacing:.5px;
+        color:#D4AF37;
+        }
+
+        /* PRODUCT CARD */
+
+        .product-card{
+        border:none;
+        border-radius:18px;
+        overflow:hidden;
+        background:white;
+        color:#0A192F;
+        box-shadow:0 18px 45px rgba(0,0,0,.35);
+        transition:.45s;
+        position:relative;
+        animation:cardFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes cardFloat{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-10px)}
+        100%{transform:translateY(0)}
+        }
+
+        .product-card:hover{
+        transform:translateY(-12px) scale(1.03);
+        box-shadow:0 30px 80px rgba(0,0,0,.45);
+        }
+
+        /* IMAGE */
+
+        .product-card img{
+        height:220px;
+        object-fit:cover;
+        transition:transform .5s ease;
+        }
+
+        .product-card:hover img{
+        transform:scale(1.1);
+        }
+
+        /* PRICE */
+
+        .price{
+        font-size:18px;
+        font-weight:700;
+        color:#0f9d58;
+        }
+
+        /* BADGES */
+
+        .badge{
+        font-size:12px;
+        padding:6px 10px;
+        border-radius:8px;
+        }
+
+       /* VIEW DETAILS BUTTON */
+.btn-view {
+    background: #0A192F !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 10px 20px;
+    transition: all .35s ease !important;
+    cursor: pointer;
+    text-decoration: none !important;
+    display: inline-block;
+}
+
+.btn-view:hover {
+    background: #2563eb !important;
+    color: white !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45) !important;
+}
+
+        /* VIEW ALL LINK */
+
+        .view-link{
+        font-weight:600;
+        color:#D4AF37;
+        text-decoration:none;
+        }
+
+        .view-link:hover{
+        text-decoration:underline;
+        }
+
+        /* FOOTER */
+
+        footer{
+        color:#cbd5e1;
+        }
+
     </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
+<!-- NAVBAR -->
 <div th:replace="buyer/fragments/navbar :: navbar"></div>
 
 <div class="container py-5">
 
-    <!-- Welcome Hero Card -->
-    <div class="welcome-card p-4 p-md-5 shadow-lg mb-5">
+    <!-- HERO SECTION -->
+
+    <div class="welcome-card p-4 p-md-5 mb-5">
 
         <div class="d-flex justify-content-between align-items-center flex-wrap">
 
             <div>
-                <h3 class="fw-bold mb-2">
+
+                <h3 class="mb-2">
                     Welcome back,
-                    <span class="text-warning"
-                          th:text="${buyerEmail}"></span>
+                    <span class="text-warning" th:text="${buyerEmail}"></span>
                 </h3>
-                <p class="mb-0 text-light opacity-75">
+
+                <p class="mb-0">
                     Discover fresh arrivals curated just for you.
                 </p>
+
             </div>
 
             <div class="mt-4 mt-md-0">
-                <a th:href="@{/buyer/products}"
-                   class="btn btn-warning px-4 me-2 shadow-sm">
+
+                <a th:href="@{/buyer/products}" class="btn btn-warning hero-btn me-2">
+                    <i class="bi bi-bag me-1"></i>
                     Browse Products
                 </a>
 
-                <a th:href="@{/buyer/orders}"
-                   class="btn btn-outline-light px-4">
+                <a th:href="@{/buyer/orders}" class="btn btn-outline-light hero-btn">
+                    <i class="bi bi-box-seam me-1"></i>
                     My Orders
                 </a>
+
             </div>
 
         </div>
 
     </div>
 
-    <!-- Section Header -->
+    <!-- SECTION HEADER -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="section-title mb-0">Latest Products</h4>
-        <a th:href="@{/buyer/products}"
-           class="text-decoration-none fw-semibold text-primary">
+
+        <h4 class="section-title mb-0">
+            Latest Products
+        </h4>
+
+        <a th:href="@{/buyer/products}" class="view-link">
             View All →
         </a>
+
     </div>
 
-    <!-- Product Grid -->
+    <!-- PRODUCT GRID -->
+
     <div class="row g-4">
 
         <div class="col-xl-3 col-lg-4 col-md-6"
              th:each="product : ${latestProducts}">
 
-            <div class="card product-card shadow-sm h-100">
+            <div class="card product-card h-100">
 
                 <img src="/images/default-product.png"
-                     class="card-img-top"
-                     style="height:220px; object-fit:cover;">
+                     class="card-img-top">
 
                 <div class="card-body d-flex flex-column p-4">
 
@@ -119,27 +252,31 @@
                         th:text="${product.productName}">
                     </h6>
 
-                    <p class="price text-success fw-bold mb-2"
+                    <p class="price mb-2"
                        th:text="'₹ ' + ${product.sellingPrice}">
                     </p>
 
                     <div class="mb-3">
-                        <span th:if="${product.stock > 0}"
-                              class="badge bg-success-subtle text-success">
-                            In Stock
-                        </span>
 
-                        <span th:if="${product.stock == 0}"
-                              class="badge bg-danger-subtle text-danger">
-                            Out of Stock
-                        </span>
+<span th:if="${product.stock > 0}"
+      class="badge bg-success-subtle text-success fw-semibold">
+In Stock
+</span>
+
+                        <span th:if="${product.stock <= 0}"
+                              class="badge bg-danger-subtle text-danger fw-semibold">
+Out of Stock
+</span>
+
                     </div>
 
                     <div class="mt-auto">
+
                         <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
-                           class="btn btn-dark w-100 rounded-pill">
+                           class="btn btn-view w-100">
                             View Details
                         </a>
+
                     </div>
 
                 </div>
@@ -152,8 +289,7 @@
 
 </div>
 
-<!-- Footer -->
-<footer class="py-4 mt-5 text-center text-muted small">
+<footer class="py-4 mt-5 text-center small">
     © 2026 RevShop. Crafted with precision.
 </footer>
 
@@ -161,3 +297,4 @@
 
 </body>
 </html>
+

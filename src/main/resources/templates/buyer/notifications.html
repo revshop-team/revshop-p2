@@ -1,62 +1,162 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>My Notifications | RevShop</title>
     <meta charset="UTF-8">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background-color: #f5f6f8;
+
+        body{
+            font-family:'Poppins',sans-serif;
+            background:linear-gradient(180deg,#0A192F,#112240);
+            min-height:100vh;
+            color:white;
+            overflow-x:hidden;
         }
 
-        .notification-card {
-            border: none;
-            border-radius: 18px;
-            padding: 18px;
-            transition: 0.25s ease;
+        /* TITLE */
+
+        .page-title{
+            font-weight:700;
+            color:#D4AF37;
+            animation:titleFloat 4s ease-in-out infinite alternate;
         }
 
-        .notification-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        @keyframes titleFloat{
+            0%{transform:translateY(0)}
+            100%{transform:translateY(-5px)}
         }
 
-        .unread {
-            border-left: 5px solid #0d6efd;
-            background: #ffffff;
+        /* NOTIFICATION CARD */
+
+        .notification-card{
+            border:none;
+            border-radius:18px;
+            padding:20px;
+            background:white;
+            color:#0A192F;
+            box-shadow:0 12px 30px rgba(0,0,0,.35);
+            transition:.4s;
+            position:relative;
+            animation:slideUp 1s ease forwards, floatCard 4s ease-in-out infinite;
+            opacity:0;
         }
 
-        .read {
-            background: #f8f9fa;
-            opacity: 0.9;
+        @keyframes slideUp{
+            0%{transform:translateY(70px);opacity:0;}
+            100%{transform:translateY(0);opacity:1;}
         }
 
-        .icon-box {
-            font-size: 28px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+        @keyframes floatCard{
+            0%{transform:translateY(0)}
+            50%{transform:translateY(-6px)}
+            100%{transform:translateY(0)}
+        }
+
+        .notification-card:hover{
+            transform:translateY(-10px) scale(1.02);
+            box-shadow:0 25px 60px rgba(0,0,0,.5);
+        }
+
+        /* UNREAD */
+
+        .unread{
+            border-left:6px solid #0d6efd;
+        }
+
+        /* READ */
+        .read{
+            background:#f8f9fa;
+            color:#0A192F;
+            opacity:1;
+        }
+
+        /* ICON */
+
+        .icon-box{
+            font-size:24px;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            transition:.3s;
+        }
+
+        .icon-box:hover{
+            transform:scale(1.2);
+        }
+
+        .placed-icon{
+            background:#e7f1ff;
+            color:#0d6efd;
+        }
+
+        .delivered-icon{
+            background:#e9f7ef;
+            color:#198754;
+        }
+
+        /* BADGES */
+
+        .badge{
+            font-weight:600;
+            border-radius:20px;
+            padding:6px 14px;
+        }
+
+        /* NEW BADGE ANIMATION */
+
+        .bg-danger{
+            animation:pulse 2s infinite;
+        }
+
+        @keyframes pulse{
+            0%{transform:scale(1)}
+            50%{transform:scale(1.12)}
+            100%{transform:scale(1)}
+        }
+
+        /* BUTTON */
+
+        .btn-outline-primary{
+            transition:.3s;
+        }
+
+        .btn-outline-primary:hover{
+            background:#0d6efd;
+            color:white;
+            transform:scale(1.05);
+            box-shadow:0 10px 25px rgba(13,110,253,.4);
+        }
+
+        /* TIME */
+
+        .time-text{
+            font-size:13px;
+            color:#6c757d;
+        }
+
+        /* HEADER TOOLBAR */
+
+        .notification-toolbar{
+            background:rgba(255,255,255,.05);
+            padding:15px 20px;
+            border-radius:12px;
+            backdrop-filter:blur(6px);
             display: flex;
             align-items: center;
-            justify-content: center;
         }
 
-        .placed-icon {
-            background: #e7f1ff;
-            color: #0d6efd;
-        }
-
-        .delivered-icon {
-            background: #e9f7ef;
-            color: #198754;
-        }
-
-        .time-text {
-            font-size: 13px;
-            color: #6c757d;
-        }
     </style>
+
 </head>
 
 <body>
@@ -65,71 +165,86 @@
 
 <div class="container py-5">
 
-    <h2 class="fw-bold mb-4">🔔 My Notifications</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
 
-    <!-- Empty State -->
+        <h3 class="page-title">
+            <i class="bi bi-bell-fill"></i>
+            My Notifications
+        </h3>
+
+        <div class="notification-toolbar">
+
+            <span class="me-4 fw-bold" style="color: #D4AF37; font-size: 1.1rem;">
+                <i class="bi bi-envelope-fill me-1"></i>
+                <span th:text="${#lists.size(notifications)}"></span>
+                Notifications
+            </span>
+
+            <button class="btn btn-sm btn-outline-warning"
+                    onclick="clearNotifications()">
+                <i class="bi bi-trash"></i>
+                Clear View
+            </button>
+
+        </div>
+
+    </div>
+
     <div th:if="${notifications == null || #lists.isEmpty(notifications)}"
          class="alert alert-info text-center rounded-4">
         No notifications yet.
     </div>
 
-    <!-- Notification List -->
     <div th:each="n : ${notifications}"
          th:class="'notification-card shadow-sm mb-3 ' + (${n.isRead} == 'N' ? 'unread' : 'read')">
 
         <div class="d-flex justify-content-between align-items-center">
 
-            <!-- LEFT SIDE (ICON + TEXT) -->
             <div class="d-flex align-items-center gap-3">
 
-                <!-- 📦 ORDER PLACED ICON -->
                 <div th:if="${#strings.contains(n.message, 'placed')}"
                      class="icon-box placed-icon">
-                    📦
+                    <i class="bi bi-box-seam"></i>
                 </div>
 
-                <!-- 🚚 DELIVERED ICON -->
                 <div th:if="${#strings.contains(n.message, 'delivered')}"
                      class="icon-box delivered-icon">
-                    🚚
+                    <i class="bi bi-truck"></i>
                 </div>
 
-                <!-- TEXT CONTENT -->
                 <div>
+
                     <div class="fw-semibold fs-5"
-                         th:text="${n.message}">
-                    </div>
+                         th:text="${n.message}"></div>
 
                     <div class="time-text"
-                         th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, hh:mm a')}">
-                    </div>
+                         th:text="${#temporals.format(n.createdAt, 'dd MMM yyyy, hh:mm a')}"></div>
+
                 </div>
 
             </div>
 
-            <!-- RIGHT SIDE (BADGE + BUTTON) -->
             <div class="text-end">
 
-                <!-- NEW BADGE -->
                 <span th:if="${n.isRead == 'N'}"
                       class="badge bg-danger mb-2">
-                    NEW
+                NEW
                 </span>
 
-                <!-- TYPE BADGE -->
                 <div>
+
                     <span th:if="${#strings.contains(n.message, 'placed')}"
                           class="badge bg-primary">
-                        ORDER PLACED
+                    ORDER PLACED
                     </span>
 
                     <span th:if="${#strings.contains(n.message, 'delivered')}"
                           class="badge bg-success">
-                        DELIVERED
+                    DELIVERED
                     </span>
+
                 </div>
 
-                <!-- MARK AS READ -->
                 <div class="mt-2" th:if="${n.isRead == 'N'}">
                     <a th:href="@{/buyer/notifications/read/{id}(id=${n.notificationId})}"
                        class="btn btn-sm btn-outline-primary">
@@ -137,10 +252,9 @@
                     </a>
                 </div>
 
-                <!-- READ STATUS -->
                 <span th:if="${n.isRead == 'Y'}"
                       class="badge bg-success mt-2">
-                    ✔ Read
+                ✔ Read
                 </span>
 
             </div>
@@ -150,5 +264,16 @@
 
 </div>
 
+<script>
+
+    function clearNotifications(){
+
+        document.querySelectorAll(".notification-card")
+            .forEach(card=>card.style.display="none")
+
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

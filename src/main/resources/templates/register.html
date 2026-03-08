@@ -1,132 +1,224 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Register | RevShop</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at 20% 20%, #1e1b4b, #0f172a 60%);
-            font-family: 'Segoe UI', sans-serif;
+
+        /* BACKGROUND */
+
+        body{
+        min-height:100vh;
+        margin:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:radial-gradient(circle at 20% 20%,#0f172a,#020617 70%);
+        font-family:'Inter',sans-serif;
+        overflow:hidden;
+        position:relative;
+        color:white;
         }
 
-        .register-wrapper {
-            width: 460px;
+        /* FLOATING ICONS */
+
+        .icon{
+        position:absolute;
+        font-size:28px;
+        color:rgba(250,204,21,0.15);
+        animation:floatIcon 14s infinite linear;
         }
 
-        .register-card {
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(18px);
-            border-radius: 24px;
-            padding: 45px 40px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: white;
+        .icon:nth-child(1){top:12%;left:8%;}
+        .icon:nth-child(2){top:75%;left:12%;}
+        .icon:nth-child(3){top:30%;left:82%;}
+        .icon:nth-child(4){top:82%;left:70%;}
+        .icon:nth-child(5){top:18%;left:60%;}
+        .icon:nth-child(6){top:55%;left:40%;}
+
+        @keyframes floatIcon{
+        0%{transform:translateY(0) rotate(0deg);}
+        50%{transform:translateY(-35px) rotate(180deg);}
+        100%{transform:translateY(0) rotate(360deg);}
         }
 
-        .brand {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, #facc15, #fde68a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* WRAPPER */
+
+        .register-wrapper{
+        width:310px;
+        z-index:10;
         }
 
-        .subtitle {
-            font-size: 13px;
-            color: rgba(255,255,255,0.6);
+        /* CARD */
+
+        .register-card{
+        background:rgba(17,24,39,0.92);
+        backdrop-filter:blur(12px);
+        border-radius:18px;
+        padding:22px 20px;
+        border:1px solid rgba(250,204,21,0.25);
+        box-shadow:
+        0 25px 60px rgba(0,0,0,.7),
+        0 0 25px rgba(250,204,21,.25);
+        animation:cardFloat 6s ease-in-out infinite;
         }
 
-        .form-label {
-            font-size: 13px;
-            color: rgba(255,255,255,0.75);
+        @keyframes cardFloat{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-6px)}
+        100%{transform:translateY(0)}
         }
 
-        .form-control,
-        .form-select {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 14px;
-            color: white;
-            padding: 11px 14px;
+        /* BRAND */
+
+        .brand{
+        font-family:'Poppins',sans-serif;
+        font-size:26px;
+        font-weight:700;
+        letter-spacing:2px;
+        background:linear-gradient(90deg,#facc15,#f59e0b,#fbbf24);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
         }
 
-        .form-control::placeholder {
-            color: rgba(255,255,255,0.5);
+        .subtitle{
+        font-size:11px;
+        color:#94a3b8;
+        margin-top:4px;
         }
 
-        .form-control:focus,
-        .form-select:focus {
-            background: rgba(255,255,255,0.12);
-            border-color: #facc15;
-            box-shadow: 0 0 0 0.2rem rgba(250,204,21,0.25);
-            color: white;
+        /* LABEL */
+
+        .form-label{
+        font-size:11px;
+        color:#e5e7eb;
+        margin-bottom:3px;
+        font-family:'Poppins',sans-serif;
         }
 
-        /* FIXED DROPDOWN VISIBILITY */
-        .form-select option {
-            background-color: #111827;
-            color: #ffffff;
+        /* INPUT */
+
+        .form-control{
+        background:#020617;
+        border:1px solid #1e293b;
+        border-radius:8px;
+        color:white;
+        padding:7px 10px;
+        font-size:12px;
+        transition:.25s;
         }
 
-        .btn-register {
-            background: linear-gradient(135deg, #facc15, #f59e0b);
-            border: none;
-            border-radius: 14px;
-            font-weight: 600;
-            padding: 12px;
-            transition: 0.3s ease;
+        .form-control:focus{
+        border-color:#facc15;
+        box-shadow:0 0 0 .15rem rgba(250,204,21,.25);
+        background:#020617;
+        color:white;
         }
 
-        .btn-register:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(250,204,21,0.4);
+        /* DROPDOWN */
+
+        .form-select{
+        background:#020617;
+        border:1px solid #1e293b;
+        border-radius:8px;
+        color:white;
+        padding:7px 10px;
+        font-size:12px;
+        font-family:'Poppins',sans-serif;
+        cursor:pointer;
+        transition:all .25s ease;
         }
 
-        .login-link {
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
+        /* DROPDOWN HOVER */
+
+        .form-select:hover{
+        border-color:#fbbf24;
+        box-shadow:0 0 12px rgba(250,204,21,.25);
+        transform:scale(1.02);
         }
 
-        .login-link:hover {
-            color: #facc15;
+        /* DROPDOWN FOCUS */
+
+        .form-select:focus{
+        border-color:#facc15;
+        box-shadow:0 0 0 .15rem rgba(250,204,21,.3);
         }
 
-        .alert {
-            border-radius: 12px;
+        /* OPTIONS */
+
+        .form-select option{
+        background:#020617;
+        color:white;
+        font-family:'Poppins',sans-serif;
+        padding:10px;
         }
 
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            margin: 25px 0;
+        /* DIVIDER */
+
+        .divider{
+        height:1px;
+        background:linear-gradient(to right,transparent,#facc15,transparent);
+        margin:14px 0;
         }
+
+        /* BUTTON */
+
+        .btn-register{
+        background:linear-gradient(135deg,#facc15,#f59e0b);
+        border:none;
+        border-radius:8px;
+        font-weight:600;
+        font-size:13px;
+        padding:8px;
+        transition:.3s;
+        color:#111827;
+        font-family:'Poppins',sans-serif;
+        }
+
+        .btn-register:hover{
+        transform:translateY(-2px);
+        box-shadow:0 10px 25px rgba(250,204,21,.5);
+        }
+
+        /* LOGIN LINK */
+
+        .login-link{
+        font-size:11px;
+        color:#94a3b8;
+        }
+
+        .login-link:hover{
+        color:#facc15;
+        }
+
     </style>
+
 </head>
 
 <body>
+
+<!-- FLOATING ICONS -->
+
+<i class="bi bi-cart icon"></i> <i class="bi bi-bag icon"></i> <i class="bi bi-box-seam icon"></i> <i class="bi bi-tag icon"></i> <i class="bi bi-credit-card icon"></i> <i class="bi bi-truck icon"></i>
 
 <div class="register-wrapper">
 
     <div class="register-card">
 
-        <div class="text-center mb-4">
+        <div class="text-center mb-3">
             <div class="brand">REVSHOP</div>
-            <div class="subtitle">Create Your Premium Account</div>
+            <div class="subtitle">Create Your Account</div>
         </div>
 
-        <!-- Error -->
-        <div th:if="${error}" class="alert alert-danger text-center">
+        <div th:if="${error}" class="alert alert-danger text-center p-2 small">
             <span th:text="${error}"></span>
         </div>
 
@@ -134,29 +226,27 @@
               th:object="${user}"
               method="post">
 
-            <!-- Email -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label">Email</label>
                 <input type="email"
                        class="form-control"
                        th:field="*{email}"
-                       placeholder="Enter your email"
+                       placeholder="Enter email"
                        required>
             </div>
 
-            <!-- Password -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label">Password</label>
                 <input type="password"
                        class="form-control"
                        th:field="*{password}"
-                       placeholder="Enter your password"
+                       placeholder="Enter password"
                        required>
             </div>
 
-            <!-- Security Question -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label">Security Question</label>
+
                 <select class="form-select"
                         th:field="*{securityQuestion}"
                         required>
@@ -169,10 +259,10 @@
                     </option>
 
                 </select>
+
             </div>
 
-            <!-- Security Answer -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label">Security Answer</label>
                 <input type="text"
                        class="form-control"
@@ -181,41 +271,45 @@
                        required>
             </div>
 
-            <!-- Role -->
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label">Register As</label>
+
                 <select class="form-select"
                         th:field="*{role}"
                         required>
+
                     <option value="">Select Role</option>
                     <option value="BUYER">Buyer</option>
                     <option value="SELLER">Seller</option>
+
                 </select>
+
             </div>
 
             <div class="divider"></div>
 
-            <!-- Button -->
             <div class="d-grid">
-                <button type="submit"
-                        class="btn btn-register">
+                <button type="submit" class="btn btn-register">
                     Create Account
                 </button>
             </div>
 
         </form>
 
-        <div class="text-center mt-4">
-            <span class="login-link">
-                Already have an account?
-                <a th:href="@{/login}" class="text-decoration-none login-link">
-                    Login
-                </a>
-            </span>
+        <div class="text-center mt-3">
+
+<span class="login-link">
+Already have an account?
+
+<a th:href="@{/login}"
+   class="text-decoration-none login-link">
+Login </a>
+
+</span>
+
         </div>
 
     </div>
-
 </div>
 
 </body>

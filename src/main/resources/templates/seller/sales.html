@@ -4,110 +4,367 @@
     <title>Sales Analytics | RevShop</title>
     <meta charset="UTF-8">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Chart.js (IMPORTANT FOR CHART) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(180deg,#0A192F,#112240);
+        color:white;
+        min-height:100vh;
+        }
+
+        /* NAVBAR */
+
+    .classic-navbar{
+    background:#0A192F;
+    border-bottom:1px solid #061022;
+    padding-top:8px;
+    padding-bottom:8px;
+    }
+
+    /* LOGO */
+
+    .navbar-brand{
+    padding-top:4px;
+    padding-bottom:4px;
+    }
+
+    .brand-text{
+    font-size:1.1rem;
+    line-height:1.3;   /* FIXES CUTTING */
+    letter-spacing:.5px;
+    }
+
+    .brand-subtext{
+    font-size:.65rem;
+    line-height:1.3;
+    }
+
+    /* GOLD SHIMMER */
+
+    .brand-accent{
+    background:linear-gradient(90deg,#D4AF37,#f5d76e,#bfa132,#D4AF37);
+    background-size:300% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:goldMove 3s linear infinite;
+    }
+
+    @keyframes goldMove{
+    0%{background-position:0%}
+    100%{background-position:300%}
+    }
+
+    /* DIAMOND ANIMATION */
+
+    .brand-diamond{
+    color:#D4AF37;
+    font-size:11px;
+    margin-left:4px;
+    display:inline-block;
+    animation:diamondSpin 2s infinite linear;
+    }
+
+    @keyframes diamondSpin{
+
+    0%{
+    transform:rotate(0deg) scale(1);
+    }
+
+    50%{
+    transform:rotate(180deg) scale(1.4);
+    }
+
+    100%{
+    transform:rotate(360deg) scale(1);
+    }
+
+    }
+
+    /* PROFILE PILL */
+
+    .profile-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border-radius:40px;
+    color:#fff;
+    font-size:.85rem;
+    border:1px solid rgba(212,175,55,.7);
+    }
+
+    .seller-tag{
+    font-size:.55rem;
+    font-weight:700;
+    background:#D4AF37;
+    color:#0A192F;
+    padding:2px 6px;
+    border-radius:12px;
+    }
+
+    /* BELL */
+
+    .bell-icon{
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+    display:inline-block;
+    transform-origin:top;
+    }
+
+    .bell-icon:hover{
+    color:#D4AF37;
+    animation:bellRing .6s ease;
+    }
+
+    @keyframes bellRing{
+    0%{transform:rotate(0)}
+    20%{transform:rotate(20deg)}
+    40%{transform:rotate(-18deg)}
+    60%{transform:rotate(14deg)}
+    80%{transform:rotate(-10deg)}
+    100%{transform:rotate(0)}
+    }
+
+    /* DROPDOWN */
+
+    .dropdown-menu{
+        background:#0A192F;
+        border:1px solid rgba(212,175,55,.5);
+        border-radius:14px;
+        box-shadow:0 12px 35px rgba(0,0,0,.6);
+        animation:dropdownFade .35s ease;
+        padding-top:8px;
+        }
+
+        @keyframes dropdownFade{
+        0%{opacity:0;transform:translateY(-10px) scale(.95);}
+        100%{opacity:1;transform:translateY(0) scale(1);}
+        }
+
+        .dropdown-item{
+        color:white;
+        font-size:.9rem;
+        transition:.25s;
+        }
+
+        .dropdown-item:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        transform:translateX(5px);
+        }
+
+    .dropdown-account{
+    color:white;
+    font-size:.85rem;
+    }
+
+        /* TITLE */
+
+        .page-title{
+        color:#D4AF37;
+        font-weight:700;
+        animation:slideDown .6s ease;
+        }
+
+        /* KPI CARDS */
+
+        .kpi-card{
+        background:white;
+        color:#0A192F;
+        border-radius:16px;
+        box-shadow:0 20px 50px rgba(0,0,0,.45);
+        transition:.35s;
+        animation:floatCard 6s ease-in-out infinite;
+        }
+
+        .kpi-card:hover{
+        transform:translateY(-6px) scale(1.03);
+        }
+
+        /* INSIGHT CARDS */
+
+        .insight-card{
+        background:#f8f9fa;
+        color:#0A192F;
+        border-radius:16px;
+        transition:.3s;
+        }
+
+        .insight-card:hover{
+        transform:scale(1.03);
+        }
+
+        /* CHART CARD */
+
+        .chart-card{
+        background:white;
+        border-radius:20px;
+        box-shadow:0 25px 60px rgba(0,0,0,.5);
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes floatCard{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-8px)}
+        100%{transform:translateY(0)}
+        }
+
+        @keyframes slideDown{
+        0%{opacity:0;transform:translateY(-20px)}
+        100%{opacity:1;transform:translateY(0)}
+        }
+
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
+<!-- NAVBAR -->
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm classic-navbar">
 
-    <a class="navbar-brand fw-bold d-flex align-items-center"
-       th:href="@{/seller/dashboard}">
-        <i class="bi bi-shop me-2"></i>
-        RevShop <span class="fw-light ms-1">Seller</span>
-    </a>
+    <div class="container">
 
-    <button class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sellerNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+        <a class="navbar-brand d-flex flex-column align-items-start text-decoration-none"
+           th:href="@{/seller/dashboard}">
 
-    <div class="collapse navbar-collapse" id="sellerNavbar">
-        <div class="ms-auto d-flex align-items-center gap-4">
+<span class="fst-italic fw-bold text-white brand-text">
+Rev<span class="brand-accent">Shop</span>
+</span>
 
-            <!-- Notifications -->
-            <a th:href="@{/seller/notifications}"
-               class="position-relative text-light text-decoration-none">
-                <i class="bi bi-bell fs-5"></i>
+            <span class="brand-subtext text-white">
+Shop <span class="brand-accent fw-bold">Smart</span>
+<i class="bi bi-gem brand-diamond"></i>
+</span>
 
-                <span id="notificationCount"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
+        </a>
 
-            <!-- Account Dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i>
-                    My Account
-                </button>
+        <button class="navbar-toggler border-0 text-white"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item"
-                           th:href="@{/seller/profile}">
-                            <i class="bi bi-person me-2"></i>
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-danger"
-                           th:href="@{/logout}">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <i class="bi bi-list fs-2"></i>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item">
+
+                    <a th:href="@{/seller/notifications}"
+                       class="nav-link position-relative text-decoration-none">
+
+                        <i class="bi bi-bell-fill fs-5 bell-icon"></i>
+
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item dropdown">
+
+                    <a href="#"
+                       class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <div class="profile-pill">
+
+                            <i class="bi bi-person-circle text-white"></i>
+
+                            <span class="fw-semibold text-capitalize"
+                                  th:text="${#strings.substringBefore(#authentication.name,'@')}">
+Seller
+</span>
+
+                            <span class="seller-tag">SELLER</span>
+
+                        </div>
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li class="px-3 py-2 dropdown-account">
+                            Seller Account<br>
+                            <strong th:text="${#authentication.name}"></strong>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/seller/profile}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
 
         </div>
+
     </div>
+
 </nav>
 
-<!-- ================= PAGE CONTENT ================= -->
-<div class="container mt-5">
+<!-- PAGE -->
 
-    <h2 class="fw-bold text-center mb-5">📊 Advanced Sales Analytics</h2>
+<div class="container py-5">
+
+    <h2 class="page-title text-center mb-5">📊 Advanced Sales Analytics</h2>
 
     <!-- KPI CARDS -->
-    <div class="row text-center mb-4">
+
+    <div class="row text-center mb-4 g-4">
 
         <div class="col-md-3">
-            <div class="card shadow-sm p-4">
+            <div class="card kpi-card p-4">
                 <h3 class="fw-bold" th:text="${totalOrders}">0</h3>
                 <p class="text-muted mb-0">Total Orders</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm p-4">
+            <div class="card kpi-card p-4">
                 <h3 class="fw-bold text-warning" th:text="${pendingOrders}">0</h3>
                 <p class="text-muted mb-0">Pending Orders</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm p-4">
+            <div class="card kpi-card p-4">
                 <h3 class="fw-bold text-success" th:text="${deliveredOrders}">0</h3>
                 <p class="text-muted mb-0">Delivered Orders</p>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm p-4">
+            <div class="card kpi-card p-4">
                 <h3 class="fw-bold text-primary">
                     ₹ <span th:text="${#numbers.formatDecimal(totalRevenue,1,2)}">0.00</span>
                 </h3>
@@ -117,85 +374,98 @@
 
     </div>
 
-    <!-- ADVANCED INSIGHTS -->
-    <div class="row mb-4">
+    <!-- INSIGHTS -->
+
+    <div class="row mb-5 g-4">
 
         <div class="col-md-6">
-            <div class="card shadow-sm p-4 text-center">
+
+            <div class="card insight-card shadow-sm p-4 text-center">
+
                 <h5 class="fw-bold">💰 Average Order Value</h5>
+
                 <h2 class="text-success">
                     ₹ <span th:text="${#numbers.formatDecimal(averageOrderValue,1,2)}">0.00</span>
                 </h2>
+
             </div>
+
         </div>
 
         <div class="col-md-6">
-            <div class="card shadow-sm p-4 text-center">
+
+            <div class="card insight-card shadow-sm p-4 text-center">
+
                 <h5 class="fw-bold">🏆 Top Selling Product</h5>
+
                 <h4 class="text-primary" th:text="${topProduct}">Product</h4>
+
             </div>
+
         </div>
 
     </div>
 
-    <!-- MONTHLY REVENUE CHART -->
-    <div class="card shadow-sm p-4">
-        <h4 class="fw-bold mb-3 text-center">📈 Monthly Revenue Chart</h4>
+    <!-- CHART -->
+
+    <div class="card chart-card p-4">
+
+        <h4 class="fw-bold text-center mb-3">📈 Monthly Revenue Chart</h4>
+
         <canvas id="revenueChart" height="100"></canvas>
+
     </div>
 
 </div>
 
-<!-- ================= NOTIFICATION SCRIPT ================= -->
 <script>
-    function loadNotificationCount() {
-        fetch('/seller/notifications/unread-count')
-            .then(res => res.text())
-            .then(count => {
-                const badge = document.getElementById('notificationCount');
-                const num = parseInt(count);
+    function loadNotificationCount(){
+    fetch('/seller/notifications/unread-count')
+    .then(res=>res.text())
+    .then(count=>{
+    const badge=document.getElementById('notificationCount');
+    const num=parseInt(count);
 
-                if (!isNaN(num) && num > 0) {
-                    badge.classList.remove('d-none');
-                    badge.textContent = num;
-                } else {
-                    badge.classList.add('d-none');
-                }
-            })
-            .catch(err => console.error("Notification error:", err));
+    if(!isNaN(num)&&num>0){
+    badge.classList.remove('d-none');
+    badge.textContent=num;
+    }else{
+    badge.classList.add('d-none');
+    }
+    });
     }
 
     loadNotificationCount();
-    setInterval(loadNotificationCount, 5000);
+    setInterval(loadNotificationCount,5000);
 </script>
 
-<!-- ================= CHART SCRIPT ================= -->
 <script th:inline="javascript">
-    const months = [[${months}]];
-    const revenues = [[${revenues}]];
 
-    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const months=[[${months}]];
+    const revenues=[[${revenues}]];
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: months,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: revenues,
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
+    const ctx=document.getElementById('revenueChart').getContext('2d');
+
+    new Chart(ctx,{
+    type:'bar',
+    data:{
+    labels:months,
+    datasets:[{
+    label:'Revenue (₹)',
+    data:revenues,
+    borderWidth:2,
+    borderRadius:8
+    }]
+    },
+    options:{
+    responsive:true,
+    plugins:{legend:{display:true}},
+    scales:{y:{beginAtZero:true}}
+    }
     });
+
 </script>
 
-<!-- Bootstrap JS (REQUIRED FOR DROPDOWN) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

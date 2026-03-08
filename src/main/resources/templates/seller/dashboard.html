@@ -1,225 +1,550 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
+
     <title>RevShop | Seller Dashboard</title>
+
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            background-color: #f5f6f8;
+
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(180deg,#0A192F,#112240);
+        min-height:100vh;
+        color:white;
+        overflow-x:hidden;
         }
 
-        .dashboard-card {
-            border-radius: 18px;
-            border: none;
-            transition: 0.25s ease;
-            cursor: pointer;
+        /* NAVBAR */
+
+        .classic-navbar{
+        background:#0A192F;
+        border-bottom:1px solid #060f1d;
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+        .navbar-brand{
+        line-height:1.2;
         }
 
-        .icon-box {
-            font-size: 48px;
+        .brand-text{
+        font-size:1.55rem;
+        letter-spacing:-0.2px;
+        line-height:1.35;
+        padding-bottom:2px;
+        display:inline-block;
         }
 
-        .section-title {
-            font-weight: 700;
-            color: #2c3e50;
+        .brand-subtext{
+        font-size:.7rem;
+        font-style:italic;
+        color:#e2e8f0;
+        display:flex;
+        align-items:center;
+        gap:5px;
         }
+
+        .brand-accent{
+        background:linear-gradient(90deg,#D4AF37,#f5d76e,#bfa132,#D4AF37);
+        background-size:200% auto;
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        display:inline-block;
+        padding-right:2px;
+        animation:goldMove 4s linear infinite;
+        }
+
+        @keyframes goldMove{
+        0%{background-position:0%}
+        100%{background-position:200%}
+        }
+
+        /* DIAMOND */
+
+        .brand-diamond{
+        color:#D4AF37;
+        font-size:11px;
+        animation:diamondJump 1.3s infinite ease-in-out;
+        }
+
+        @keyframes diamondJump{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-4px)}
+        100%{transform:translateY(0)}
+        }
+
+        /* SEARCH */
+
+        .search-input{
+        font-size:.85rem;
+        padding:.4rem 1rem;
+        }
+
+        .search-btn{
+        background:#D4AF37;
+        color:#0A192F;
+        font-weight:bold;
+        }
+
+        /* PROFILE */
+
+        .profile-pill{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:5px 12px;
+        border-radius:50px;
+        color:#fff;
+        font-size:.85rem;
+        border:1px solid rgba(212,175,55,.6);
+        transition:.3s;
+        }
+
+        .profile-pill:hover{
+        background:rgba(255,255,255,.08);
+        border-color:#D4AF37;
+        box-shadow:0 0 12px rgba(212,175,55,.6);
+        }
+
+        .seller-tag{
+        font-size:.6rem;
+        font-weight:800;
+        background:#D4AF37;
+        color:#0A192F;
+        padding:2px 6px;
+        border-radius:12px;
+        }
+
+        /* BELL HOVER SHAKE */
+
+        .bell-icon{
+        color:white;
+        cursor:pointer;
+        transition:.25s;
+        display:inline-block;
+        transform-origin:top;
+        }
+
+        .bell-icon:hover{
+        color:#D4AF37;
+        animation:bellRing .6s ease;
+        }
+
+        @keyframes bellRing{
+
+        0%{transform:rotate(0)}
+
+        15%{transform:rotate(22deg)}
+
+        30%{transform:rotate(-18deg)}
+
+        45%{transform:rotate(15deg)}
+
+        60%{transform:rotate(-10deg)}
+
+        75%{transform:rotate(6deg)}
+
+        100%{transform:rotate(0)}
+
+        }
+
+        /* DROPDOWN */
+
+        .dropdown-menu{
+        background:#0A192F;
+        border:1px solid rgba(212,175,55,.5);
+        border-radius:14px;
+        box-shadow:0 12px 35px rgba(0,0,0,.6);
+        animation:dropdownFade .35s ease;
+        padding-top:8px;
+        }
+
+        @keyframes dropdownFade{
+        0%{opacity:0;transform:translateY(-10px) scale(.95);}
+        100%{opacity:1;transform:translateY(0) scale(1);}
+        }
+
+        .dropdown-item{
+        color:white;
+        font-size:.9rem;
+        transition:.25s;
+        }
+
+        .dropdown-item:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        transform:translateX(5px);
+        }
+
+        /* ACCOUNT TEXT */
+
+        .dropdown-account{
+        color:white;
+        font-size:.85rem;
+        }
+
+        /* DASHBOARD */
+
+        .dashboard-title{
+        font-weight:600;
+        margin-bottom:25px;
+        color:#D4AF37;
+        }
+
+        /* CARDS */
+
+        .dashboard-card{
+        border:none;
+        border-radius:16px;
+        transition:.4s;
+        background:white;
+        color:#0A192F;
+        box-shadow:0 15px 40px rgba(0,0,0,.4);
+        }
+
+        .dashboard-card:hover{
+        transform:translateY(-8px) scale(1.02);
+        box-shadow:0 25px 70px rgba(0,0,0,.6);
+        }
+
+        .card-icon{
+        font-size:30px;
+        color:#D4AF37;
+        }
+
     </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
+<!-- NAVBAR -->
 
-    <a class="navbar-brand fw-bold d-flex align-items-center"
-       th:href="@{/seller/dashboard}">
-        <i class="bi bi-shop me-2"></i>
-        RevShop <span class="fw-light ms-1">Seller</span>
-    </a>
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm py-2 classic-navbar">
 
-    <button class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sellerNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="container">
 
-    <div class="collapse navbar-collapse" id="sellerNavbar">
-        <div class="ms-auto d-flex align-items-center gap-4">
+        <a class="navbar-brand d-flex flex-column align-items-start me-4 text-decoration-none"
+           th:href="@{/seller/dashboard}">
 
-            <!-- Notifications -->
-            <a th:href="@{/seller/notifications}"
-               class="position-relative text-light text-decoration-none">
-                <i class="bi bi-bell fs-5"></i>
+<span class="fst-italic fw-bold text-white brand-text">
+Rev<span class="brand-accent">Shop</span>
+</span>
 
-                <span id="notificationCount"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
+            <span class="brand-subtext">
+<span class="text-white">Shop</span>
+<span class="brand-accent fw-bold">Smart</span>
+<i class="bi bi-gem brand-diamond"></i>
+</span>
 
-            <!-- Account Dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i>
-                    My Account
-                </button>
+        </a>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item" th:href="@{/seller/profile}">
-                            <i class="bi bi-person me-2"></i>
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-danger" th:href="@{/logout}">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <button class="navbar-toggler border-0 text-white"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+            <i class="bi bi-list fs-2"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <form class="d-flex mx-auto w-100 my-3 my-lg-0 px-lg-4"
+                  style="max-width:500px;"
+                  th:action="@{/seller/my-products}"
+                  method="get">
+
+                <div class="input-group shadow-sm">
+
+                    <input class="form-control border-0 search-input"
+                           type="search"
+                           name="keyword"
+                           placeholder="Search your products...">
+
+                    <button class="btn search-btn border-0 px-3">
+                        <i class="bi bi-search"></i>
+                    </button>
+
+                </div>
+
+            </form>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item">
+
+                    <a th:href="@{/seller/notifications}"
+                       class="nav-link position-relative text-decoration-none">
+
+                        <i class="bi bi-bell-fill fs-5 bell-icon"></i>
+
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item dropdown">
+
+                    <a href="#"
+                       class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <div class="profile-pill">
+
+                            <i class="bi bi-person-circle text-white"></i>
+
+                            <span class="fw-semibold text-capitalize"
+                                  th:text="${#strings.substringBefore(#authentication.name,'@')}">
+Seller
+</span>
+
+                            <span class="seller-tag">SELLER</span>
+
+                        </div>
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li class="px-3 py-2 dropdown-account">
+                            Seller Account<br>
+                            <strong th:text="${#authentication.name}"></strong>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               th:href="@{/seller/profile}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger"
+                               th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
 
         </div>
+
     </div>
+
 </nav>
 
-<!-- ================= PAGE CONTENT ================= -->
+<!-- DASHBOARD -->
+
 <div class="container py-5">
 
-    <h2 class="text-center mb-5 section-title">
-        Seller Dashboard
-    </h2>
+    <h3 class="dashboard-title">Seller Dashboard</h3>
 
-    <div class="row g-4 justify-content-center">
+    <div class="row g-4">
 
-        <!-- ADD PRODUCT -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/add-product}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-primary">
-                        <i class="bi bi-plus-square"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">Add Product</h5>
-                    <small class="text-muted">Create and list new products</small>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-box-seam card-icon"></i>
+
+                    <h5 class="mt-3">My Products</h5>
+
+                    <p class="text-muted small">
+                        Manage and update your product listings
+                    </p>
+
+                    <a th:href="@{/seller/my-products}" class="btn btn-outline-dark btn-sm">
+                        View Products
+                    </a>
+
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- MANAGE PRODUCTS -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/my-products}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-success">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">Manage Products</h5>
-                    <small class="text-muted">Edit, update & delete products</small>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-plus-circle card-icon"></i>
+
+                    <h5 class="mt-3">Add Product</h5>
+
+                    <p class="text-muted small">
+                        Add new products to your store
+                    </p>
+
+                    <a th:href="@{/seller/add-product}" class="btn btn-outline-dark btn-sm">
+                        Add Product
+                    </a>
+
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- VIEW ORDERS -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/orders}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-warning">
-                        <i class="bi bi-bag-check"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">View Orders</h5>
-                    <small class="text-muted">Orders placed for your products</small>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-receipt card-icon"></i>
+
+                    <h5 class="mt-3">Orders</h5>
+
+                    <p class="text-muted small">
+                        View and manage customer orders
+                    </p>
+
+                    <a th:href="@{/seller/orders}" class="btn btn-outline-dark btn-sm">
+                        View Orders
+                    </a>
+
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- SALES ANALYTICS -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/sales}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-info">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">Sales Analytics</h5>
-                    <small class="text-muted">Revenue & performance insights</small>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-graph-up card-icon"></i>
+
+                    <h5 class="mt-3">Sales</h5>
+
+                    <p class="text-muted small">
+                        Track your sales performance
+                    </p>
+
+                    <a th:href="@{/seller/sales}" class="btn btn-outline-dark btn-sm">
+                        View Sales
+                    </a>
+
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- LOW STOCK ALERT -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/my-products}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-danger">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">Low Stock Alerts</h5>
-                    <small class="text-muted">Products nearing stock threshold</small>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-person card-icon"></i>
+
+                    <h5 class="mt-3">Profile</h5>
+
+                    <p class="text-muted small">
+                        Update your seller profile
+                    </p>
+
+                    <a th:href="@{/seller/profile}" class="btn btn-outline-dark btn-sm">
+                        View Profile
+                    </a>
+
                 </div>
-            </a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-exclamation-triangle card-icon"></i>
+
+                    <h5 class="mt-3">Low Stock</h5>
+
+                    <p class="text-muted small">
+                        Products nearing stock threshold
+                    </p>
+
+                    <a th:href="@{/seller/low-stock}" class="btn btn-outline-dark btn-sm">
+                        View Alerts
+                    </a>
+
+                </div>
+            </div>
         </div>
 
-        <!-- PRODUCT REVIEWS -->
-        <div class="col-lg-3 col-md-6">
-            <a th:href="@{/seller/reviews}" class="text-decoration-none">
-                <div class="card dashboard-card text-center shadow-sm p-4">
-                    <div class="icon-box text-secondary">
-                        <i class="bi bi-star"></i>
-                    </div>
-                    <h5 class="mt-3 fw-bold">Product Reviews</h5>
-                    <small class="text-muted">Ratings & customer feedback</small>
+
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+
+                    <i class="bi bi-star card-icon"></i>
+
+                    <h5 class="mt-3">Product Reviews</h5>
+
+                    <p class="text-muted small">
+                        Ratings & customer feedback
+                    </p>
+
+                    <a th:href="@{/seller/reviews}" class="btn btn-outline-dark btn-sm">
+                        View Reviews
+                    </a>
+
                 </div>
-            </a>
+            </div>
         </div>
 
     </div>
-</div>
 
-<!-- ================= NOTIFICATION SCRIPT ================= -->
+</div>
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
 
-        function loadNotificationCount() {
-            fetch('/seller/notifications/unread-count')
-                .then(response => response.text())
-                .then(count => {
+    function loadNotificationCount() {
 
-                    const badge = document.getElementById("notificationCount");
-                    if (!badge) return;
+    fetch('/seller/notifications/unread-count')
 
-                    const num = parseInt(count);
+    .then(response => response.text())
 
-                    if (!isNaN(num) && num > 0) {
-                        badge.classList.remove("d-none");
-                        badge.textContent = num;
-                    } else {
-                        badge.classList.add("d-none");
-                    }
-                })
-                .catch(error => console.error("Notification error:", error));
-        }
+    .then(count => {
 
-        loadNotificationCount();
-        setInterval(loadNotificationCount, 5000);
+    const badge = document.getElementById("notificationCount");
+
+    if(!badge) return;
+
+    const num = parseInt(count);
+
+    if(!isNaN(num) && num > 0){
+
+    badge.classList.remove("d-none");
+
+    badge.textContent = num;
+
+    }else{
+
+    badge.classList.add("d-none");
+
+    }
+
+    })
+
+    .catch(error => console.error("Notification error:", error));
+
+    }
+
+    loadNotificationCount();
+
+    setInterval(loadNotificationCount,5000);
 
     });
-</script>
 
-<!-- Bootstrap JS -->
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

@@ -1,126 +1,384 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <title>Product Reviews | RevShop</title>
     <meta charset="UTF-8">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #f5f6f8; }
 
-        .product-card { border-radius: 14px; border: none; }
-        .review-box { background: #f8f9fa; border-radius: 12px; padding: 15px; }
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(180deg,#0A192F,#112240);
+        min-height:100vh;
+        color:white;
+        }
+        /* NAVBAR */
 
-        .avg-badge {
-            font-size: 16px;
-            padding: 8px 16px;
-            border-radius: 20px;
+    .classic-navbar{
+    background:#0A192F;
+    border-bottom:1px solid #061022;
+    padding-top:8px;
+    padding-bottom:8px;
+    }
+
+    /* LOGO */
+
+    .navbar-brand{
+    padding-top:4px;
+    padding-bottom:4px;
+    }
+
+    .brand-text{
+    font-size:1.1rem;
+    line-height:1.3;   /* FIXES CUTTING */
+    letter-spacing:.5px;
+    }
+
+    .brand-subtext{
+    font-size:.65rem;
+    line-height:1.3;
+    }
+
+    /* GOLD SHIMMER */
+
+    .brand-accent{
+    background:linear-gradient(90deg,#D4AF37,#f5d76e,#bfa132,#D4AF37);
+    background-size:300% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:goldMove 3s linear infinite;
+    }
+
+    @keyframes goldMove{
+    0%{background-position:0%}
+    100%{background-position:300%}
+    }
+
+    /* DIAMOND ANIMATION */
+
+    .brand-diamond{
+    color:#D4AF37;
+    font-size:11px;
+    margin-left:4px;
+    display:inline-block;
+    animation:diamondSpin 2s infinite linear;
+    }
+
+    @keyframes diamondSpin{
+
+    0%{
+    transform:rotate(0deg) scale(1);
+    }
+
+    50%{
+    transform:rotate(180deg) scale(1.4);
+    }
+
+    100%{
+    transform:rotate(360deg) scale(1);
+    }
+
+    }
+
+    /* PROFILE PILL */
+
+    .profile-pill{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border-radius:40px;
+    color:#fff;
+    font-size:.85rem;
+    border:1px solid rgba(212,175,55,.7);
+    }
+
+    .seller-tag{
+    font-size:.55rem;
+    font-weight:700;
+    background:#D4AF37;
+    color:#0A192F;
+    padding:2px 6px;
+    border-radius:12px;
+    }
+
+    /* BELL */
+
+    .bell-icon{
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+    display:inline-block;
+    transform-origin:top;
+    }
+
+    .bell-icon:hover{
+    color:#D4AF37;
+    animation:bellRing .6s ease;
+    }
+
+    @keyframes bellRing{
+    0%{transform:rotate(0)}
+    20%{transform:rotate(20deg)}
+    40%{transform:rotate(-18deg)}
+    60%{transform:rotate(14deg)}
+    80%{transform:rotate(-10deg)}
+    100%{transform:rotate(0)}
+    }
+
+    /* DROPDOWN */
+
+   .dropdown-menu{
+        background:#0A192F;
+        border:1px solid rgba(212,175,55,.5);
+        border-radius:14px;
+        box-shadow:0 12px 35px rgba(0,0,0,.6);
+        animation:dropdownFade .35s ease;
+        padding-top:8px;
         }
 
-        .star { font-size: 16px; color: #ffc107; }
-        .star-muted { color: #dee2e6; }
-
-        .low-rating {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 6px;
+        @keyframes dropdownFade{
+        0%{opacity:0;transform:translateY(-10px) scale(.95);}
+        100%{opacity:1;transform:translateY(0) scale(1);}
         }
+
+        .dropdown-item{
+        color:white;
+        font-size:.9rem;
+        transition:.25s;
+        }
+
+        .dropdown-item:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        transform:translateX(5px);
+        }
+
+    .dropdown-account{
+    color:white;
+    font-size:.85rem;
+    }
+
+        /* TITLE */
+
+        .page-title{
+        color:#D4AF37;
+        font-weight:700;
+        animation:slideDown .6s ease;
+        }
+
+        /* PRODUCT CARD */
+
+        .product-card{
+        background:white;
+        color:#0A192F;
+        border-radius:20px;
+        box-shadow:0 25px 60px rgba(0,0,0,.5);
+        transition:.35s;
+        animation:floatCard 6s ease-in-out infinite;
+        }
+
+        .product-card:hover{
+        transform:translateY(-6px);
+        }
+
+        /* REVIEW BOX */
+
+        .review-box{
+        background:#f8f9fa;
+        border-radius:12px;
+        padding:15px;
+        transition:.3s;
+        }
+
+        .review-box:hover{
+        transform:scale(1.02);
+        }
+
+        /* RATING BADGE */
+
+        .avg-badge{
+font-size:14px;
+padding:6px 12px;
+border-radius:20px;
+background:#D4AF37;
+color:#0A192F;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:4px;
+}
+
+        /* STARS */
+
+        .star{
+        color:#ffc107;
+        font-size:18px;
+        }
+
+        .star-muted{
+        color:#dee2e6;
+        }
+
+        /* WARNING */
+
+        .low-rating{
+        background:#fff3cd;
+        border-left:4px solid #ffc107;
+        padding:8px 12px;
+        border-radius:8px;
+        margin-top:6px;
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes floatCard{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-8px)}
+        100%{transform:translateY(0)}
+        }
+
+        @keyframes slideDown{
+        0%{opacity:0;transform:translateY(-20px)}
+        100%{opacity:1;transform:translateY(0)}
+        }
+
     </style>
 </head>
 
 <body>
+<!-- NAVBAR -->
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm classic-navbar">
 
-    <a class="navbar-brand fw-bold d-flex align-items-center"
-       th:href="@{/seller/dashboard}">
-        <i class="bi bi-shop me-2"></i>
-        RevShop <span class="fw-light ms-1">Seller</span>
-    </a>
+    <div class="container">
 
-    <button class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sellerNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+        <a class="navbar-brand d-flex flex-column align-items-start text-decoration-none"
+           th:href="@{/seller/dashboard}">
 
-    <div class="collapse navbar-collapse" id="sellerNavbar">
-        <div class="ms-auto d-flex align-items-center gap-4">
+<span class="fst-italic fw-bold text-white brand-text">
+Rev<span class="brand-accent">Shop</span>
+</span>
 
-            <!-- Notifications -->
-            <a th:href="@{/seller/notifications}"
-               class="position-relative text-light text-decoration-none">
-                <i class="bi bi-bell fs-5"></i>
+            <span class="brand-subtext text-white">
+Shop <span class="brand-accent fw-bold">Smart</span>
+<i class="bi bi-gem brand-diamond"></i>
+</span>
 
-                <span id="notificationCount"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
+        </a>
 
-            <!-- Account Dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i>
-                    My Account
-                </button>
+        <button class="navbar-toggler border-0 text-white"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item"
-                           th:href="@{/seller/profile}">
-                            <i class="bi bi-person me-2"></i>
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-danger"
-                           th:href="@{/logout}">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <i class="bi bi-list fs-2"></i>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item">
+
+                    <a th:href="@{/seller/notifications}"
+                       class="nav-link position-relative text-decoration-none">
+
+                        <i class="bi bi-bell-fill fs-5 bell-icon"></i>
+
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item dropdown">
+
+                    <a href="#"
+                       class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <div class="profile-pill">
+
+                            <i class="bi bi-person-circle text-white"></i>
+
+                            <span class="fw-semibold text-capitalize"
+                                  th:text="${#strings.substringBefore(#authentication.name,'@')}">
+Seller
+</span>
+
+                            <span class="seller-tag">SELLER</span>
+
+                        </div>
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li class="px-3 py-2 dropdown-account">
+                            Seller Account<br>
+                            <strong th:text="${#authentication.name}"></strong>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item" th:href="@{/seller/profile}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
 
         </div>
+
     </div>
+
 </nav>
+<div class="container py-5">
 
-<!-- ================= PAGE CONTENT ================= -->
-<div class="container mt-5">
+    <h3 class="page-title mb-4">⭐ Product Reviews & Ratings</h3>
 
-    <h3 class="fw-bold mb-4">⭐ Product Reviews & Ratings</h3>
-
-    <!-- EMPTY STATE -->
     <div th:if="${productReviewsMap == null || #maps.isEmpty(productReviewsMap)}"
-         class="alert alert-info text-center rounded-3 shadow-sm">
+         class="alert alert-info text-center">
         No reviews received for your products yet.
     </div>
 
-    <!-- PRODUCT GROUPED REVIEWS -->
     <div th:each="entry : ${productReviewsMap}"
-         class="card product-card shadow-sm mb-4">
+         class="card product-card mb-4">
+
         <div class="card-body">
 
-            <!-- PRODUCT HEADER -->
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between">
+
                 <div>
-                    <h4 class="fw-bold mb-1"
+
+                    <h4 class="fw-bold"
                         th:text="${entry.key.productName}">
-                        Product Name
+                        Product
                     </h4>
 
                     <small class="text-muted">
@@ -128,94 +386,76 @@
                         <span th:text="${reviewCountMap[entry.key.productId]}"></span>
                     </small>
 
-                    <div th:if="${avgRatingMap[entry.key.productId] != null
-                                 and avgRatingMap[entry.key.productId] < 3}"
+                    <div th:if="${avgRatingMap[entry.key.productId] != null and avgRatingMap[entry.key.productId] < 3}"
                          class="low-rating">
-                        ⚠ Low customer satisfaction for this product
+
+                        ⚠ Low customer satisfaction
+
                     </div>
+
                 </div>
 
-                <span class="badge bg-warning text-dark avg-badge shadow-sm fw-bold">
-                    ⭐
-                    <span th:text="${#numbers.formatDecimal(avgRatingMap[entry.key.productId], 1, 1)}"></span>
-                    / 5
-                </span>
+                <span class="avg-badge">
+
+⭐
+<span th:text="${#numbers.formatDecimal(avgRatingMap[entry.key.productId],1,1)}"></span>
+/5
+
+</span>
+
             </div>
 
-            <hr/>
+            <hr>
 
-            <!-- LATEST 2 REVIEWS -->
-            <div th:each="review, stat : ${entry.value}"
+            <div th:each="review,stat : ${entry.value}"
                  th:if="${stat.index < 2}"
                  class="review-box mb-3">
 
-                <div class="fw-semibold mb-2">
-                    <span th:each="i : ${#numbers.sequence(1,5)}">
-                        <span th:text="${i <= review.rating ? '★' : '☆'}"
-                              th:class="${i <= review.rating} ? 'star' : 'star star-muted'"></span>
-                    </span>
+                <div class="mb-2">
+
+<span th:each="i : ${#numbers.sequence(1,5)}">
+
+<span th:text="${i <= review.rating ? '★' : '☆'}"
+      th:class="${i <= review.rating}? 'star' : 'star star-muted'"></span>
+
+</span>
+
                     <span class="ms-2"
-                          th:text="${review.rating} + ' / 5'"></span>
+                          th:text="${review.rating + ' / 5'}"></span>
+
                 </div>
 
                 <div class="text-muted mb-1">
                     Buyer:
                     <span class="fw-semibold"
-                          th:text="${review.buyer.email}">
-                        buyer@email.com
-                    </span>
+                          th:text="${review.buyer.email}"></span>
                 </div>
 
-                <div class="mb-2 text-dark"
-                     th:text="${review.reviewComment}">
-                    Review comment
-                </div>
+                <div class="mb-2"
+                     th:text="${review.reviewComment}"></div>
 
                 <small class="text-secondary">
                     Reviewed on:
-                    <span th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}"></span>
+                    <span th:text="${#temporals.format(review.reviewDate,'dd MMM yyyy')}"></span>
                 </small>
 
             </div>
 
-            <!-- VIEW ALL -->
-            <div th:if="${entry.value.size() > 2}" class="text-end">
+            <div th:if="${entry.value.size() > 2}"
+                 class="text-end">
+
                 <a th:href="@{/seller/reviews/product/{id}(id=${entry.key.productId})}"
-                   class="btn btn-sm btn-outline-primary">
+                   class="btn btn-outline-primary btn-sm">
                     View All Reviews
                 </a>
+
             </div>
 
         </div>
+
     </div>
 
 </div>
-
-<!-- ================= NOTIFICATION SCRIPT ================= -->
-<script>
-    function loadNotificationCount() {
-        fetch('/seller/notifications/unread-count')
-            .then(res => res.text())
-            .then(count => {
-                const badge = document.getElementById('notificationCount');
-                const num = parseInt(count);
-
-                if (!isNaN(num) && num > 0) {
-                    badge.classList.remove('d-none');
-                    badge.textContent = num;
-                } else {
-                    badge.classList.add('d-none');
-                }
-            })
-            .catch(err => console.error("Notification error:", err));
-    }
-
-    loadNotificationCount();
-    setInterval(loadNotificationCount, 5000);
-</script>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
