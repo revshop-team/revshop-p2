@@ -562,4 +562,52 @@ public class SellerController {
 
         return "seller/sales";
     }
+    @GetMapping("/reviews/product/{id}")
+    public String viewAllReviewsForProduct(@PathVariable Long id, Model model) {
+
+        List<Review> reviews =
+                reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(id);
+
+        if (reviews.isEmpty()) {
+            model.addAttribute("reviews", reviews);
+            return "seller/product-reviews";
+        }
+
+        Product product = reviews.get(0).getProduct();
+
+        double avgRating =
+                reviewRepository.getAverageRatingByProductId(id);
+
+        long totalReviews =
+                reviewRepository.countByProduct_ProductId(id);
+
+        // ⭐ rating breakdown
+        Map<Integer, Long> ratingCount = new HashMap<>();
+
+        for (int i = 1; i <= 5; i++) {
+            int rating = i;
+            long count = reviews.stream()
+                    .filter(r -> r.getRating() == rating)
+                    .count();
+
+            ratingCount.put(i, count);
+        }
+
+        model.addAttribute("product", product);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("totalReviews", totalReviews);
+        model.addAttribute("ratingCount", ratingCount);
+
+        return "seller/product-reviews";
+    }
+    @GetMapping("/notifications/clear-all")
+    public String clearSellerNotifications(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        notificationService.clearAllNotifications(email);
+
+        return "redirect:/seller/notifications";
+    }
 }

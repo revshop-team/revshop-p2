@@ -503,4 +503,13 @@ public class BuyerController {
         model.addAttribute("payment",payment);
         return "buyer/orders-success";
     }
+    @GetMapping("/notifications/clear-all")
+    public String clearAllNotifications(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        notificationService.clearAllNotifications(email);
+
+        return "redirect:/buyer/notifications";
+    }
 }

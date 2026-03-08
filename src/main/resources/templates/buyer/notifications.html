@@ -66,7 +66,11 @@
 <div class="container py-5">
 
     <h2 class="fw-bold mb-4">🔔 My Notifications</h2>
-
+    <a href="/buyer/notifications/clear-all"
+       onclick="return confirm('Clear all notifications?')"
+       class="btn btn-sm btn-outline-danger">
+        Clear All
+    </a>
     <!-- Empty State -->
     <div th:if="${notifications == null || #lists.isEmpty(notifications)}"
          class="alert alert-info text-center rounded-4">
