@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> get12Products() {
         return productRepository
-                .findByIsActiveTrue()
+                .findByIsActive(1)
                 .stream()
                 .limit(12)
                 .toList();
@@ -94,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllActiveProducts() {
-        return productRepository.findByIsActiveTrue();
+        return productRepository.findByIsActive(1);
     }
     @Override
     public Page<Product> searchActiveProducts(String keyword, PageRequest pageable) {
