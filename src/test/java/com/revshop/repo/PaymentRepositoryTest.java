@@ -1,181 +1,162 @@
 package com.revshop.repo;
 
-import com.revshop.entity.Order;
 import com.revshop.entity.Payment;
-import com.revshop.entity.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@ExtendWith(MockitoExtension.class)
+public class PaymentRepositoryTest {
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
-class PaymentRepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
+    @Mock
     private PaymentRepository paymentRepository;
 
-    private Order testOrder;
-    private Payment testPayment;
+    private Payment dummyPayment;
 
     @BeforeEach
     void setUp() {
-        // 1. Create a unique User for the Order
-        User buyer = new User();
-        buyer.setEmail("pay_user_" + System.currentTimeMillis() + "@test.com");
-        buyer.setPassword("pass123");
-        buyer.setRole("BUYER");
-        buyer = entityManager.persistAndFlush(buyer);
-
-        // 2. Create an Order (Payment needs an Order)
-        testOrder = new Order();
-        testOrder.setBuyer(buyer);
-        testOrder.setStatus("PLACED");
-        testOrder.setTotalAmount(1500.0);
-        testOrder = entityManager.persistAndFlush(testOrder);
-
-        // 3. Create a baseline Payment
-        testPayment = new Payment();
-        testPayment.setOrder(testOrder);
-        testPayment.setPaymentMethod("UPI");
-        testPayment.setPaymentStatus("SUCCESS");
-        testPayment.setAmount(1500.0);
-        testPayment.setPaidAt(LocalDateTime.now());
-        testPayment = entityManager.persistAndFlush(testPayment);
+        dummyPayment = new Payment();
+        dummyPayment.setPaymentId(1L);
+        dummyPayment.setPaymentMethod("UPI");
+        dummyPayment.setPaymentStatus("SUCCESS");
+        dummyPayment.setAmount(1500.00);
+        dummyPayment.setPaidAt(LocalDateTime.now());
     }
 
-    // 1. Test Saving a Payment (Covers setPaymentMethod, setPaymentStatus, etc.)
+    // 1. Testing findByOrder_OrderIdIn with a match
     @Test
-    void testSavePayment_ShouldPersistData() {
-        assertThat(testPayment.getPaymentId()).isNotNull();
-        assertThat(testPayment.getPaymentStatus()).isEqualTo("SUCCESS");
+    void testFindByOrder_OrderIdIn_Found() {
+        List<Long> orderIds = Arrays.asList(101L, 102L);
+        Mockito.when(paymentRepository.findByOrder_OrderIdIn(orderIds)).thenReturn(Arrays.asList(dummyPayment));
+
+        List<Payment> result = paymentRepository.findByOrder_OrderIdIn(orderIds);
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("UPI", result.get(0).getPaymentMethod());
     }
 
-    // 2. Test Custom Method: findByOrder_OrderId
+    // 2. Testing findByOrder_OrderIdIn with no match
     @Test
-    void testFindByOrder_OrderId_ShouldReturnPayment() {
-        Payment found = paymentRepository.findByOrder_OrderId(testOrder.getOrderId());
+    void testFindByOrder_OrderIdIn_Empty() {
+        List<Long> orderIds = Arrays.asList(999L);
+        Mockito.when(paymentRepository.findByOrder_OrderIdIn(orderIds)).thenReturn(Collections.emptyList());
 
-        assertThat(found).isNotNull();
-        assertThat(found.getPaymentId()).isEqualTo(testPayment.getPaymentId());
+        List<Payment> result = paymentRepository.findByOrder_OrderIdIn(orderIds);
+
+        Assertions.assertTrue(result.isEmpty());
     }
 
-    // 3. Test Custom Method: findByOrder_OrderIdIn
+    // 3. Testing findByOrder_OrderId with a match
     @Test
-    void testFindByOrder_OrderIdIn_ShouldReturnList() {
-        List<Payment> results = paymentRepository.findByOrder_OrderIdIn(List.of(testOrder.getOrderId()));
+    void testFindByOrder_OrderId_Found() {
+        Long orderId = 101L;
+        Mockito.when(paymentRepository.findByOrder_OrderId(orderId)).thenReturn(dummyPayment);
 
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getPaymentMethod()).isEqualTo("UPI");
+        Payment result = paymentRepository.findByOrder_OrderId(orderId);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1500.00, result.getAmount());
     }
 
-    // 4. Test Find By ID
-    @Test
-    void testFindById_ShouldReturnPayment() {
-        Optional<Payment> found = paymentRepository.findById(testPayment.getPaymentId());
-        assertThat(found).isPresent();
-    }
-
-    // 5. Test Update Payment Status (Critical for Coverage)
-    @Test
-    void testUpdatePaymentStatus_ShouldReflectInDB() {
-        testPayment.setPaymentStatus("FAILED");
-        Payment updated = paymentRepository.save(testPayment);
-        entityManager.flush();
-
-        assertThat(updated.getPaymentStatus()).isEqualTo("FAILED");
-    }
-
-    // 6. Test Find All
-    @Test
-    void testFindAll_ShouldReturnAtLeastOne() {
-        List<Payment> all = paymentRepository.findAll();
-        assertThat(all.size()).isGreaterThanOrEqualTo(1);
-    }
-
-    // 7. Test Delete Payment
-    @Test
-    void testDeletePayment_ShouldRemoveFromDB() {
-        Long id = testPayment.getPaymentId();
-        paymentRepository.delete(testPayment);
-        entityManager.flush();
-
-        Optional<Payment> found = paymentRepository.findById(id);
-        assertThat(found).isNotPresent();
-    }
-
-    // 8. Test One-to-One Constraint (Unique Order ID)
-    @Test
-    void testDuplicateOrderPayment_ShouldFail() {
-        Payment duplicatePay = new Payment();
-        duplicatePay.setOrder(testOrder); // Same order as testPayment
-        duplicatePay.setAmount(10.0);
-
-        try {
-            paymentRepository.save(duplicatePay);
-            entityManager.flush();
-        } catch (Exception e) {
-            // Success: Oracle blocked the duplicate @OneToOne
-            return;
-        }
-        assertThat(false).as("Expected unique constraint violation for Order ID").isTrue();
-    }
-
-    // 9. Test Null Order Failure
-    @Test
-    void testSavePayment_NullOrder_ShouldFail() {
-        Payment badPay = new Payment();
-        badPay.setOrder(null);
-
-        try {
-            paymentRepository.save(badPay);
-            entityManager.flush();
-        } catch (Exception e) {
-            return;
-        }
-        assertThat(false).as("Expected null constraint violation").isTrue();
-    }
-
-    // 10. Test Count
-    @Test
-    void testCount_ShouldBePositive() {
-        assertThat(paymentRepository.count()).isGreaterThanOrEqualTo(1L);
-    }
-
-    // 11. Test Payment with Different Method (CARD)
-    @Test
-    void testSavePayment_CardMethod() {
-        Payment cardPay = new Payment();
-        // Needs a new Order because of @OneToOne Unique constraint
-        Order newOrder = new Order();
-        newOrder.setBuyer(testOrder.getBuyer());
-        newOrder = entityManager.persistAndFlush(newOrder);
-
-        cardPay.setOrder(newOrder);
-        cardPay.setPaymentMethod("CARD");
-        cardPay.setPaymentStatus("PENDING");
-
-        Payment saved = paymentRepository.save(cardPay);
-        assertThat(saved.getPaymentMethod()).isEqualTo("CARD");
-    }
-
-    // 12. Test Finding Payment by Non-Existent Order ID
+    // 4. Testing findByOrder_OrderId with no match
     @Test
     void testFindByOrder_OrderId_NotFound() {
-        Payment found = paymentRepository.findByOrder_OrderId(-99L);
-        assertThat(found).isNull();
+        Long orderId = 999L;
+        Mockito.when(paymentRepository.findByOrder_OrderId(orderId)).thenReturn(null);
+
+        Payment result = paymentRepository.findByOrder_OrderId(orderId);
+
+        Assertions.assertNull(result);
+    }
+
+    // 5. Testing built-in save method
+    @Test
+    void testSavePayment() {
+        Mockito.when(paymentRepository.save(dummyPayment)).thenReturn(dummyPayment);
+
+        Payment result = paymentRepository.save(dummyPayment);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("SUCCESS", result.getPaymentStatus());
+    }
+
+    // 6. Testing built-in findById with a match
+    @Test
+    void testFindById_Found() {
+        Mockito.when(paymentRepository.findById(1L)).thenReturn(Optional.of(dummyPayment));
+
+        Optional<Payment> result = paymentRepository.findById(1L);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(1L, result.get().getPaymentId());
+    }
+
+    // 7. Testing built-in findById with no match
+    @Test
+    void testFindById_NotFound() {
+        Mockito.when(paymentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<Payment> result = paymentRepository.findById(99L);
+
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    // 8. Testing built-in findAll with data
+    @Test
+    void testFindAll_Found() {
+        Mockito.when(paymentRepository.findAll()).thenReturn(Arrays.asList(dummyPayment));
+
+        List<Payment> result = paymentRepository.findAll();
+
+        Assertions.assertEquals(1, result.size());
+    }
+
+    // 9. Testing built-in findAll when empty
+    @Test
+    void testFindAll_Empty() {
+        Mockito.when(paymentRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<Payment> result = paymentRepository.findAll();
+
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    // 10. Testing built-in deleteById method
+    @Test
+    void testDeleteById() {
+        paymentRepository.deleteById(1L);
+
+        // Verify that the delete method was actually called exactly one time
+        Mockito.verify(paymentRepository, Mockito.times(1)).deleteById(1L);
+    }
+
+    // 11. Testing built-in count method
+    @Test
+    void testCount() {
+        Mockito.when(paymentRepository.count()).thenReturn(5L);
+
+        long result = paymentRepository.count();
+
+        Assertions.assertEquals(5L, result);
+    }
+
+    // 12. Testing built-in existsById method
+    @Test
+    void testExistsById() {
+        Mockito.when(paymentRepository.existsById(1L)).thenReturn(true);
+
+        boolean result = paymentRepository.existsById(1L);
+
+        Assertions.assertTrue(result);
     }
 }

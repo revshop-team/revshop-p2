@@ -42,7 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory_CategoryId(Long categoryId);
 
     // (Optional) Only active products
-    List<Product> findByIsActive(Integer isActive);
+    List<Product> findByIsActiveTrue();
     Page<Product> findByIsActiveTrue(PageRequest pageable);
 
     Page<Product> findByIsActiveTrueAndProductNameContainingIgnoreCase(
@@ -54,7 +54,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Long categoryId,
             PageRequest pageable
     );
-
     @Query("""
     SELECT p FROM Product p
     WHERE p.isActive = 1 AND (

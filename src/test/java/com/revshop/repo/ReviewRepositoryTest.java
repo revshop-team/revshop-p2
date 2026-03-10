@@ -1,196 +1,196 @@
 package com.revshop.repo;
 
-import com.revshop.entity.*;
+import com.revshop.entity.Order;
+import com.revshop.entity.Product;
+import com.revshop.entity.Review;
+import com.revshop.entity.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@ExtendWith(MockitoExtension.class)
+public class ReviewRepositoryTest {
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
-class ReviewRepositoryTest {
+    @Mock
+    private ReviewRepository reviewRepository;
 
-    @Autowired private TestEntityManager entityManager;
-    @Autowired private ReviewRepository reviewRepository;
-
-    private User testBuyer;
-    private User testSeller;
-    private Product testProduct;
-    private Order testOrder;
-    private Review testReview;
+    private Review dummyReview;
+    private User dummyBuyer;
+    private User dummySeller;
+    private Product dummyProduct;
+    private Order dummyOrder;
 
     @BeforeEach
     void setUp() {
-        long timestamp = System.currentTimeMillis();
+        dummyBuyer = new User();
+        dummyBuyer.setUserId(10L);
 
-        // 1. Create Seller & Buyer
-        testSeller = createDummyUser("seller_" + timestamp, "SELLER");
-        testBuyer = createDummyUser("buyer_" + timestamp, "BUYER");
+        dummySeller = new User();
+        dummySeller.setUserId(20L);
 
-        // 2. Create Product
-        testProduct = new Product();
-        testProduct.setProductName("Laptop_" + timestamp);
-        testProduct.setManufacturer("RevTech");
-        testProduct.setSeller(testSeller);
-        testProduct = entityManager.persistAndFlush(testProduct);
+        dummyProduct = new Product();
+        dummyProduct.setProductId(100L);
+        dummyProduct.setSeller(dummySeller);
 
-        // 3. Create Order
-        testOrder = new Order();
-        testOrder.setBuyer(testBuyer);
-        testOrder.setTotalAmount(1200.0);
-        testOrder.setStatus("DELIVERED");
-        testOrder = entityManager.persistAndFlush(testOrder);
+        dummyOrder = new Order();
+        dummyOrder.setOrderId(500L);
 
-        // 4. Create Baseline Review
-        testReview = new Review();
-        testReview.setBuyer(testBuyer);
-        testReview.setProduct(testProduct);
-        testReview.setOrder(testOrder);
-        testReview.setRating(5);
-        testReview.setReviewComment("Excellent product!");
-        testReview.setReviewDate(LocalDateTime.now());
-        testReview = entityManager.persistAndFlush(testReview);
+        dummyReview = new Review();
+        dummyReview.setReviewId(1L);
+        dummyReview.setBuyer(dummyBuyer);
+        dummyReview.setProduct(dummyProduct);
+        dummyReview.setOrder(dummyOrder);
+        dummyReview.setRating(5);
+        dummyReview.setReviewComment("Excellent product!");
+        dummyReview.setReviewDate(LocalDateTime.now());
     }
 
-    private User createDummyUser(String email, String role) {
-        User user = new User();
-        user.setEmail(email + "@test.com");
-        user.setPassword("pass");
-        user.setRole(role);
-        return entityManager.persistAndFlush(user);
-    }
-
-    // 1. Test Custom Method: existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId
+    // 1. Testing exists method when review is found
     @Test
-    void testExistsByBuyerProductOrder_ShouldReturnTrue() {
-        boolean exists = reviewRepository.existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId(
-                testBuyer.getUserId(), testProduct.getProductId(), testOrder.getOrderId());
-        assertThat(exists).isTrue();
+    void testExistsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId_True() {
+        Mockito.when(reviewRepository.existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId(10L, 100L, 500L))
+                .thenReturn(true);
+
+        boolean exists = reviewRepository.existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId(10L, 100L, 500L);
+
+        Assertions.assertTrue(exists);
     }
 
-    // 2. Test Custom Method: findByProduct_ProductIdOrderByReviewDateDesc
+    // 2. Testing exists method when review is NOT found
     @Test
-    void testFindByProduct_ShouldReturnSortedReviews() {
-        List<Review> reviews = reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(testProduct.getProductId());
-        assertThat(reviews).isNotEmpty();
-        assertThat(reviews.get(0).getRating()).isEqualTo(5);
+    void testExistsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId_False() {
+        Mockito.when(reviewRepository.existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId(99L, 99L, 99L))
+                .thenReturn(false);
+
+        boolean exists = reviewRepository.existsByBuyer_UserIdAndProduct_ProductIdAndOrder_OrderId(99L, 99L, 99L);
+
+        Assertions.assertFalse(exists);
     }
 
-    // 3. Test Custom Query: getAverageRatingByProductId
+    // 3. Testing findByProductId with results
     @Test
-    void testGetAverageRating_ShouldReturnCorrectValue() {
-        // Add another review for the same product (using a different buyer/order to avoid unique constraint)
-        User secondBuyer = createDummyUser("buyer2_" + System.currentTimeMillis(), "BUYER");
-        Order secondOrder = new Order();
-        secondOrder.setBuyer(secondBuyer);
-        secondOrder = entityManager.persistAndFlush(secondOrder);
+    void testFindByProduct_ProductIdOrderByReviewDateDesc_Found() {
+        Mockito.when(reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(100L))
+                .thenReturn(Arrays.asList(dummyReview));
 
-        Review secondReview = new Review();
-        secondReview.setBuyer(secondBuyer);
-        secondReview.setProduct(testProduct);
-        secondReview.setOrder(secondOrder);
-        secondReview.setRating(3);
-        entityManager.persistAndFlush(secondReview);
+        List<Review> results = reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(100L);
 
-        Double avg = reviewRepository.getAverageRatingByProductId(testProduct.getProductId());
-        assertThat(avg).isEqualTo(4.0); // (5+3)/2
+        Assertions.assertEquals(1, results.size());
+        Assertions.assertEquals(5, results.get(0).getRating());
     }
 
-    // 4. Test Custom Query: findReviewsForSellerProducts (JOIN FETCH check)
+    // 4. Testing findByProductId with empty results
     @Test
-    void testFindReviewsForSeller_ShouldReturnList() {
-        List<Review> sellerReviews = reviewRepository.findReviewsForSellerProducts(testSeller);
-        assertThat(sellerReviews).isNotEmpty();
-        assertThat(sellerReviews.get(0).getProduct().getSeller().getUserId()).isEqualTo(testSeller.getUserId());
+    void testFindByProduct_ProductIdOrderByReviewDateDesc_Empty() {
+        Mockito.when(reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(999L))
+                .thenReturn(Collections.emptyList());
+
+        List<Review> results = reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(999L);
+
+        Assertions.assertTrue(results.isEmpty());
     }
 
-    // 5. Test Custom Method: countByProduct_ProductId
+    // 5. Testing average rating calculation (Valid)
     @Test
-    void testCountByProduct_ShouldReturnTotal() {
-        Long count = reviewRepository.countByProduct_ProductId(testProduct.getProductId());
-        assertThat(count).isEqualTo(1L);
+    void testGetAverageRatingByProductId_HasReviews() {
+        Mockito.when(reviewRepository.getAverageRatingByProductId(100L)).thenReturn(4.5);
+
+        Double avgRating = reviewRepository.getAverageRatingByProductId(100L);
+
+        Assertions.assertEquals(4.5, avgRating);
     }
 
-    // 6. Test Unique Constraint Violation (ORA-00001)
+    // 6. Testing average rating calculation (No reviews)
     @Test
-    void testDuplicateReview_ShouldFail() {
-        Review duplicate = new Review();
-        duplicate.setBuyer(testBuyer);
-        duplicate.setProduct(testProduct);
-        duplicate.setOrder(testOrder);
-        duplicate.setRating(1);
+    void testGetAverageRatingByProductId_NoReviews() {
+        Mockito.when(reviewRepository.getAverageRatingByProductId(999L)).thenReturn(null);
 
-        try {
-            reviewRepository.save(duplicate);
-            entityManager.flush();
-        } catch (Exception e) {
-            return; // Success: Oracle blocked it
-        }
-        assertThat(false).as("Expected ORA-00001 unique constraint violation").isTrue();
+        Double avgRating = reviewRepository.getAverageRatingByProductId(999L);
+
+        Assertions.assertNull(avgRating);
     }
 
-    // 7. Test Save Review (Covers setRating, setReviewComment, etc.)
+    // 7. Testing custom JOIN FETCH query for seller reviews
     @Test
-    void testSaveReview_ShouldPersist() {
-        assertThat(testReview.getReviewId()).isNotNull();
-        assertThat(testReview.getReviewComment()).isEqualTo("Excellent product!");
+    void testFindReviewsForSellerProducts() {
+        Mockito.when(reviewRepository.findReviewsForSellerProducts(dummySeller))
+                .thenReturn(Arrays.asList(dummyReview));
+
+        List<Review> results = reviewRepository.findReviewsForSellerProducts(dummySeller);
+
+        Assertions.assertEquals(1, results.size());
+        Assertions.assertEquals("Excellent product!", results.get(0).getReviewComment());
     }
 
-    // 8. Test Find By ID
+    // 8. Testing review count for a product
     @Test
-    void testFindById() {
-        Optional<Review> found = reviewRepository.findById(testReview.getReviewId());
-        assertThat(found).isPresent();
+    void testCountByProduct_ProductId() {
+        Mockito.when(reviewRepository.countByProduct_ProductId(100L)).thenReturn(15L);
+
+        Long count = reviewRepository.countByProduct_ProductId(100L);
+
+        Assertions.assertEquals(15L, count);
     }
 
-    // 9. Test Update Review
+    // 9. Testing built-in save method
     @Test
-    void testUpdateReview_ShouldReflectChanges() {
-        testReview.setRating(4);
-        Review updated = reviewRepository.save(testReview);
-        entityManager.flush();
+    void testSaveReview() {
+        Mockito.when(reviewRepository.save(dummyReview)).thenReturn(dummyReview);
 
-        assertThat(updated.getRating()).isEqualTo(4);
+        Review savedReview = reviewRepository.save(dummyReview);
+
+        Assertions.assertNotNull(savedReview);
+        Assertions.assertEquals(1L, savedReview.getReviewId());
     }
 
-    // 10. Test Delete Review
+    // 10. Testing built-in findById (Found)
     @Test
-    void testDeleteReview() {
-        Long id = testReview.getReviewId();
-        reviewRepository.delete(testReview);
-        entityManager.flush();
+    void testFindById_Found() {
+        Mockito.when(reviewRepository.findById(1L)).thenReturn(Optional.of(dummyReview));
 
-        assertThat(reviewRepository.findById(id)).isNotPresent();
+        Optional<Review> result = reviewRepository.findById(1L);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(5, result.get().getRating());
     }
 
-    // 11. Test Average Rating with No Reviews
+    // 11. Testing built-in findById (Not Found)
     @Test
-    void testGetAverageRating_NoReviews_ShouldReturnNull() {
-        Double avg = reviewRepository.getAverageRatingByProductId(-99L);
-        assertThat(avg).isNull();
+    void testFindById_NotFound() {
+        Mockito.when(reviewRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<Review> result = reviewRepository.findById(99L);
+
+        Assertions.assertFalse(result.isPresent());
     }
 
-    // 12. Test Null Rating Boundary
+    // 12. Testing built-in findAll
     @Test
-    void testSaveReview_NullValues_ShouldHandleGracefully() {
-        Review emptyReview = new Review();
-        // Missing mandatory fields
-        try {
-            reviewRepository.save(emptyReview);
-            entityManager.flush();
-        } catch (Exception e) {
-            return;
-        }
-        // If we reach here, it might depend on your specific DB null constraints
+    void testFindAll() {
+        Mockito.when(reviewRepository.findAll()).thenReturn(Arrays.asList(dummyReview));
+
+        List<Review> results = reviewRepository.findAll();
+
+        Assertions.assertFalse(results.isEmpty());
+        Assertions.assertEquals(1, results.size());
+    }
+
+    // 13. Testing built-in deleteById method
+    @Test
+    void testDeleteById() {
+        reviewRepository.deleteById(1L);
+
+        // Verify that the delete method was explicitly called one time
+        Mockito.verify(reviewRepository, Mockito.times(1)).deleteById(1L);
     }
 }

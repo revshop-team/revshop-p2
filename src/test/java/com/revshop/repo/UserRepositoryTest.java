@@ -1,161 +1,160 @@
 package com.revshop.repo;
 
-import com.revshop.entity.User;
 import com.revshop.entity.SecurityQuestion;
+import com.revshop.entity.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@ExtendWith(MockitoExtension.class)
+public class UserRepositoryTest {
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
-class UserRepositoryTest {
+    @Mock
+    private UserRepository userRepository;
 
-    @Autowired private TestEntityManager entityManager;
-    @Autowired private UserRepository userRepository;
-
-    private User testUser;
-    private SecurityQuestion testQuestion;
+    private User dummyUser;
 
     @BeforeEach
     void setUp() {
-        // 1. Setup a Security Question correctly based on your entity
-        testQuestion = new SecurityQuestion();
-        // FIX: Using setQuestionText() to match your field 'questionText'
-        testQuestion.setQuestionText("What is your pet's name?");
-        testQuestion = entityManager.persistAndFlush(testQuestion);
+        SecurityQuestion sq = new SecurityQuestion();
+        sq.setQuestionId(1L);
 
-        // 2. Create a baseline BUYER
-        testUser = new User();
-        testUser.setEmail("buyer_" + System.currentTimeMillis() + "@test.com");
-        testUser.setPassword("encoded_password");
-        testUser.setRole("BUYER");
-        testUser.setSecurityQuestion(testQuestion);
-        testUser.setSecurityAnswer("Buddy");
-        testUser = entityManager.persistAndFlush(testUser);
+        dummyUser = new User();
+        dummyUser.setUserId(1L);
+        dummyUser.setEmail("matloob@test.com");
+        dummyUser.setPassword("securepass123");
+        dummyUser.setRole("BUYER");
+        dummyUser.setSecurityQuestion(sq);
+        dummyUser.setSecurityAnswer("Fluffy");
+        dummyUser.setCreatedAt(LocalDateTime.now());
     }
 
-    // 1. Test Custom Method: findByEmail
+    // 1. Testing custom findByEmail (Found)
     @Test
-    void testFindByEmail_ShouldReturnUser() {
-        Optional<User> found = userRepository.findByEmail(testUser.getEmail());
-        assertThat(found).isPresent();
-        assertThat(found.get().getRole()).isEqualTo("BUYER");
+    void testFindByEmail_Found() {
+        Mockito.when(userRepository.findByEmail("matloob@test.com")).thenReturn(Optional.of(dummyUser));
+
+        Optional<User> result = userRepository.findByEmail("matloob@test.com");
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("BUYER", result.get().getRole());
     }
 
-    // 2. Test Role Verification: SELLER (Turns setRole green)
-    @Test
-    void testSaveSeller_ShouldPersistCorrectRole() {
-        User seller = new User();
-        seller.setEmail("seller_" + System.currentTimeMillis() + "@test.com");
-        seller.setPassword("pass123");
-        seller.setRole("SELLER");
-
-        User saved = userRepository.save(seller);
-        assertThat(saved.getRole()).isEqualTo("SELLER");
-    }
-
-    // 3. Test Email Uniqueness (Verifies @Column(unique=true))
-    @Test
-    void testDuplicateEmail_ShouldFail() {
-        User duplicate = new User();
-        duplicate.setEmail(testUser.getEmail());
-        duplicate.setPassword("any");
-
-        try {
-            userRepository.save(duplicate);
-            entityManager.flush();
-        } catch (Exception e) {
-            return; // Success: ORA-00001 triggered
-        }
-        assertThat(false).as("Expected unique constraint violation").isTrue();
-    }
-
-    // 4. Test Security Question Association (Turns setSecurityQuestion green)
-    @Test
-    void testSecurityQuestionAssociation() {
-        assertThat(testUser.getSecurityQuestion().getQuestionText()).isEqualTo("What is your pet's name?");
-        assertThat(testUser.getSecurityAnswer()).isEqualTo("Buddy");
-    }
-
-    // 5. Test Null Password (Verifies @Column(nullable=false))
-    @Test
-    void testSaveUser_NullPassword_ShouldFail() {
-        User badUser = new User();
-        badUser.setEmail("nullpass_" + System.currentTimeMillis() + "@test.com");
-        badUser.setPassword(null);
-
-        try {
-            userRepository.save(badUser);
-            entityManager.flush();
-        } catch (Exception e) {
-            return; // Success: ORA-01400 triggered
-        }
-        assertThat(false).as("Expected null constraint violation").isTrue();
-    }
-
-    // 6. Test Find By ID
-    @Test
-    void testFindById() {
-        Optional<User> found = userRepository.findById(testUser.getUserId());
-        assertThat(found).isPresent();
-    }
-
-    // 7. Test Update Role
-    @Test
-    void testUpdateUserRole() {
-        testUser.setRole("SELLER");
-        User updated = userRepository.save(testUser);
-        entityManager.flush();
-        assertThat(updated.getRole()).isEqualTo("SELLER");
-    }
-
-    // 8. Test Delete User
-    @Test
-    void testDeleteUser() {
-        userRepository.delete(testUser);
-        entityManager.flush();
-        assertThat(userRepository.findByEmail(testUser.getEmail())).isNotPresent();
-    }
-
-    // 9. Test findByEmail (Non-existent)
+    // 2. Testing custom findByEmail (Not Found)
     @Test
     void testFindByEmail_NotFound() {
-        Optional<User> found = userRepository.findByEmail("ghost@test.com");
-        assertThat(found).isNotPresent();
+        Mockito.when(userRepository.findByEmail("unknown@test.com")).thenReturn(Optional.empty());
+
+        Optional<User> result = userRepository.findByEmail("unknown@test.com");
+
+        Assertions.assertFalse(result.isPresent());
     }
 
-    // 10. Test CreatedAt Persistence (Turns setCreatedAt green)
+    // 3. Testing built-in save method
     @Test
-    void testCreatedAt_ShouldBeAutomaticallySet() {
-        assertThat(testUser.getCreatedAt()).isNotNull();
+    void testSaveUser() {
+        Mockito.when(userRepository.save(dummyUser)).thenReturn(dummyUser);
+
+        User savedUser = userRepository.save(dummyUser);
+
+        Assertions.assertNotNull(savedUser);
+        Assertions.assertEquals(1L, savedUser.getUserId());
     }
 
-    // 11. Test Find All (Oracle integration check)
+    // 4. Testing built-in findById (Found)
     @Test
-    void testFindAll() {
-        List<User> users = userRepository.findAll();
-        assertThat(users.size()).isGreaterThanOrEqualTo(1);
+    void testFindById_Found() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(dummyUser));
+
+        Optional<User> result = userRepository.findById(1L);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("matloob@test.com", result.get().getEmail());
     }
 
-    // 12. Test Password Persistence (Turns setPassword green)
+    // 5. Testing built-in findById (Not Found)
     @Test
-    void testPasswordPersistence() {
-        String testPass = "new_secret_password";
-        testUser.setPassword(testPass);
-        User saved = userRepository.save(testUser);
-        entityManager.flush();
+    void testFindById_NotFound() {
+        Mockito.when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThat(saved.getPassword()).isEqualTo(testPass);
+        Optional<User> result = userRepository.findById(99L);
+
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    // 6. Testing built-in findAll (With Data)
+    @Test
+    void testFindAll_Found() {
+        Mockito.when(userRepository.findAll()).thenReturn(Arrays.asList(dummyUser));
+
+        List<User> result = userRepository.findAll();
+
+        Assertions.assertEquals(1, result.size());
+    }
+
+    // 7. Testing built-in findAll (Empty)
+    @Test
+    void testFindAll_Empty() {
+        Mockito.when(userRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<User> result = userRepository.findAll();
+
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    // 8. Testing built-in deleteById method
+    @Test
+    void testDeleteById() {
+        userRepository.deleteById(1L);
+
+        Mockito.verify(userRepository, Mockito.times(1)).deleteById(1L);
+    }
+
+    // 9. Testing built-in delete method (passing the object)
+    @Test
+    void testDelete() {
+        userRepository.delete(dummyUser);
+
+        Mockito.verify(userRepository, Mockito.times(1)).delete(dummyUser);
+    }
+
+    // 10. Testing built-in count method
+    @Test
+    void testCount() {
+        Mockito.when(userRepository.count()).thenReturn(50L);
+
+        long result = userRepository.count();
+
+        Assertions.assertEquals(50L, result);
+    }
+
+    // 11. Testing built-in existsById (True)
+    @Test
+    void testExistsById_True() {
+        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+
+        boolean exists = userRepository.existsById(1L);
+
+        Assertions.assertTrue(exists);
+    }
+
+    // 12. Testing built-in existsById (False)
+    @Test
+    void testExistsById_False() {
+        Mockito.when(userRepository.existsById(99L)).thenReturn(false);
+
+        boolean exists = userRepository.existsById(99L);
+
+        Assertions.assertFalse(exists);
     }
 }

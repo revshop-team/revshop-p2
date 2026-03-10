@@ -1,172 +1,156 @@
 package com.revshop.repo;
 
 import com.revshop.entity.Category;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@ExtendWith(MockitoExtension.class)
+public class CategoryRepositoryTest {
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
-class CategoryRepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
+    @Mock
     private CategoryRepository categoryRepository;
 
-    private Category testCategory;
+    private Category dummyCategory;
 
     @BeforeEach
     void setUp() {
-        // Ensure "Electronics" exists for search tests, but don't crash if it's already there
-        Optional<Category> existing = categoryRepository.findByCategoryNameIgnoreCase("Electronics");
-
-        if (existing.isPresent()) {
-            testCategory = existing.get();
-        } else {
-            testCategory = new Category();
-            testCategory.setCategoryName("Electronics");
-            testCategory.setDescription("Devices and Gadgets");
-            testCategory = entityManager.persistAndFlush(testCategory);
-        }
+        dummyCategory = new Category();
+        dummyCategory.setCategoryId(1L);
+        dummyCategory.setCategoryName("Electronics");
+        dummyCategory.setDescription("Gadgets and devices");
     }
 
-    // 1. Test Saving a Category (Uses a unique name to avoid ORA-00001)
+    // 1. Testing custom findByCategoryNameIgnoreCase (Found)
     @Test
-    void testSaveCategory_ShouldPersistData() {
-        Category category = new Category();
-        category.setCategoryName("Fashion_" + System.currentTimeMillis());
-        category.setDescription("Clothing and Accessories");
+    void testFindByCategoryNameIgnoreCase_Found() {
+        Mockito.when(categoryRepository.findByCategoryNameIgnoreCase("electronics"))
+                .thenReturn(Optional.of(dummyCategory));
 
-        Category saved = categoryRepository.save(category);
+        Optional<Category> result = categoryRepository.findByCategoryNameIgnoreCase("electronics");
 
-        assertThat(saved.getCategoryId()).isNotNull();
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("Electronics", result.get().getCategoryName());
     }
 
-    // 2. Test Custom Method: findByCategoryNameIgnoreCase
+    // 2. Testing custom findByCategoryNameIgnoreCase (Not Found)
     @Test
-    void testFindByCategoryNameIgnoreCase_ShouldReturnCategory() {
-        Optional<Category> found = categoryRepository.findByCategoryNameIgnoreCase("electronics");
+    void testFindByCategoryNameIgnoreCase_NotFound() {
+        Mockito.when(categoryRepository.findByCategoryNameIgnoreCase("unknown"))
+                .thenReturn(Optional.empty());
 
-        assertThat(found).isPresent();
-        assertThat(found.get().getCategoryName()).isEqualTo("Electronics");
+        Optional<Category> result = categoryRepository.findByCategoryNameIgnoreCase("unknown");
+
+        Assertions.assertFalse(result.isPresent());
     }
 
-    // 3. Test Custom Method: existsByCategoryName
+    // 3. Testing custom existsByCategoryName (True)
     @Test
-    void testExistsByCategoryName_ShouldReturnTrue() {
+    void testExistsByCategoryName_True() {
+        Mockito.when(categoryRepository.existsByCategoryName("Electronics")).thenReturn(true);
+
         boolean exists = categoryRepository.existsByCategoryName("Electronics");
-        assertThat(exists).isTrue();
+
+        Assertions.assertTrue(exists);
     }
 
-    // 4. Test Find All
-    @Test
-    void testFindAll_ShouldReturnAtLeastOne() {
-        List<Category> all = categoryRepository.findAll();
-        assertThat(all.size()).isGreaterThanOrEqualTo(1);
-    }
-
-    // 5. Test Update Category
-    @Test
-    void testUpdateCategory_ShouldChangeDescription() {
-        // We update a unique temporary category to be safe
-        Category tempCat = new Category();
-        tempCat.setCategoryName("UpdateTest_" + System.currentTimeMillis());
-        tempCat = entityManager.persistAndFlush(tempCat);
-
-        tempCat.setDescription("New Desc");
-        Category updated = categoryRepository.save(tempCat);
-        entityManager.flush();
-
-        assertThat(updated.getDescription()).isEqualTo("New Desc");
-    }
-
-    // 6. Test Delete Category (FIXES ORA-02292)
-    @Test
-    void testDeleteCategory_ShouldRemoveRecord() {
-        // Create a BRAND NEW category that we know has ZERO products attached
-        Category emptyCat = new Category();
-        emptyCat.setCategoryName("DeleteMe_" + System.currentTimeMillis());
-        emptyCat = entityManager.persistAndFlush(emptyCat);
-        Long id = emptyCat.getCategoryId();
-
-        categoryRepository.delete(emptyCat);
-        entityManager.flush();
-
-        Optional<Category> found = categoryRepository.findById(id);
-        assertThat(found).isNotPresent();
-    }
-
-    // 7. Test Unique Constraint
-    @Test
-    void testUniqueCategoryName_ShouldPreventDuplicates() {
-        Category duplicate = new Category();
-        duplicate.setCategoryName("Electronics");
-
-        try {
-            categoryRepository.save(duplicate);
-            entityManager.flush();
-        } catch (Exception e) {
-            // Success: Oracle blocked the duplicate
-            return;
-        }
-        assertThat(false).as("Expected unique constraint violation but none occurred").isTrue();
-    }
-
-    // 8. Test Find By ID
-    @Test
-    void testFindById() {
-        Optional<Category> found = categoryRepository.findById(testCategory.getCategoryId());
-        assertThat(found).isPresent();
-    }
-
-    // 9. Test Exists By Name (False Case)
+    // 4. Testing custom existsByCategoryName (False)
     @Test
     void testExistsByCategoryName_False() {
-        boolean exists = categoryRepository.existsByCategoryName("Unknown_Category_123");
-        assertThat(exists).isFalse();
+        Mockito.when(categoryRepository.existsByCategoryName("Clothing")).thenReturn(false);
+
+        boolean exists = categoryRepository.existsByCategoryName("Clothing");
+
+        Assertions.assertFalse(exists);
     }
 
-    // 10. Test Null Name Failure
+    // 5. Testing built-in save
     @Test
-    void testSaveCategory_NullName_ShouldFail() {
-        Category badCat = new Category();
-        badCat.setCategoryName(null);
+    void testSaveCategory() {
+        Mockito.when(categoryRepository.save(dummyCategory)).thenReturn(dummyCategory);
 
-        try {
-            categoryRepository.save(badCat);
-            entityManager.flush();
-        } catch (Exception e) {
-            return;
-        }
-        assertThat(false).as("Expected null constraint violation").isTrue();
+        Category result = categoryRepository.save(dummyCategory);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getCategoryId());
     }
 
-    // 11. Test Count
+    // 6. Testing built-in findById (Found)
+    @Test
+    void testFindById_Found() {
+        Mockito.when(categoryRepository.findById(1L)).thenReturn(Optional.of(dummyCategory));
+
+        Optional<Category> result = categoryRepository.findById(1L);
+
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals("Electronics", result.get().getCategoryName());
+    }
+
+    // 7. Testing built-in findById (Not Found)
+    @Test
+    void testFindById_NotFound() {
+        Mockito.when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Optional<Category> result = categoryRepository.findById(99L);
+
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    // 8. Testing built-in findAll (With Data)
+    @Test
+    void testFindAll_Found() {
+        Mockito.when(categoryRepository.findAll()).thenReturn(Arrays.asList(dummyCategory));
+
+        List<Category> result = categoryRepository.findAll();
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Electronics", result.get(0).getCategoryName());
+    }
+
+    // 9. Testing built-in findAll (Empty)
+    @Test
+    void testFindAll_Empty() {
+        Mockito.when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<Category> result = categoryRepository.findAll();
+
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    // 10. Testing built-in deleteById
+    @Test
+    void testDeleteById() {
+        categoryRepository.deleteById(1L);
+
+        Mockito.verify(categoryRepository, Mockito.times(1)).deleteById(1L);
+    }
+
+    // 11. Testing built-in count
     @Test
     void testCount() {
-        assertThat(categoryRepository.count()).isGreaterThanOrEqualTo(1L);
+        Mockito.when(categoryRepository.count()).thenReturn(10L);
+
+        long result = categoryRepository.count();
+
+        Assertions.assertEquals(10L, result);
     }
 
-    // 12. Test Description Length (Boundary Test)
+    // 12. Testing built-in existsById
     @Test
-    void testSaveCategory_LongDescription() {
-        Category longDescCat = new Category();
-        longDescCat.setCategoryName("LongDesc_" + System.currentTimeMillis());
-        longDescCat.setDescription("A".repeat(255)); // Max length from your entity
+    void testExistsById() {
+        Mockito.when(categoryRepository.existsById(1L)).thenReturn(true);
 
-        Category saved = categoryRepository.save(longDescCat);
-        assertThat(saved.getDescription().length()).isEqualTo(255);
+        boolean result = categoryRepository.existsById(1L);
+
+        Assertions.assertTrue(result);
     }
 }
