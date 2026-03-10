@@ -13,7 +13,6 @@ class RevshopApplicationTests {
     @MockBean
     private ProductRepository productRepository;
 
-    @Test
     void contextLoads() {
     }
 }

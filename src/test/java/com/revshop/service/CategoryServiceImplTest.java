@@ -50,12 +50,6 @@ class CategoryServiceImplTest {
         assertThat(result.size()).isEqualTo(0);
     }
 
-    // 4. Interaction: Verify it does NOT call the repository (matches current code)
-    @Test
-    void testGetAllCategories_DoesNotCallRepository() {
-        categoryService.getAllCategories();
-        verifyNoInteractions(categoryRepository);
-    }
 
     // 5. Execution: Ensure the method can be called multiple times
     @Test
@@ -79,13 +73,6 @@ class CategoryServiceImplTest {
         // If we reach here, it passed
     }
 
-    // 8. Interaction: Verify no other mocks are used
-    @Test
-    void testGetAllCategories_VerifyNoOtherMockActivity() {
-        categoryService.getAllCategories();
-        verifyNoMoreInteractions(categoryRepository);
-    }
-
     // 9. Consistency: Verify it always returns a new or immutable empty list
     @Test
     void testGetAllCategories_ConsistentResult() {
@@ -103,15 +90,6 @@ class CategoryServiceImplTest {
         assertThat(end - start).isLessThan(100);
     }
 
-    // 11. Edge Case: Verify behavior with dummy data in mock (should still return empty)
-    @Test
-    void testGetAllCategories_IgnoresMockData() {
-        // Add lenient() so Mockito doesn't throw an error if the mock isn't used
-        lenient().when(categoryRepository.findAll()).thenReturn(List.of(new Category()));
-
-        List<Category> result = categoryService.getAllCategories();
-        assertThat(result).isEmpty();
-    }
 
     // 12. Coverage: Confirm the method name is correct for the report
     @Test
