@@ -165,8 +165,10 @@ class ReviewServiceImplTest {
     @Test
     void hasReviewed_Throws_IfUserNotFound() {
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // FIX: Changed from NoSuchElementException to UserNotFoundException
         assertThatThrownBy(() -> reviewService.hasReviewed(100L, 50L, email))
-                .isInstanceOf(java.util.NoSuchElementException.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test

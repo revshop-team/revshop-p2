@@ -55,7 +55,7 @@ class CartServiceImplTest {
         testItem = new CartItem();
         testItem.setCartItemId(500L);
         testItem.setProduct(testProduct);
-        testItem.setQuantity(1);
+        testItem.setQuantity(1); // Starting quantity is 1
     }
 
     // --- ADD TO CART TESTS ---
@@ -83,11 +83,11 @@ class CartServiceImplTest {
         // Act
         cartService.addToCart(10L, email);
 
-        // Assert: We expect 3 because the implementation increments twice (1 + 1 + 1)
-        assertThat(testItem.getQuantity()).isEqualTo(3);
+        // Assert: Expected is 2 (1 existing + 1 added)
+        assertThat(testItem.getQuantity()).isEqualTo(2);
 
-        // Verify that save was called twice as per your current code logic
-        verify(cartItemRepository, times(2)).save(testItem);
+        // Verify that save was called exactly once for the updated item
+        verify(cartItemRepository, times(1)).save(testItem);
     }
 
     @Test
