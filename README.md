@@ -64,6 +64,11 @@ The application supports both **Buyers and Sellers**, providing end-to-end featu
 - 📈 SonarQube, PMD, Checkstyle & JaCoCo Integration  
 
 ---
+# 📄 Project Documentation
+
+📥 Download the complete documentation:
+
+👉 [Download RevShop Documentation](./P2_REVSHOP_DOCUMENTATION.pdf)
 
 # 👤 Buyer Functionalities
 
