@@ -47,3 +47,5 @@ logs/
 # ======================
 node_modules/
 dist/
+
+.scannerwork

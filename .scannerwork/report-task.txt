@@ -2,5 +2,5 @@ projectKey=revshop
 serverUrl=http://localhost:9000
 serverVersion=26.1.0.118079
 dashboardUrl=http://localhost:9000/dashboard?id=revshop
-ceTaskId=27c444ee-0ce6-4576-9ca6-551cd600c2d0
-ceTaskUrl=http://localhost:9000/api/ce/task?id=27c444ee-0ce6-4576-9ca6-551cd600c2d0
+ceTaskId=e45b1620-d274-49de-bf3d-b4611e4754a4
+ceTaskUrl=http://localhost:9000/api/ce/task?id=e45b1620-d274-49de-bf3d-b4611e4754a4
