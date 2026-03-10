@@ -4,6 +4,8 @@ import com.revshop.entity.*;
 import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.*;
 import org.aspectj.weaver.ast.Not;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/seller")
 public class SellerController {
+    private static final Logger logger =
+            LoggerFactory.getLogger(SellerController.class);
 
     private final ProductService productService;
     private final UserService userService;
@@ -58,12 +62,16 @@ public class SellerController {
     // RENDER SELLER'S DASHBOARD
     @GetMapping("/dashboard")
     public String sellerDashboard() {
+        logger.info("Seller dashboard accessed");
+
         return "seller/dashboard";
     }
 
     // SELLER PRODUCTS
     @GetMapping("/products")
     public String sellerProducts() {
+        logger.info("Seller products page opened");
+
         return "seller/products";
     }
 
@@ -76,10 +84,13 @@ public class SellerController {
     // show add product page
     @GetMapping("/add-product")
     public String showAddProductForm(Model model) {
+        logger.info("Add product page requested");
+
 
         model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryRepository.findAll());
-        System.out.println("Categories: " + categoryRepository.findAll().size());
+        logger.debug("Loaded {} categories", categoryRepository.findAll().size());
+
         return "seller/add-product";
     }
 
@@ -87,12 +98,15 @@ public class SellerController {
     public String showProfile(Model model, Authentication authentication) {
 
         String email = authentication.getName();  // logged-in email
+        logger.info("Seller profile requested by {}", email);
 
         User user = userService.findByEmail(email);
 
         SellerDetails details = sellerService.getSellerDetails(user.getUserId());
 
         if (details == null) {
+            logger.warn("Seller details not found for {}", email);
+
             details = new SellerDetails();
         }
 
@@ -105,21 +119,23 @@ public class SellerController {
     public String updateProfile(@ModelAttribute SellerDetails details,
                                 Authentication authentication,Model model) {
 
+        String email = authentication.getName();
 
+        logger.info("Seller profile update attempt for {}", email);
 
         try {
 
-            String email = authentication.getName();
 
             User user = userService.findByEmail(email);
 
             sellerService.saveOrUpdateSeller(user, details);
+            logger.info("Seller profile updated successfully for {}", email);
 
             return "redirect:/seller/profile?success";
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            logger.error("Error updating seller profile for {}", email, e);
 
             model.addAttribute("error",
                     "Business name / GST / Phone already exists");
@@ -139,10 +155,11 @@ public class SellerController {
                               RedirectAttributes redirectAttributes) {
 
         try {
-            System.out.println("INSIDE SAVE PRODUCT METHOD");
-
+            logger.info("Save product request received");
             // 🔹 Get Logged-in Seller
             String email = authentication.getName();
+            logger.debug("Seller email: {}", email);
+
             User seller = userService.findByEmail(email);
 
             if (seller == null) {
@@ -253,8 +270,7 @@ public class SellerController {
             return "redirect:/seller/my-products";
 
         } catch (Exception e) {
-            e.printStackTrace();
-
+            logger.error("Error occurred while saving product", e);
             // 🔥 ORACLE / DB ERROR HANDLING (prevents WhiteLabel 500 page)
             model.addAttribute("error", "Failed to save product. Please try again.");
             model.addAttribute("categories", categoryRepository.findAll());
@@ -269,6 +285,8 @@ public class SellerController {
                                Authentication authentication) {
 
         String email = authentication.getName();
+        logger.info("Seller {} viewing own products", email);
+
         User seller = userService.findByEmail(email);
 
         model.addAttribute("products",
@@ -340,6 +358,7 @@ public class SellerController {
     @GetMapping("/delete-product/{id}")
     public String deleteProduct(@PathVariable Long id,
                                 RedirectAttributes redirectAttributes) {
+        logger.warn("Seller deleting product with ID {}", id);
 
         productService.deleteProductById(id);
 
@@ -452,9 +471,11 @@ public class SellerController {
     public String viewLowStock(Authentication authentication, Model model) {
 
         String email = authentication.getName();
+        logger.info("Seller checking low stock products: {}", email);
 
         List<Product> lowStockProducts =
                 lowStockService.getLowStockProducts(email);
+        logger.debug("Low stock products count {}", lowStockProducts.size());
 
         model.addAttribute("lowStockProducts", lowStockProducts);
 
@@ -465,6 +486,7 @@ public class SellerController {
     public String viewNotifications(Authentication authentication, Model model) {
 
         String email = authentication.getName();
+        logger.info("Seller viewing notifications {}", email);
 
         List<Notification> notifications =
                 notificationService.getUserNotifications(email);
@@ -480,7 +502,10 @@ public class SellerController {
     public long getUnreadCount(Authentication authentication) {
 
         String email = authentication.getName();
-        return notificationService.getUnreadCount(email);
+        long count = notificationService.getUnreadCount(email);
+        logger.debug("Unread notifications for {} = {}", email, count);
+        return count;
+
     }
 
     // ✔ Mark notification as read
@@ -493,6 +518,7 @@ public class SellerController {
     @PostMapping("/orders/deliver/{orderId}")
     public String markOrderDelivered(@PathVariable Long orderId,
                                      RedirectAttributes redirectAttributes) {
+        logger.info("Order {} marked as delivered by seller", orderId);
 
         orderService.markAsDelivered(orderId);
 
@@ -504,17 +530,20 @@ public class SellerController {
     public String sellerAnalytics(Authentication authentication, Model model) {
 
         String email = authentication.getName();
+        logger.info("Seller sales analytics requested");
+
+
         User seller = userService.findByEmail(email);
-        System.out.println("LOGGED SELLER ID: " + seller.getUserId());
-        // 🔥 FETCH ALL ORDER ITEMS (Reliable)
+
+        logger.debug("Logged seller ID: {}", seller.getUserId());        // 🔥 FETCH ALL ORDER ITEMS (Reliable)
         List<OrderItem> allItems = orderItemRepository.findAll();
-        System.out.println("TOTAL ITEMS IN DB: " + allItems.size());
+        logger.debug("Total order items in database: {}", allItems.size());
         // 🔥 FILTER BY SELLER ID (100% MATCH WITH DB seller_id column)
         List<OrderItem> orderItems = allItems.stream()
                 .filter(item -> item.getSeller() != null
                         && item.getSeller().getUserId().equals(seller.getUserId()))
                 .toList();
-        System.out.println("SELLER FILTERED ITEMS: " + orderItems.size());
+        logger.debug("Order items belonging to seller: {}",  orderItems.size());
 
         long totalOrders = 0;
         long pendingOrders = 0;

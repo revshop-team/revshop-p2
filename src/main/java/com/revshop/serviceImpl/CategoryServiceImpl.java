@@ -3,12 +3,17 @@ package com.revshop.serviceImpl;
 import com.revshop.entity.Category;
 import com.revshop.repo.CategoryRepository;
 import com.revshop.serviceInterfaces.CategoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
 
     private final CategoryRepository categoryRepository;
 
@@ -19,6 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAllCategories() {
-        return List.of();
+
+        logger.info("Fetching all categories");
+
+        List<Category> categories = categoryRepository.findAll();
+
+        logger.debug("Total categories found: {}", categories.size());
+
+        return categories;
     }
 }

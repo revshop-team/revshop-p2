@@ -6,6 +6,8 @@ import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.NotificationService;
 import com.revshop.serviceInterfaces.OrderService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+
 
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
@@ -62,15 +66,26 @@ public class OrderServiceImpl implements OrderService {
                           String pincode,
                           String paymentMethod) {
 
+        logger.info("Checkout started for buyer: {}", buyerEmail);
+
+
         // GET BUYER
         User buyer = userRepository.findByEmail(buyerEmail)
-                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+                .orElseThrow(() -> {
+                    logger.error("Buyer not found with email: {}", buyerEmail);
+                    return new RuntimeException("Buyer not found");
+                });
 
         // GET CART
         Cart cart = cartRepository.findByBuyer(buyer)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> {
+                    logger.error("Cart not found for buyer: {}", buyerEmail);
+                    return new RuntimeException("Cart not found");
+                });
 
         if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            logger.warn("Checkout attempted with empty cart for buyer: {}", buyerEmail);
+
             throw new RuntimeException("Cart is empty");
         }
 
@@ -86,15 +101,24 @@ public class OrderServiceImpl implements OrderService {
         // CONVERT CARTITEMS → ORDERITEMS
         for (CartItem cartItem : cart.getCartItems()) {
             Product product = cartItem.getProduct();
+            logger.debug("Processing product {} with quantity {}", product.getProductName(), cartItem.getQuantity());
+
 
             if (product.getStock() < cartItem.getQuantity()) {
+                logger.error("Insufficient stock for product: {}", product.getProductName());
+
                 throw new RuntimeException("Insufficient stock for: " + product.getProductName());
             }
 
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
 
+            logger.info("Stock updated for product {}. Remaining: {}",
+                    product.getProductName(), product.getStock());
+
             if (product.getStock() <= product.getStockThreshold()) {
+                logger.warn("Low stock alert for product {}", product.getProductName());
+
                 Notification lowStockNotification = new Notification();
                 lowStockNotification.setUser(product.getSeller());
                 lowStockNotification.setMessage(
@@ -122,6 +146,8 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderItems(orderItems);
 
         orderRepository.save(order);
+        logger.info("Order created successfully. OrderId: {}", order.getOrderId());
+
         // 🔔 NOTIFY SELLERS
         notificationService.notifySellerOrderPlaced(order.getOrderId());
         // Save address
@@ -161,6 +187,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         paymentRepository.save(payment);
+        logger.info("Payment record created for orderId: {}", order.getOrderId());
+
         Notification buyerNotification = new Notification();
         buyerNotification.setUser(buyer); // Buyer receives notification
         buyerNotification.setOrder(order);
@@ -173,20 +201,28 @@ public class OrderServiceImpl implements OrderService {
         // CLEAR CART PROPERLY
         cart.getCartItems().clear();
         cartRepository.save(cart);
+        logger.info("Cart cleared after successful checkout for buyer: {}", buyerEmail);
+
         return order;
     }
 
     @Override
     @jakarta.transaction.Transactional
     public List<Order> getOrdersByBuyer(String email) {
+        logger.info("Fetching orders for buyer: {}", email);
+
 
         User buyer = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new BuyerNotFoundException("Buyer not found"));
+                .orElseThrow(() -> {
+                    logger.error("Buyer not found while fetching orders: {}", email);
+                    return new BuyerNotFoundException("Buyer not found");
+                });
 
         List<Order> orders = orderRepository.findByBuyer(buyer);
 
         orders.sort(Comparator.comparing(Order::getOrderDate).reversed());
+        logger.debug("Total orders fetched for {} : {}", email, orders.size());
+
 
         return orders;
     }
@@ -197,11 +233,16 @@ public class OrderServiceImpl implements OrderService {
 //    }
 
     public void updateBuyerDetails(String email, BuyerDetails updatedDetails) {
+        logger.info("Updating buyer details for email: {}", email);
 
         BuyerDetails existing =
                 buyerDetailsRepository.findByUser_Email(email)
-                                .orElseThrow(() ->
-                                        new BuyerNotFoundException("buyer not found"));
+                                .orElseThrow(() -> {
+
+                                    logger.error("Buyer details not found for email: {}", email);
+
+                                    return new BuyerNotFoundException("buyer not found");
+                                });
 
         existing.setFullName(updatedDetails.getFullName());
         existing.setGender(updatedDetails.getGender());
@@ -209,18 +250,28 @@ public class OrderServiceImpl implements OrderService {
         existing.setPhone(updatedDetails.getPhone());
 
         buyerDetailsRepository.save(existing);
+        logger.info("Buyer details updated successfully for {}", email);
+
     }
     @Override
     public void markAsDelivered(Long orderId) {
+        logger.info("Mark order as delivered. OrderId: {}", orderId);
+
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> {
+                    logger.error("Order not found with id: {}", orderId);
+
+                    return new RuntimeException("Order not found");
+                });
 
         if ("PLACED".equals(order.getStatus())) {
 
             // 1️⃣ Update order status
             order.setStatus("DELIVERED");
             orderRepository.save(order);
+            logger.info("Order delivered successfully. OrderId: {}", orderId);
+
 
             // 2️⃣ UPDATE PAYMENT STATUS FOR COD
             Payment payment = paymentRepository
@@ -232,6 +283,8 @@ public class OrderServiceImpl implements OrderService {
                 payment.setPaidAt(LocalDateTime.now());
 
                 paymentRepository.save(payment);
+                logger.info("COD payment marked as SUCCESS for orderId: {}", orderId);
+
             }
 
             // 2️⃣ CREATE BUYER NOTIFICATION (🔥 NEW)
@@ -243,6 +296,8 @@ public class OrderServiceImpl implements OrderService {
             notification.setCreatedAt(LocalDateTime.now());
 
             notificationRepository.save(notification);
+            logger.debug("Delivery notification sent to buyer for orderId: {}", orderId);
+
         }
     }
 }

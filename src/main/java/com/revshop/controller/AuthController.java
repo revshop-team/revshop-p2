@@ -8,6 +8,8 @@ import com.revshop.serviceImpl.UserServiceImpl;
 import com.revshop.serviceInterfaces.CategoryService;
 import com.revshop.serviceInterfaces.ProductService;
 import com.revshop.serviceInterfaces.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,8 @@ import java.util.List;
 
 @Controller
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
 
     private final SecurityQuestionRepository securityQuestionRepository;
     private final UserRepository userRepository;
@@ -47,12 +51,16 @@ public class AuthController {
     // Test endpoint
     @GetMapping("/test")
     public String test() {
+        logger.info("Test endpoint accessed");
+
         return "Auth API Working!";
     }
 
     // default / home page
     @GetMapping("/")
     public String home(Model model) {
+        logger.info("Home page requested");
+
 
         model.addAttribute("products", productService.get12Products());
         model.addAttribute("categories", categoryService.getAllCategories());
@@ -63,8 +71,11 @@ public class AuthController {
     // Register page render's
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
+        logger.info("Register page requested");
+
         model.addAttribute("user", new User());
         model.addAttribute("questions", securityQuestionRepository.findAll());
+
         return "register";
     }
 
@@ -79,10 +90,14 @@ public class AuthController {
     public String register(User user,
                            Model model,
                            RedirectAttributes redirectAttributes) {
+        logger.info("User registration attempt for email: {}", user.getEmail());
+
 
         try {
 
             userService.registerUser(user);
+            logger.info("User registered successfully: {}", user.getEmail());
+
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
@@ -92,6 +107,8 @@ public class AuthController {
             return "redirect:/login";
 
         } catch (Exception e) {
+            logger.error("Registration failed for email: {}", user.getEmail());
+
 
             model.addAttribute("error",
                     "Email already registered");
@@ -107,12 +124,16 @@ public class AuthController {
     // login form render's
     @GetMapping("/login")
     public String showLoginForm() {
+
+        logger.info("Login page requested");
         return "login";
     }
 
     // show access denied page for unauthorize request
     @GetMapping("/access-denied")
     public String accessDenied() {
+
+        logger.warn("Access denied page accessed");
         return "access-denied";
     }
 

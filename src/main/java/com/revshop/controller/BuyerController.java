@@ -1,9 +1,10 @@
 package com.revshop.controller;
-
 import com.revshop.entity.*;
 import com.revshop.exceptions.UserNotFoundException;
 import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/buyer")
 public class BuyerController {
+    private static final Logger logger = LoggerFactory.getLogger(BuyerController.class);
 
     private final ProductService productService;
     private final CartService cartService;
@@ -61,6 +63,7 @@ public class BuyerController {
     public String buyerHome(Authentication authentication, Model model) {
 
         String buyerEmail = authentication.getName();
+        logger.info("Buyer home accessed by {}", buyerEmail);
 
         List<Category> categories = categoryService.getAllCategories();
 
@@ -76,6 +79,7 @@ public class BuyerController {
 //        model.addAttribute("categories", categories);
         model.addAttribute("latestProducts", latestProducts.getContent());
         model.addAttribute("buyerEmail", buyerEmail);
+        logger.debug("Loaded {} latest products", latestProducts.getContent().size());
 
         return "buyer/home";
     }
@@ -88,6 +92,7 @@ public class BuyerController {
                               Model model) {
 
         String email = authentication.getName();
+        logger.info("Buyer profile requested for {}", email);
 
         // Existing profile logic
         BuyerDetails buyerDetails =
@@ -109,6 +114,7 @@ public class BuyerController {
         model.addAttribute("editMode", edit);
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("totalSpending", totalSpending);
+        logger.debug("Orders: {}, Spending: {}", totalOrders, totalSpending);
 
         return "buyer/profile";
     }
@@ -117,17 +123,20 @@ public class BuyerController {
     public String updateProfile(Authentication authentication,
                                 @ModelAttribute BuyerDetails buyerDetails,Model model) {
 
-          String  email = authentication.getName();
+        String  email = authentication.getName();
+        logger.info("Updating buyer profile for {}", email);
+
         try {
 
 
             buyerService.updateBuyerDetails(email, buyerDetails);
+            logger.info("Buyer profile updated successfully for {}", email);
 
             return "redirect:/buyer/profile";
 
         } catch (Exception e) {
 
-            e.printStackTrace();
+            logger.error("Failed to update profile for {}", email, e);
 
             List<Order> orders =
                     orderService.getOrdersByBuyer(email);
@@ -153,7 +162,7 @@ public class BuyerController {
 
 
 
-        }
+    }
 
 
     //  View all products exist in RevShop
@@ -166,6 +175,8 @@ public class BuyerController {
                                @RequestParam(required = false) Long categoryId,
                                Authentication authentication,
                                Model model) {
+        logger.info("Buyer viewing products page={} sort={} keyword={}",
+                page, sort, keyword);
 
         Sort sorting = Sort.unsorted();
 
@@ -250,12 +261,15 @@ public class BuyerController {
                             RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
+        logger.info("Buyer {} adding product {} to cart", buyerEmail, id);
+
         Product product = productService.getProductById(id);
 
 
         try {
 
             cartService.addToCart(id, buyerEmail);
+            logger.info("Product {} added to cart", product.getProductName());
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
@@ -263,6 +277,7 @@ public class BuyerController {
             );
 
         } catch (RuntimeException e) {
+            logger.error("Failed to add product {} to cart: {}", id, e.getMessage());
 
             redirectAttributes.addFlashAttribute(
                     "errorMessage",
@@ -279,6 +294,7 @@ public class BuyerController {
                            Authentication authentication) {
 
         String buyerEmail = authentication.getName();
+        logger.info("Viewing cart for {}", buyerEmail);
 
         Cart cart = cartService.getCartByBuyer(buyerEmail);
 
@@ -337,6 +353,8 @@ public class BuyerController {
                            RedirectAttributes redirectAttributes) {
 
         String buyerEmail = authentication.getName();
+        logger.info("Checkout started for {}", buyerEmail);
+
         Cart cart = cartService.getCartByBuyer(buyerEmail);
         if (cart == null || cart.getCartItems().isEmpty()) {
             redirectAttributes.addFlashAttribute(
@@ -356,6 +374,7 @@ public class BuyerController {
                 pincode,
                 paymentMethod
         );
+        logger.info("Order created with ID {}", order.getOrderId());
 
 //        redirectAttributes.addFlashAttribute(
 //                "successMessage",
