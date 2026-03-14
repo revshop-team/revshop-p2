@@ -92,6 +92,90 @@
 
     </div>
 
+    <!-- Purchase Suggestions -->
+
+    <div th:if="${purchaseSuggestions != null and !purchaseSuggestions.isEmpty()}">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="section-title mb-0">Suggestions for you</h4>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-xl-3 col-lg-4 col-md-6"
+                 th:each="product : ${purchaseSuggestions}">
+
+                <div class="card product-card shadow-sm h-100">
+
+                    <img th:src="@{/images/{img}(img=${product.imageName})}"
+                         class="card-img-top"
+                         style="height:220px; object-fit:cover;">
+
+                    <div class="card-body d-flex flex-column p-4">
+
+                        <h6 th:text="${product.productName}"></h6>
+
+                        <p class="price text-success fw-bold"
+                           th:text="'₹ ' + ${product.sellingPrice}">
+                        </p>
+
+                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
+                           class="btn btn-dark w-100 rounded-pill">
+                            View Details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- View Suggestions -->
+
+    <div th:if="${viewSuggestions != null and !viewSuggestions.isEmpty()}">
+
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+            <h4 class="section-title mb-0">You may also like</h4>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-xl-3 col-lg-4 col-md-6"
+                 th:each="product : ${viewSuggestions}">
+
+                <div class="card product-card shadow-sm h-100">
+
+                    <img th:src="@{/images/{img}(img=${product.imageName})}"
+                         class="card-img-top"
+                         style="height:220px; object-fit:cover;">
+
+                    <div class="card-body d-flex flex-column p-4">
+
+                        <h6 th:text="${product.productName}"></h6>
+
+                        <p class="price text-success fw-bold"
+                           th:text="'₹ ' + ${product.sellingPrice}">
+                        </p>
+
+                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
+                           class="btn btn-dark w-100 rounded-pill">
+                            View Details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <!-- Section Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="section-title mb-0">Latest Products</h4>

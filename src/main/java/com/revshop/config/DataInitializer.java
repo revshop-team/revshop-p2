@@ -90,22 +90,43 @@ public class DataInitializer {
     CommandLineRunner initCategories(CategoryRepository categoryRepository) {
         return args -> {
 
-            insertCategoryIfNotExists(categoryRepository, "Electronics", "Electronic Items");
-            insertCategoryIfNotExists(categoryRepository, "Fashion", "Clothing & Accessories");
-            insertCategoryIfNotExists(categoryRepository, "Books", "Books & Study");
-            insertCategoryIfNotExists(categoryRepository, "Home & Kitchen", "Home Products");
-            insertCategoryIfNotExists(categoryRepository, "Groceries", "Daily Essentials");
-            insertCategoryIfNotExists(categoryRepository, "Mobiles", "Smartphones & Accessories");
-            insertCategoryIfNotExists(categoryRepository, "Laptops", "Laptop & Computer Accessories");
-            insertCategoryIfNotExists(categoryRepository, "Furniture", "Home Furniture");
-            insertCategoryIfNotExists(categoryRepository, "Beauty", "Beauty & Personal Care");
-            insertCategoryIfNotExists(categoryRepository, "Sports", "Sports Equipment");
-            insertCategoryIfNotExists(categoryRepository, "Toys", "Kids Toys");
+            insertCategoryIfNotExists(categoryRepository, "Electronics", "TV, Audio, Cameras, Accessories");
+
+            insertCategoryIfNotExists(categoryRepository, "Mobiles", "Smartphones & Mobile Accessories");
+
+            insertCategoryIfNotExists(categoryRepository, "Laptops", "Laptops, Computers & Accessories");
+
+            insertCategoryIfNotExists(categoryRepository, "Fashion", "Men, Women & Kids Clothing");
+
+            insertCategoryIfNotExists(categoryRepository, "Footwear", "Shoes, Sandals & Sneakers");
+
+            insertCategoryIfNotExists(categoryRepository, "Watches", "Smart Watches & Analog Watches");
+
+            insertCategoryIfNotExists(categoryRepository, "Home & Kitchen", "Home Appliances & Kitchen Items");
+
+            insertCategoryIfNotExists(categoryRepository, "Furniture", "Sofas, Beds, Tables & Chairs");
+
+            insertCategoryIfNotExists(categoryRepository, "Books", "Educational & Story Books");
+
+            insertCategoryIfNotExists(categoryRepository, "Groceries", "Daily Needs & Food Items");
+
+            insertCategoryIfNotExists(categoryRepository, "Beauty", "Cosmetics & Personal Care");
+
+            insertCategoryIfNotExists(categoryRepository, "Sports", "Sports & Fitness Equipment");
+
+            insertCategoryIfNotExists(categoryRepository, "Toys", "Kids Toys & Games");
+
+            insertCategoryIfNotExists(categoryRepository, "Automotive", "Bike & Car Accessories");
+
+            insertCategoryIfNotExists(categoryRepository, "Stationery", "Office & School Supplies");
+
+            insertCategoryIfNotExists(categoryRepository, "Health", "Health Care & Medical Items");
+
+            insertCategoryIfNotExists(categoryRepository, "Jewellery", "Gold, Silver & Artificial Jewellery");
 
             System.out.println("✅ Default Categories Inserted");
         };
     }
-
     private void insertCategoryIfNotExists(CategoryRepository repo, String name, String desc) {
 
         if (!repo.existsByCategoryName(name)) {

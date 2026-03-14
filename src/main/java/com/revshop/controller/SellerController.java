@@ -148,7 +148,7 @@ public class SellerController {
 
     // SAVE PRODUCTS (STATIC IMAGE VERSION - FINAL)
     @PostMapping("/save-product")
-    public String saveProduct(@ModelAttribute("product") Product product,
+    public String saveProduct(@ModelAttribute("product") Product product,@RequestParam("imageFile") MultipartFile imageFile,
                               @RequestParam(value = "newCategoryName", required = false) String newCategoryName,
                               Authentication authentication,
                               Model model,
@@ -250,9 +250,47 @@ public class SellerController {
             product.setCreatedAt(LocalDateTime.now());
             product.setIsActive(1);
 
-            // 🔹 STATIC IMAGE SAFETY (since you removed file upload)
-            if (product.getImageName() == null || product.getImageName().isBlank()) {
+            // ================= IMAGE UPLOAD =================
+
+            if (!imageFile.isEmpty()) {
+
+                try {
+
+                    String uploadDir = "target/classes/static/images/";
+
+                    String fileName =
+                            System.currentTimeMillis()
+                                    + "_"
+                                    + imageFile.getOriginalFilename();
+
+                    Path filePath =
+                            Paths.get(uploadDir, fileName);
+
+                    Files.createDirectories(filePath.getParent());
+
+                    Files.write(filePath, imageFile.getBytes());
+
+                    product.setImageName(fileName);
+
+                    logger.info("Image uploaded: {}", fileName);
+
+                } catch (Exception e) {
+
+                    logger.error("Image upload failed", e);
+
+                    model.addAttribute("error",
+                            "Image upload failed");
+
+                    model.addAttribute("categories",
+                            categoryRepository.findAll());
+
+                    return "seller/add-product";
+                }
+
+            } else {
+
                 product.setImageName("default.png");
+
             }
 
             // 🔥 IMPORTANT: Prevent unique constraint / update conflict

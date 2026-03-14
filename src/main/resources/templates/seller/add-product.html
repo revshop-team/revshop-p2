@@ -108,6 +108,7 @@
         <form th:action="@{/seller/save-product}"
               th:object="${product}"
               method="post"
+              enctype="multipart/form-data"
               onsubmit="return validateProductForm()">
 
             <!-- Product Name -->
@@ -204,7 +205,7 @@
             <div class="mb-3">
                 <label class="form-label">
                     Product Image
-                    <small class="text-muted">(auto selected based on category)</small>
+                    <small class="text-muted"></small>
                 </label>
                 <img id="imagePreview"
                      class="image-preview"
@@ -212,9 +213,17 @@
                      alt="Preview"
                      style="display:block;">
 
-                <input type="hidden"
-                       id="imageName"
-                       th:field="*{imageName}">
+                <div class="mb-3">
+
+                    <label class="form-label">Product Image</label>
+
+                    <input type="file"
+                           name="imageFile"
+                           class="form-control"
+                           accept="image/*"
+                           required>
+
+                </div>
             </div>
 
             <button type="submit" class="btn btn-success w-100">
@@ -235,7 +244,9 @@
                 .then(res => res.text())
                 .then(count => {
 
-                    const badge = document.getElementById('notificationCount');
+                    const badge =
+                        document.getElementById('notificationCount');
+
                     const num = parseInt(count);
 
                     if (!isNaN(num) && num > 0) {
@@ -244,7 +255,6 @@
                     } else {
                         badge.classList.add('d-none');
                     }
-
                 });
         }
 
@@ -252,45 +262,38 @@
         setInterval(loadNotificationCount, 5000);
 
 
-        const category = document.getElementById("category");
+        document.querySelector("input[name='imageFile']")
+            .addEventListener("change", function(event) {
 
-        category.addEventListener("change", function(){
+                const file = event.target.files[0];
 
-            const selectedCategory = this.options[this.selectedIndex].text;
+                if (file) {
 
-            const imageMap = {
+                    const preview =
+                        document.getElementById("imagePreview");
 
-                "Electronics": "electronics.png",
-                "Mobiles": "mobile.png",
-                "Laptops": "laptop.jpg",
-                "Books": "book.jpg",
-                "Fashion": "fashion.jpg",
-                "Home & Kitchen": "home-appliances.jpg",
-                "Furniture": "furniture.jpg",
-                "Groceries": "grocery.png",
-                "Beauty": "beauty.jpg",
-                "Sports": "sports.jpg",
-                "Toys": "toys.jpg"
+                    preview.src =
+                        URL.createObjectURL(file);
 
-            };
-
-            let image = imageMap[selectedCategory] || "default.png";
-
-            document.getElementById("imagePreview").src = "/images/" + image;
-            document.getElementById("imagePreview").style.display = "block";
-
-            document.getElementById("imageName").value = image;
-
-        });
+                    preview.style.display = "block";
+                }
+            });
 
     });
 
-     function updateSellingPrice() {
-        const mrp = parseFloat(document.getElementById('mrp').value) || 0;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-        document.getElementById('sellingPrice').value = (mrp - (mrp * discount / 100)).toFixed(2);
-    }
 
+    // ✅ MUST be outside
+    function updateSellingPrice() {
+
+        const mrp =
+            parseFloat(document.getElementById('mrp').value) || 0;
+
+        const discount =
+            parseFloat(document.getElementById('discount').value) || 0;
+
+        document.getElementById('sellingPrice').value =
+            (mrp - (mrp * discount / 100)).toFixed(2);
+    }
 
 </script>
 

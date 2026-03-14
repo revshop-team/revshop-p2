@@ -24,4 +24,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     );
     List<OrderItem> findBySeller(User seller);
     List<OrderItem> findByProduct_Seller_UserIdOrderByOrder_OrderDateDesc(Long sellerId);
+
+    List<OrderItem>
+    findByOrderBuyerOrderByOrderItemIdDesc(User buyer);
 }

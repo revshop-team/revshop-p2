@@ -36,13 +36,15 @@ public class BuyerController {
     private final PaymentRepository paymentRepository;
     private NotificationService notificationService;
     private OrderRepository orderRepository;
+    private final ProductViewRepo productViewRepo;
+    private final SuggestionService suggestionService;
 
 
     public BuyerController(ProductService productService, CartService cartService,
                            OrderService orderService, CategoryService categoryService,
                            BuyerService buyerService, ReviewService reviewService,
                            ReviewRepository reviewRepository, FavouriteRepository favouriteRepository,
-                           UserRepository userRepository, OrderRepository orderRepository,PaymentRepository paymentRepository,NotificationService notificationService) {
+                           UserRepository userRepository, OrderRepository orderRepository,PaymentRepository paymentRepository,NotificationService notificationService, ProductViewRepo productViewRepo,SuggestionService suggestionService) {
 
         this.productService = productService;
         this.cartService = cartService;
@@ -56,17 +58,19 @@ public class BuyerController {
         this.paymentRepository = paymentRepository;
         this.notificationService=notificationService;
         this.orderRepository=orderRepository;
+        this.productViewRepo = productViewRepo;
+        this.suggestionService = suggestionService;
     }
 
     // buyer's home page
     @GetMapping("/home")
     public String buyerHome(Authentication authentication, Model model) {
 
-        String buyerEmail = authentication.getName();
-        logger.info("Buyer home accessed by {}", buyerEmail);
+        String email = authentication.getName();
 
-        List<Category> categories = categoryService.getAllCategories();
+        User user = userRepository.findByEmail(email).orElseThrow();
 
+        // latest products
         PageRequest pageable = PageRequest.of(
                 0,
                 8,
@@ -76,14 +80,28 @@ public class BuyerController {
         Page<Product> latestProducts =
                 productService.getActiveProducts(pageable);
 
-//        model.addAttribute("categories", categories);
-        model.addAttribute("latestProducts", latestProducts.getContent());
-        model.addAttribute("buyerEmail", buyerEmail);
-        logger.debug("Loaded {} latest products", latestProducts.getContent().size());
+
+        // ⭐ PURCHASE BASED SUGGESTIONS
+        List<Product> purchaseSuggestions =
+                suggestionService.suggestByOrder(user);
+
+
+        // ⭐ VIEW BASED SUGGESTIONS
+        List<Product> viewSuggestions =
+                suggestionService.suggestByView(user);
+
+
+        model.addAttribute("latestProducts",
+                latestProducts.getContent());
+
+        model.addAttribute("purchaseSuggestions",
+                purchaseSuggestions);
+
+        model.addAttribute("viewSuggestions",
+                viewSuggestions);
 
         return "buyer/home";
     }
-
 
     // buyer profile
     @GetMapping("/profile")
@@ -233,9 +251,22 @@ public class BuyerController {
 
     // view product details
     @GetMapping("/product/{id}")
-    public String viewProduct(@PathVariable Long id, Model model) {
+    public String viewProduct(@PathVariable Long id, Model model,Authentication authentication) {
 
         Product product = productService.getProductById(id);
+
+        String email = authentication.getName();
+
+        User user = userRepository
+                .findByEmail(email)
+                .orElseThrow();
+
+        ProductView v = new ProductView();
+        v.setUser(user);
+        v.setProduct(product);
+        v.setViewTime(LocalDateTime.now());
+
+        productViewRepo.save(v);
 
         List<Review> reviews =
                 reviewRepository.findByProduct_ProductIdOrderByReviewDateDesc(id);
@@ -585,4 +616,6 @@ public class BuyerController {
 
         return "redirect:/buyer/notifications";
     }
+
+
 }
