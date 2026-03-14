@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Architecture-Layered%20Monolithic-blue?style=for-the-badge"/>
 </p>
 
----
+
 
 # Welcome to RevShop
 
@@ -33,7 +33,7 @@ The platform simulates a real-world **online marketplace** where buyers and sell
 
 The system follows **enterprise-level development practices** including layered architecture, secure authentication, automated testing, and CI/CD integration.
 
----
+
 
 # Technology Stack & Tools
 
@@ -60,7 +60,7 @@ The system follows **enterprise-level development practices** including layered 
 
 </p>
 
----
+
 
 # System Architecture
 
@@ -77,7 +77,7 @@ The application follows a **Layered Monolithic Architecture** implementing the *
 * Automated Testing & Code Coverage Monitoring
 * Static Code Analysis using SonarQube, PMD, and Checkstyle
 
----
+
 
 # Project Structure
 
@@ -127,7 +127,7 @@ revshop-p2
 └── sonar-project.properties
 ```
 
----
+
 
 # Feature Overview
 
@@ -143,7 +143,7 @@ revshop-p2
 | Wishlist management                         | Monitor reviews and ratings            |
 | Track order status                          | Low stock alerts                       |
 
----
+
 
 # Project Modules
 
@@ -154,7 +154,7 @@ revshop-p2
 * Role-Based Access Control
 * Web UI using Thymeleaf
 
----
+
 
 # Team Members
 
@@ -166,7 +166,7 @@ revshop-p2
 | <img src="https://github.com/BGunashree.png" width="70"/>        | Gunashree         | https://github.com/BGunashree        |
 | <img src="https://github.com/abdulkareemmomin.png" width="70"/>  | Abdulkareem       | https://github.com/abdulkareemmomin  |
 
----
+
 
 
 # Repository Information
@@ -181,7 +181,7 @@ revshop-p2
 
 **Architecture:** Layered Monolithic (MVC)
 
----
+
 
 # Setup and Run Instructions
 
@@ -193,7 +193,7 @@ revshop-p2
 * Git
 * IDE (IntelliJ / Eclipse / VS Code)
 
----
+
 
 ## Clone the Repository
 
@@ -202,7 +202,7 @@ git clone https://github.com/revshop-team/revshop-p2.git
 cd revshop-p2
 ```
 
----
+
 
 ## Database Setup
 
@@ -213,7 +213,7 @@ CREATE USER revshop IDENTIFIED BY password;
 GRANT CONNECT, RESOURCE TO revshop;
 ```
 
----
+
 
 ## Configure Database
 
@@ -232,7 +232,7 @@ spring.datasource.password=revshop123
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 ```
 
----
+
 
 ## Build Project
 
@@ -246,7 +246,7 @@ This will:
 * Run tests
 * Generate build artifact (WAR/JAR)
 
----
+
 
 ## Run Application
 
@@ -268,7 +268,7 @@ Copy WAR file to:
 Tomcat/webapps
 ```
 
----
+
 
 ## Access Application
 
@@ -276,7 +276,7 @@ Tomcat/webapps
 http://localhost:8090
 ```
 
----
+
 
 # Default Roles
 
@@ -294,12 +294,12 @@ http://localhost:8090
 * View orders
 * Monitor stock
 
----
+
 
 # Conclusion
 
 This project was developed as part of the Revature Java Full Stack Training Program by the PES Mandya batch and reflects collaborative software development practices including version control, code quality enforcement, and automated testing.
 
----
 
-### ⭐ Thank You
+
+###  Thank You ⭐
