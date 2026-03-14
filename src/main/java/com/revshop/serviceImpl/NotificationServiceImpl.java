@@ -128,16 +128,14 @@ public class NotificationServiceImpl implements NotificationService {
 
         return count;
     }
-    @Override
-    public void clearAllNotifications(String email) {
-        logger.info("Clearing all notifications for email: {}", email);
+    public void deleteNotification(Long id, String email) {
 
+        Notification notification =
+                notificationRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Notification not found"));
 
-        List<Notification> notifications =
-                notificationRepository.findByUserEmail(email);
-
-        notificationRepository.deleteAll(notifications);
-        logger.info("All notifications cleared for {}. Deleted count: {}", email, notifications.size());
-
+        if(notification.getUser().getEmail().equals(email)) {
+            notificationRepository.delete(notification);
+        }
     }
 }

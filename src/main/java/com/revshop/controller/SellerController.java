@@ -3,7 +3,6 @@ package com.revshop.controller;
 import com.revshop.entity.*;
 import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.*;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -701,12 +700,13 @@ public class SellerController {
 
         return "seller/product-reviews";
     }
-    @GetMapping("/notifications/clear-all")
-    public String clearSellerNotifications(Authentication authentication) {
+    @GetMapping("/notifications/delete/{id}")
+    public String deleteNotification(@PathVariable Long id,
+                                     Authentication authentication) {
 
         String email = authentication.getName();
 
-        notificationService.clearAllNotifications(email);
+        notificationService.deleteNotification(id, email);
 
         return "redirect:/seller/notifications";
     }

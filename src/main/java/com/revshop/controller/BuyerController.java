@@ -607,12 +607,13 @@ public class BuyerController {
         model.addAttribute("payment",payment);
         return "buyer/orders-success";
     }
-    @GetMapping("/notifications/clear-all")
-    public String clearAllNotifications(Authentication authentication) {
+    @GetMapping("/notifications/delete/{id}")
+    public String deleteNotification(@PathVariable Long id,
+                                     Authentication authentication) {
 
         String email = authentication.getName();
 
-        notificationService.clearAllNotifications(email);
+        notificationService.deleteNotification(id, email);
 
         return "redirect:/buyer/notifications";
     }
