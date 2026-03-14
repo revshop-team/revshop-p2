@@ -9,12 +9,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/revshop-team/revshop-p2.git'
-            }
-        }
-
         stage('Build Application') {
             steps {
                 bat 'mvn clean compile'
@@ -31,8 +25,7 @@ pipeline {
             steps {
                 jacoco execPattern: 'target/jacoco.exec',
                        classPattern: 'target/classes',
-                       sourcePattern: 'src/main/java',
-                       exclusionPattern: ''
+                       sourcePattern: 'src/main/java'
             }
         }
 
