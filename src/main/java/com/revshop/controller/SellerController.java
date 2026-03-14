@@ -418,23 +418,41 @@ public class SellerController {
         User seller = userService.findByEmail(email);
 
         // 1. Get all order items of this seller
-        List<OrderItem> orderItems = orderItemRepository.findBySeller(seller);
-
-        // 🔥 2. FILTER LOGIC (All / Pending / Delivered)
-        if (status != null && !status.isEmpty()) {
-            orderItems = orderItems.stream()
-                    .filter(item -> item.getOrder() != null
-                            && status.equalsIgnoreCase(item.getOrder().getStatus()))
-                    .toList();
-        }
-
+        List<OrderItem> orderItems = orderItemRepository.findBySeller(seller)
+                .stream()
+                .filter(item -> item.getOrder() != null &&
+                        ("PLACED".equals(item.getOrder().getStatus()) ||
+                                "DELIVERED".equals(item.getOrder().getStatus())))
+                .sorted(
+                        Comparator
+                                // Pending first
+                                .comparing((OrderItem i) ->
+                                        "DELIVERED".equalsIgnoreCase(i.getOrder().getStatus()))
+                                // Latest orders first
+                                .thenComparing(i -> i.getOrder().getOrderDate(),
+                                        Comparator.reverseOrder())
+                )
+                .toList();
         // 3. Extract unique orders (for payment & address mapping)
         List<Order> orders = orderItems.stream()
                 .map(OrderItem::getOrder)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
+        Map<Long, Boolean> newOrderMap = new HashMap<>();
 
+        for (OrderItem item : orderItems) {
+
+            Order order = item.getOrder();
+
+            if (order != null && order.getOrderDate() != null) {
+
+                boolean isNew = order.getOrderDate()
+                        .isAfter(LocalDateTime.now().minusMinutes(5));
+
+                newOrderMap.put(order.getOrderId(), isNew);
+            }
+        }
         // 4. Fetch payments map (OrderId -> Payment)
         Map<Long, Payment> paymentMap = new HashMap<>();
         if (!orders.isEmpty()) {
@@ -460,6 +478,7 @@ public class SellerController {
         }
 
         // 6. Send data to UI
+        model.addAttribute("newOrderMap", newOrderMap);
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("paymentMap", paymentMap);
         model.addAttribute("addressMap", addressMap);

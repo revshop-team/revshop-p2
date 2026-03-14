@@ -60,8 +60,7 @@ public class PaymentController {
 
         logger.info("Processing payment for orderId: {} with status: {}", orderId, status);
 
-        Payment payment =
-                paymentRepository.findByOrder_OrderId(orderId);
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId);
 
         Order order = payment.getOrder();
 
@@ -74,18 +73,24 @@ public class PaymentController {
 
             order.setStatus("PLACED");
 
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+
+            return "redirect:/buyer/payment/success/" + orderId;
+
         } else {
 
             logger.warn("Payment failed for orderId: {}", orderId);
 
             payment.setPaymentStatus("FAILED");
+
             order.setStatus("PAYMENT_FAILED");
+
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+
+            return "redirect:/buyer/payment/cancel/" + orderId;
         }
-
-        paymentRepository.save(payment);
-        orderRepository.save(order);
-
-        return "redirect:/buyer/payment/success/" + orderId;
     }
 
     /* ================= SUCCESS PAGE ================= */
@@ -101,5 +106,23 @@ public class PaymentController {
 
         return "buyer/payment-success";
     }
+    @GetMapping("/cancel/{orderId}")
+    public String paymentCancel(@PathVariable Long orderId, Model model){
 
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId);
+
+        if(payment != null){
+            payment.setPaymentStatus("FAILED");
+            paymentRepository.save(payment);
+        }
+
+        order.setStatus("PENDING_PAYMENT");
+        orderRepository.save(order);
+
+        model.addAttribute("order", order);
+
+        return "buyer/payment-cancel";
+    }
 }

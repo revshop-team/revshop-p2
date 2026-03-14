@@ -255,27 +255,23 @@ public class OrderServiceImpl implements OrderService {
     }
     @Override
     public void markAsDelivered(Long orderId) {
+
         logger.info("Mark order as delivered. OrderId: {}", orderId);
 
-
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> {
-                    logger.error("Order not found with id: {}", orderId);
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-                    return new RuntimeException("Order not found");
-                });
-
-        if ("PLACED".equals(order.getStatus())) {
+        if ("PLACED".equals(order.getStatus()) ||
+                "PENDING_PAYMENT".equals(order.getStatus())) {
 
             // 1️⃣ Update order status
             order.setStatus("DELIVERED");
             orderRepository.save(order);
+
             logger.info("Order delivered successfully. OrderId: {}", orderId);
 
-
-            // 2️⃣ UPDATE PAYMENT STATUS FOR COD
-            Payment payment = paymentRepository
-                    .findByOrder_OrderId(orderId);
+            // 2️⃣ Update payment status only for COD
+            Payment payment = paymentRepository.findByOrder_OrderId(orderId);
 
             if (payment != null && "PENDING".equals(payment.getPaymentStatus())) {
 
@@ -283,20 +279,19 @@ public class OrderServiceImpl implements OrderService {
                 payment.setPaidAt(LocalDateTime.now());
 
                 paymentRepository.save(payment);
-                logger.info("COD payment marked as SUCCESS for orderId: {}", orderId);
 
+                logger.info("COD payment marked as SUCCESS for orderId: {}", orderId);
             }
 
-            // 2️⃣ CREATE BUYER NOTIFICATION (🔥 NEW)
+            // 3️⃣ Notify buyer
             Notification notification = new Notification();
-            notification.setUser(order.getBuyer()); // send to buyer
+            notification.setUser(order.getBuyer());
             notification.setOrder(order);
             notification.setMessage("Your order #" + order.getOrderId() + " has been delivered.");
             notification.setIsRead("N");
             notification.setCreatedAt(LocalDateTime.now());
 
             notificationRepository.save(notification);
-            logger.debug("Delivery notification sent to buyer for orderId: {}", orderId);
 
         }
     }

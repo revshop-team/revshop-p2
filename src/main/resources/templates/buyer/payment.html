@@ -67,7 +67,9 @@
         box-shadow:0 0 0 0 rgba(34,197,94,0.7);
         animation:pulse 2s infinite;
         }
-
+        .btn-outline-danger{
+        margin-top:15px;
+        }
         @keyframes pulse{
         0%{ box-shadow:0 0 0 0 rgba(34,197,94,0.7);}
         70%{ box-shadow:0 0 0 12px rgba(34,197,94,0);}
@@ -219,6 +221,13 @@
                 Login & Pay
             </button>
 
+
+        </div>
+        <div class="mt-3 text-center">
+            <button class="btn btn-outline-danger w-100"
+                    onclick="cancelPayment()">
+                Cancel Payment
+            </button>
         </div>
 
     </div>
@@ -362,7 +371,16 @@
     },2000);
 
     }
+    function cancelPayment(){
 
+    if(confirm("Are you sure you want to cancel this payment?")){
+
+        window.location =
+        "/buyer/payment/process?orderId="+orderId+"&status=failed";
+
+    }
+
+}
 </script>
 
 </body>
