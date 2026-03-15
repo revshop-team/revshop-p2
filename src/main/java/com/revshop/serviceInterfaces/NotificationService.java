@@ -14,5 +14,7 @@ public interface NotificationService {
 
     long getUnreadCount(String email);
 
-    void clearAllNotifications(String email);
+
+    void deleteNotification(Long id, String email);
+
 }

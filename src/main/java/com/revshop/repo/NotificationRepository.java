@@ -14,4 +14,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     // Fetch all notifications for a user, newest first
     List<Notification> findByUserOrderByCreatedAtDesc(User user);
     List<Notification> findByUserEmail(String email);
+
 }

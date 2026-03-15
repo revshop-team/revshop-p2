@@ -18,11 +18,7 @@
             background: radial-gradient(circle at 20% 20%, #1e1b4b, #0f172a 60%);
             font-family: 'Segoe UI', sans-serif;
         }
-
-        .register-wrapper {
-            width: 460px;
-        }
-
+        .register-wrapper { width: 460px; }
         .register-card {
             background: rgba(15, 23, 42, 0.92);
             backdrop-filter: blur(18px);
@@ -32,92 +28,24 @@
             border: 1px solid rgba(255,255,255,0.08);
             color: white;
         }
-
-        .brand {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, #facc15, #fde68a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            font-size: 13px;
-            color: rgba(255,255,255,0.6);
-        }
-
-        .form-label {
-            font-size: 13px;
-            color: rgba(255,255,255,0.75);
-        }
-
-        .form-control,
-        .form-select {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 14px;
-            color: white;
-            padding: 11px 14px;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background: rgba(255,255,255,0.12);
-            border-color: #facc15;
-            box-shadow: 0 0 0 0.2rem rgba(250,204,21,0.25);
-            color: white;
-        }
-
-        /* FIXED DROPDOWN VISIBILITY */
-        .form-select option {
-            background-color: #111827;
-            color: #ffffff;
-        }
-
-        .btn-register {
-            background: linear-gradient(135deg, #facc15, #f59e0b);
-            border: none;
-            border-radius: 14px;
-            font-weight: 600;
-            padding: 12px;
-            transition: 0.3s ease;
-        }
-
-        .btn-register:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(250,204,21,0.4);
-        }
-
-        .login-link {
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .login-link:hover {
-            color: #facc15;
-        }
-
-        .alert {
-            border-radius: 12px;
-        }
-
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            margin: 25px 0;
-        }
+        .brand { font-size: 26px; font-weight: 700; letter-spacing: 2px; background: linear-gradient(90deg, #facc15, #fde68a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 13px; color: rgba(255,255,255,0.6); }
+        .form-label { font-size: 13px; color: rgba(255,255,255,0.75); }
+        .form-control, .form-select { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; color: white; padding: 11px 14px; }
+        .form-control::placeholder { color: rgba(255,255,255,0.5); }
+        .form-control:focus, .form-select:focus { background: rgba(255,255,255,0.12); border-color: #facc15; box-shadow: 0 0 0 0.2rem rgba(250,204,21,0.25); color: white; }
+        .form-select option { background-color: #111827; color: #ffffff; }
+        .btn-register { background: linear-gradient(135deg, #facc15, #f59e0b); border: none; border-radius: 14px; font-weight: 600; padding: 12px; transition: 0.3s ease; }
+        .btn-register:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(250,204,21,0.4); }
+        .login-link { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .login-link:hover { color: #facc15; }
+        .alert { border-radius: 12px; }
+        .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); margin: 25px 0; }
     </style>
 </head>
-
 <body>
 
 <div class="register-wrapper">
-
     <div class="register-card">
 
         <div class="text-center mb-4">
@@ -125,98 +53,176 @@
             <div class="subtitle">Create Your Premium Account</div>
         </div>
 
-        <!-- Error -->
+        <!-- Display Errors -->
         <div th:if="${error}" class="alert alert-danger text-center">
             <span th:text="${error}"></span>
         </div>
 
-        <form th:action="@{/register-user}"
-              th:object="${user}"
-              method="post">
+        <form th:action="@{/register-user}" th:object="${user}" method="post">
 
             <!-- Email -->
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email"
-                       class="form-control"
-                       th:field="*{email}"
-                       placeholder="Enter your email"
-                       required>
+                <input type="email" class="form-control" th:field="*{email}" placeholder="Enter your email" required>
             </div>
 
             <!-- Password -->
             <div class="mb-3">
                 <label class="form-label">Password</label>
+
                 <input type="password"
                        class="form-control"
                        th:field="*{password}"
-                       placeholder="Enter your password"
-                       required>
+                       placeholder="Enter your password">
+
+                <div class="text-danger small"
+                     th:if="${#fields.hasErrors('password')}"
+                     th:errors="*{password}">
+                </div>
             </div>
 
             <!-- Security Question -->
             <div class="mb-3">
                 <label class="form-label">Security Question</label>
-                <select class="form-select"
-                        th:field="*{securityQuestion}"
-                        required>
-
+                <select class="form-select" th:field="*{securityQuestion}" required>
                     <option value="">Select Question</option>
-
-                    <option th:each="q : ${questions}"
-                            th:value="${q.questionId}"
-                            th:text="${q.questionText}">
-                    </option>
-
+                    <option th:each="q : ${questions}" th:value="${q.questionId}" th:text="${q.questionText}"></option>
                 </select>
             </div>
 
             <!-- Security Answer -->
             <div class="mb-3">
                 <label class="form-label">Security Answer</label>
-                <input type="text"
-                       class="form-control"
-                       th:field="*{securityAnswer}"
-                       placeholder="Your answer"
-                       required>
+                <input type="text" class="form-control" th:field="*{securityAnswer}" placeholder="Your answer" required>
             </div>
 
             <!-- Role -->
             <div class="mb-4">
                 <label class="form-label">Register As</label>
-                <select class="form-select"
-                        th:field="*{role}"
-                        required>
+                <select id="role" class="form-select" th:field="*{role}" required>
                     <option value="">Select Role</option>
                     <option value="BUYER">Buyer</option>
                     <option value="SELLER">Seller</option>
                 </select>
             </div>
 
-            <div class="divider"></div>
-
-            <!-- Button -->
-            <div class="d-grid">
-                <button type="submit"
-                        class="btn btn-register">
-                    Create Account
-                </button>
+            <!-- Buyer Fields -->
+            <div id="buyer-fields">
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" th:field="*{buyerDetails.fullName}" placeholder="Enter your full name"
+                           th:attr="required=${user.role=='BUYER'}"
+                           th:disabled="${user.role!='BUYER'}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Gender</label>
+                    <select class="form-select" th:field="*{buyerDetails.gender}"
+                            th:attr="required=${user.role=='BUYER'}"
+                            th:disabled="${user.role!='BUYER'}">
+                        <option value="">Select Gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" th:field="*{buyerDetails.dateOfBirth}"
+                           th:attr="required=${user.role=='BUYER'}"
+                           th:disabled="${user.role!='BUYER'}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" th:field="*{buyerDetails.phone}" placeholder="Enter phone"
+                           th:attr="required=${user.role=='BUYER'}"
+                           th:disabled="${user.role!='BUYER'}"
+                           pattern="[7-9][0-9]{9}" title="Phone must be 10 digits starting with 9,8,7">
+                </div>
             </div>
 
+            <!-- Seller Fields -->
+            <div id="seller-fields">
+                <div class="mb-3">
+                    <label class="form-label">Business Name</label>
+                    <input type="text" class="form-control" th:field="*{sellerDetails.businessName}" placeholder="Enter your business name"
+                           th:attr="required=${user.role=='SELLER'}"
+                           th:disabled="${user.role!='SELLER'}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">GST Number</label>
+                    <input type="text" class="form-control" th:field="*{sellerDetails.gstNumber}" placeholder="Enter GST number"
+                           th:attr="required=${user.role=='SELLER'}"
+                           th:disabled="${user.role!='SELLER'}"
+                           pattern="[0-9A-Z]{15}" title="GST must be 15 alphanumeric characters">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" th:field="*{sellerDetails.address}" placeholder="Enter your address"
+                           th:attr="required=${user.role=='SELLER'}"
+                           th:disabled="${user.role!='SELLER'}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" th:field="*{sellerDetails.phone}" placeholder="Enter phone"
+                           th:attr="required=${user.role=='SELLER'}"
+                           th:disabled="${user.role!='SELLER'}"
+                           pattern="[7-9][0-9]{9}" title="Phone must be 10 digits starting with 9,8,7">
+                </div>
+            </div>
+
+
+
+            <div class="divider"></div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-register">Create Account</button>
+            </div>
         </form>
 
         <div class="text-center mt-4">
             <span class="login-link">
                 Already have an account?
-                <a th:href="@{/login}" class="text-decoration-none login-link">
-                    Login
-                </a>
+                <a th:href="@{/login}" class="text-decoration-none login-link">Login</a>
             </span>
         </div>
 
     </div>
-
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const roleSelect = document.getElementById("role");
+        const buyerFields = document.getElementById("buyer-fields");
+        const sellerFields = document.getElementById("seller-fields");
+
+        function toggleFields() {
+            const role = roleSelect.value;
+            const buyerInputs = buyerFields.querySelectorAll("input, select");
+            const sellerInputs = sellerFields.querySelectorAll("input, select");
+
+            if (role === "BUYER") {
+                buyerFields.style.display = "block";
+                sellerFields.style.display = "none";
+                buyerInputs.forEach(i => i.disabled = false);
+                sellerInputs.forEach(i => i.disabled = true);
+            } else if (role === "SELLER") {
+                buyerFields.style.display = "none";
+                sellerFields.style.display = "block";
+                buyerInputs.forEach(i => i.disabled = true);
+                sellerInputs.forEach(i => i.disabled = false);
+            } else {
+                buyerFields.style.display = "none";
+                sellerFields.style.display = "none";
+                buyerInputs.forEach(i => i.disabled = true);
+                sellerInputs.forEach(i => i.disabled = true);
+            }
+        }
+
+        roleSelect.addEventListener("change", toggleFields);
+        toggleFields(); // initialize
+    });
+</script>
 
 </body>
 </html>

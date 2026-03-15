@@ -73,4 +73,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            """)
 
     List<Product> findLowStockProductsBySeller(User seller);
+
+
+    List<Product>
+    findByCategoryCategoryIdAndIsActive(
+            Long categoryId,
+            Integer isActive
+    );
 }

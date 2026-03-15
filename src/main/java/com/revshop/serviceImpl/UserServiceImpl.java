@@ -1,8 +1,12 @@
 package com.revshop.serviceImpl;
 
+import com.revshop.entity.BuyerDetails;
+import com.revshop.entity.SellerDetails;
 import com.revshop.entity.User;
 import com.revshop.exceptions.EmailAlreadyExistsException;
 import com.revshop.exceptions.UserNotFoundException;
+import com.revshop.repo.BuyerDetailsRepository;
+import com.revshop.repo.SellerDetailsRepository;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceInterfaces.UserService;
 import org.slf4j.Logger;
@@ -20,31 +24,87 @@ public class UserServiceImpl implements UserService {
 
 
     private final UserRepository userRepository;
+    private final BuyerDetailsRepository buyerDetailsRepository;
+    private final SellerDetailsRepository sellerDetailsRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
+                           BuyerDetailsRepository buyerDetailsRepository,
+                           SellerDetailsRepository sellerDetailsRepository,
                            BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.buyerDetailsRepository = buyerDetailsRepository;
+        this.sellerDetailsRepository = sellerDetailsRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void registerUser(User user) {
-        logger.info("User registration request received for email: {}", user.getEmail());
 
-
-        if (userRepository.findByEmail(user.getEmail()).isPresent()){
-            logger.warn("Registration failed. Email already exists: {}", user.getEmail());
-
-            throw new EmailAlreadyExistsException(("Email is already registered"));
+        // EMAIL check
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already registered");
         }
+
+        // ===== BUYER VALIDATION =====
+        if ("BUYER".equals(user.getRole())) {
+
+            BuyerDetails buyer = user.getBuyerDetails();
+
+            if (buyer == null) {
+                throw new RuntimeException("Buyer details required");
+            }
+
+            if (buyerDetailsRepository.existsByFullName(buyer.getFullName())) {
+                throw new RuntimeException("Full name already taken");
+            }
+
+            // ⭐ IMPORTANT GLOBAL PHONE CHECK
+            if (buyerDetailsRepository.existsByPhone(buyer.getPhone())
+                    || sellerDetailsRepository.existsByPhone(buyer.getPhone())) {
+
+                throw new RuntimeException("Phone already registered in system");
+            }
+
+            buyer.setUser(user);
+        }
+
+        // ===== SELLER VALIDATION =====
+        if ("SELLER".equals(user.getRole())) {
+
+            SellerDetails seller = user.getSellerDetails();
+
+            if (seller == null) {
+                throw new RuntimeException("Seller details required");
+            }
+
+            if (sellerDetailsRepository.existsByBusinessName(seller.getBusinessName())) {
+                throw new RuntimeException("Business name already exists");
+            }
+
+            if (sellerDetailsRepository.existsByGstNumber(seller.getGstNumber())) {
+                throw new RuntimeException("GST already registered");
+            }
+
+            // ⭐ IMPORTANT GLOBAL PHONE CHECK
+            if (sellerDetailsRepository.existsByPhone(seller.getPhone())
+                    || buyerDetailsRepository.existsByPhone(seller.getPhone())) {
+
+                throw new RuntimeException("Phone already registered in system");
+            }
+
+            seller.setUser(user);
+        }
+
+        // PASSWORD encode
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
-        logger.info("User registered successfully with email: {}", user.getEmail());
-
     }
+
+
+
+
 
     @Override
     public User findByEmail(String email) {

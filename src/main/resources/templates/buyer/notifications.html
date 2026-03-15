@@ -3,6 +3,7 @@
 <head>
     <title>My Notifications | RevShop</title>
     <meta charset="UTF-8">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -56,6 +57,10 @@
             font-size: 13px;
             color: #6c757d;
         }
+
+        .section-title {
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -66,44 +71,37 @@
 <div class="container py-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <h2 class="fw-bold mb-0">🔔 My Notifications</h2>
-
-        <a th:href="@{/buyer/notifications/clear-all}"
-           onclick="return confirm('Clear all notifications?')"
-           class="btn btn-sm btn-outline-danger">
-            Clear All
-        </a>
-
     </div>
-    <!-- Empty State -->
+
+    <!-- EMPTY STATE -->
     <div th:if="${notifications == null || #lists.isEmpty(notifications)}"
          class="alert alert-info text-center rounded-4">
         No notifications yet.
     </div>
 
-    <!-- Notification List -->
+    <!-- NOTIFICATION LIST -->
     <div th:each="n : ${notifications}"
          th:class="'notification-card shadow-sm mb-3 ' + (${n.isRead} == 'N' ? 'unread' : 'read')">
 
         <div class="d-flex justify-content-between align-items-center">
 
-            <!-- LEFT SIDE (ICON + TEXT) -->
+            <!-- LEFT SIDE -->
             <div class="d-flex align-items-center gap-3">
 
-                <!-- 📦 ORDER PLACED ICON -->
+                <!-- ORDER PLACED -->
                 <div th:if="${#strings.contains(n.message, 'placed')}"
                      class="icon-box placed-icon">
                     📦
                 </div>
 
-                <!-- 🚚 DELIVERED ICON -->
+                <!-- ORDER DELIVERED -->
                 <div th:if="${#strings.contains(n.message, 'delivered')}"
                      class="icon-box delivered-icon">
                     🚚
                 </div>
 
-                <!-- TEXT CONTENT -->
+                <!-- TEXT -->
                 <div>
                     <div class="fw-semibold fs-5"
                          th:text="${n.message}">
@@ -116,7 +114,7 @@
 
             </div>
 
-            <!-- RIGHT SIDE (BADGE + BUTTON) -->
+            <!-- RIGHT SIDE -->
             <div class="text-end">
 
                 <!-- NEW BADGE -->
@@ -146,15 +144,19 @@
                     </a>
                 </div>
 
-                <!-- READ STATUS -->
-                <span th:if="${n.isRead == 'Y'}"
-                      class="badge bg-success mt-2">
-                    ✔ Read
-                </span>
+                <!-- REMOVE BUTTON -->
+                <div class="mt-2" th:if="${n.isRead == 'Y'}">
+                    <a th:href="@{/buyer/notifications/delete/{id}(id=${n.notificationId})}"
+                       onclick="return confirm('Remove this notification?')"
+                       class="btn btn-sm btn-outline-danger">
+                        Remove
+                    </a>
+                </div>
 
             </div>
 
         </div>
+
     </div>
 
 </div>

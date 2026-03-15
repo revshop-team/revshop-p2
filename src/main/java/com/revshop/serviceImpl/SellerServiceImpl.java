@@ -2,11 +2,14 @@ package com.revshop.serviceImpl;
 
 import com.revshop.entity.SellerDetails;
 import com.revshop.entity.User;
+import com.revshop.repo.BuyerDetailsRepository;
 import com.revshop.repo.SellerDetailsRepository;
 import com.revshop.serviceInterfaces.SellerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class SellerServiceImpl implements SellerService {
@@ -15,8 +18,11 @@ public class SellerServiceImpl implements SellerService {
 
     private final SellerDetailsRepository sellerRepo;
 
-    public SellerServiceImpl(SellerDetailsRepository sellerRepo) {
+    private BuyerDetailsRepository buyerDetailsRepository;
+
+    public SellerServiceImpl(SellerDetailsRepository sellerRepo,BuyerDetailsRepository buyerDetailsRepository) {
         this.sellerRepo = sellerRepo;
+        this.buyerDetailsRepository = buyerDetailsRepository;
     }
 
     @Override
@@ -39,6 +45,39 @@ public class SellerServiceImpl implements SellerService {
     public void saveOrUpdateSeller(User user, SellerDetails details) {
         logger.info("Saving or updating seller details for userId: {}", user.getUserId());
 
+        SellerDetails existing =
+                sellerRepo.findByUser_Email(user.getEmail())
+                        .orElse(new SellerDetails());
+
+        String newPhone = details.getPhone();
+
+        // ⭐ SELLER DUPLICATE CHECK (exclude self)
+        boolean sellerPhoneExists =
+                sellerRepo.existsByPhone(newPhone);
+
+        if (sellerPhoneExists &&
+                existing.getPhone() != null &&
+                !existing.getPhone().equals(newPhone)) {
+
+            throw new RuntimeException("Phone already used by another seller");
+        }
+
+        Optional<SellerDetails> businessExists =
+                sellerRepo.findByBusinessName(details.getBusinessName());
+
+        if (businessExists.isPresent() &&
+                !businessExists.get().getSellerId()
+                        .equals(existing.getSellerId())) {
+
+            throw new RuntimeException("Business name already used by another seller");
+        }
+        // ⭐ BUYER DUPLICATE CHECK
+        boolean buyerPhoneExists =
+                buyerDetailsRepository.existsByPhone(newPhone);
+
+        if (buyerPhoneExists) {
+            throw new RuntimeException("Phone already used by a buyer");
+        }
 
         details.setUser(user);   // important for @MapsId
         sellerRepo.save(details);
