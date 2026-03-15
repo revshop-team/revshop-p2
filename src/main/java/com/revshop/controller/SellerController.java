@@ -3,7 +3,6 @@ package com.revshop.controller;
 import com.revshop.entity.*;
 import com.revshop.repo.*;
 import com.revshop.serviceInterfaces.*;
-import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -61,9 +60,19 @@ public class SellerController {
 
     // RENDER SELLER'S DASHBOARD
     @GetMapping("/dashboard")
-    public String sellerDashboard() {
+    public String sellerDashboard(Authentication authentication, Model model) {
         logger.info("Seller dashboard accessed");
+        String email = authentication.getName();
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
         return "seller/dashboard";
     }
 
@@ -83,9 +92,19 @@ public class SellerController {
 
     // show add product page
     @GetMapping("/add-product")
-    public String showAddProductForm(Model model) {
+    public String showAddProductForm(Model model,Authentication authentication) {
         logger.info("Add product page requested");
+        String email = authentication.getName();
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryRepository.findAll());
@@ -102,6 +121,12 @@ public class SellerController {
 
         User user = userService.findByEmail(email);
 
+
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
         SellerDetails details = sellerService.getSellerDetails(user.getUserId());
 
         if (details == null) {
@@ -109,6 +134,8 @@ public class SellerController {
 
             details = new SellerDetails();
         }
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("sellerDetails", details);
 
@@ -148,7 +175,7 @@ public class SellerController {
 
     // SAVE PRODUCTS (STATIC IMAGE VERSION - FINAL)
     @PostMapping("/save-product")
-    public String saveProduct(@ModelAttribute("product") Product product,
+    public String saveProduct(@ModelAttribute("product") Product product,@RequestParam("imageFile") MultipartFile imageFile,
                               @RequestParam(value = "newCategoryName", required = false) String newCategoryName,
                               Authentication authentication,
                               Model model,
@@ -250,9 +277,47 @@ public class SellerController {
             product.setCreatedAt(LocalDateTime.now());
             product.setIsActive(1);
 
-            // 🔹 STATIC IMAGE SAFETY (since you removed file upload)
-            if (product.getImageName() == null || product.getImageName().isBlank()) {
+            // ================= IMAGE UPLOAD =================
+
+            if (!imageFile.isEmpty()) {
+
+                try {
+
+                    String uploadDir = "target/classes/static/images/";
+
+                    String fileName =
+                            System.currentTimeMillis()
+                                    + "_"
+                                    + imageFile.getOriginalFilename();
+
+                    Path filePath =
+                            Paths.get(uploadDir, fileName);
+
+                    Files.createDirectories(filePath.getParent());
+
+                    Files.write(filePath, imageFile.getBytes());
+
+                    product.setImageName(fileName);
+
+                    logger.info("Image uploaded: {}", fileName);
+
+                } catch (Exception e) {
+
+                    logger.error("Image upload failed", e);
+
+                    model.addAttribute("error",
+                            "Image upload failed");
+
+                    model.addAttribute("categories",
+                            categoryRepository.findAll());
+
+                    return "seller/add-product";
+                }
+
+            } else {
+
                 product.setImageName("default.png");
+
             }
 
             // 🔥 IMPORTANT: Prevent unique constraint / update conflict
@@ -288,6 +353,17 @@ public class SellerController {
         logger.info("Seller {} viewing own products", email);
 
         User seller = userService.findByEmail(email);
+
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("products",
                 productService.getProductBySeller(seller)
@@ -380,24 +456,51 @@ public class SellerController {
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
 
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         // 1. Get all order items of this seller
-        List<OrderItem> orderItems = orderItemRepository.findBySeller(seller);
-
-        // 🔥 2. FILTER LOGIC (All / Pending / Delivered)
-        if (status != null && !status.isEmpty()) {
-            orderItems = orderItems.stream()
-                    .filter(item -> item.getOrder() != null
-                            && status.equalsIgnoreCase(item.getOrder().getStatus()))
-                    .toList();
-        }
-
+        List<OrderItem> orderItems = orderItemRepository.findBySeller(seller)
+                .stream()
+                .filter(item -> item.getOrder() != null &&
+                        ("PLACED".equals(item.getOrder().getStatus()) ||
+                                "DELIVERED".equals(item.getOrder().getStatus())))
+                .sorted(
+                        Comparator
+                                // Pending first
+                                .comparing((OrderItem i) ->
+                                        "DELIVERED".equalsIgnoreCase(i.getOrder().getStatus()))
+                                // Latest orders first
+                                .thenComparing(i -> i.getOrder().getOrderDate(),
+                                        Comparator.reverseOrder())
+                )
+                .toList();
         // 3. Extract unique orders (for payment & address mapping)
         List<Order> orders = orderItems.stream()
                 .map(OrderItem::getOrder)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
+        Map<Long, Boolean> newOrderMap = new HashMap<>();
 
+        for (OrderItem item : orderItems) {
+
+            Order order = item.getOrder();
+
+            if (order != null && order.getOrderDate() != null) {
+
+                boolean isNew = order.getOrderDate()
+                        .isAfter(LocalDateTime.now().minusMinutes(5));
+
+                newOrderMap.put(order.getOrderId(), isNew);
+            }
+        }
         // 4. Fetch payments map (OrderId -> Payment)
         Map<Long, Payment> paymentMap = new HashMap<>();
         if (!orders.isEmpty()) {
@@ -423,6 +526,9 @@ public class SellerController {
         }
 
         // 6. Send data to UI
+        model.addAttribute("businessName", businessName);
+
+        model.addAttribute("newOrderMap", newOrderMap);
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("paymentMap", paymentMap);
         model.addAttribute("addressMap", addressMap);
@@ -436,6 +542,15 @@ public class SellerController {
 
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
+
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
 
         List<Review> reviews = reviewRepository.findReviewsForSellerProducts(seller);
 
@@ -461,6 +576,8 @@ public class SellerController {
                     reviewRepository.countByProduct_ProductId(productId));
         }
 
+        model.addAttribute("businessName", businessName);
+
         model.addAttribute("productReviewsMap", productReviewsMap);
         model.addAttribute("avgRatingMap", avgRatingMap);
         model.addAttribute("reviewCountMap", reviewCountMap);
@@ -473,9 +590,19 @@ public class SellerController {
         String email = authentication.getName();
         logger.info("Seller checking low stock products: {}", email);
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         List<Product> lowStockProducts =
                 lowStockService.getLowStockProducts(email);
         logger.debug("Low stock products count {}", lowStockProducts.size());
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("lowStockProducts", lowStockProducts);
 
@@ -488,8 +615,19 @@ public class SellerController {
         String email = authentication.getName();
         logger.info("Seller viewing notifications {}", email);
 
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         List<Notification> notifications =
                 notificationService.getUserNotifications(email);
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("notifications", notifications);
 
@@ -534,6 +672,16 @@ public class SellerController {
 
 
         User seller = userService.findByEmail(email);
+
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
 
         logger.debug("Logged seller ID: {}", seller.getUserId());        // 🔥 FETCH ALL ORDER ITEMS (Reliable)
         List<OrderItem> allItems = orderItemRepository.findAll();
@@ -606,6 +754,7 @@ public class SellerController {
                 topProduct = entry.getKey();
             }
         }
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("pendingOrders", pendingOrders);
@@ -663,12 +812,13 @@ public class SellerController {
 
         return "seller/product-reviews";
     }
-    @GetMapping("/notifications/clear-all")
-    public String clearSellerNotifications(Authentication authentication) {
+    @GetMapping("/notifications/delete/{id}")
+    public String deleteNotification(@PathVariable Long id,
+                                     Authentication authentication) {
 
         String email = authentication.getName();
 
-        notificationService.clearAllNotifications(email);
+        notificationService.deleteNotification(id, email);
 
         return "redirect:/seller/notifications";
     }

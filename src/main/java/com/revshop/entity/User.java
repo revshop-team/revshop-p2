@@ -1,6 +1,10 @@
 package com.revshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,12 +25,18 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
+
+    @NotNull(message = "Role is required")
     @Column(name = "role", length = 10)
     private String role; // BUYER or SELLER
 
@@ -39,6 +49,13 @@ public class User {
 
     @Column(name = "security_answer", length = 200)
     private String securityAnswer;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private BuyerDetails buyerDetails;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private SellerDetails sellerDetails;
+
 
 
     public Long getUserId() {
@@ -97,4 +114,19 @@ public class User {
         this.securityAnswer = securityAnswer;
     }
 
+    public void setBuyerDetails(BuyerDetails buyerDetails) {
+        this.buyerDetails = buyerDetails;
+    }
+
+    public void setSellerDetails(SellerDetails sellerDetails) {
+        this.sellerDetails = sellerDetails;
+    }
+
+    public BuyerDetails getBuyerDetails() {
+        return buyerDetails;
+    }
+
+    public SellerDetails getSellerDetails() {
+        return sellerDetails;
+    }
 }

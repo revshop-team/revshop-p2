@@ -1,19 +1,25 @@
 package com.revshop.controller;
 
+import com.revshop.entity.BuyerDetails;
 import com.revshop.entity.Product;
+import com.revshop.entity.SellerDetails;
 import com.revshop.entity.User;
+import com.revshop.exceptions.EmailAlreadyExistsException;
 import com.revshop.repo.SecurityQuestionRepository;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceImpl.UserServiceImpl;
 import com.revshop.serviceInterfaces.CategoryService;
 import com.revshop.serviceInterfaces.ProductService;
 import com.revshop.serviceInterfaces.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -73,7 +79,19 @@ public class AuthController {
     public String showRegisterForm(Model model) {
         logger.info("Register page requested");
 
-        model.addAttribute("user", new User());
+        User user = new User();
+        // Initialize BuyerDetails and link to user
+        BuyerDetails buyer = new BuyerDetails();
+        buyer.setUser(user);         // important!
+        user.setBuyerDetails(buyer); // cascade will work
+
+        // Initialize SellerDetails and link to user
+        SellerDetails seller = new SellerDetails();
+        seller.setUser(user);        // important!
+        user.setSellerDetails(seller);
+
+        model.addAttribute("user", user);
+
         model.addAttribute("questions", securityQuestionRepository.findAll());
 
         return "register";
@@ -87,35 +105,70 @@ public class AuthController {
 //    }
 
     @PostMapping("/register-user")
-    public String register(User user,
+    public String register(@Valid @ModelAttribute("user") User user, BindingResult result,
                            Model model,
                            RedirectAttributes redirectAttributes) {
         logger.info("User registration attempt for email: {}", user.getEmail());
+        System.out.println(user.getEmail());
 
+        if (user.getBuyerDetails() != null) {
+            user.getBuyerDetails().setUser(user);
+        }
+        if (user.getSellerDetails() != null) {
+            user.getSellerDetails().setUser(user);
+        }
+
+        // Check for validation errors
+        if (result.hasErrors()) {
+            logger.warn("Validation errors while registering user: {}", result.getAllErrors());
+
+            // Re-add questions for the dropdown
+            model.addAttribute("questions", securityQuestionRepository.findAll());
+            return "register";  // stay on form with errors displayed
+        }
 
         try {
 
             userService.registerUser(user);
-            logger.info("User registered successfully: {}", user.getEmail());
-
 
             redirectAttributes.addFlashAttribute(
                     "successMessage",
                     "Registration successful 🎉 Please login"
             );
-
             return "redirect:/login";
 
-        } catch (Exception e) {
-            logger.error("Registration failed for email: {}", user.getEmail());
+        }
 
+        catch (DataIntegrityViolationException e) {
 
-            model.addAttribute("error",
-                    "Email already registered");
+            logger.error("Database constraint violation", e);
 
-            model.addAttribute("user", user);
-            model.addAttribute("questions",
-                    securityQuestionRepository.findAll());
+            model.addAttribute("error", "Duplicate value detected");
+            model.addAttribute("user",user);
+
+            model.addAttribute("questions", securityQuestionRepository.findAll());
+
+            return "register";
+        }
+
+        catch (RuntimeException e) {
+
+            logger.warn("Registration validation failed: {}", e.getMessage());
+
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("user",user);
+
+            model.addAttribute("questions", securityQuestionRepository.findAll());
+
+            return "register";
+        }
+        catch (Exception e) {
+
+            logger.error("Unexpected registration error", e);
+
+            model.addAttribute("user",user);
+            model.addAttribute("error", "Something went wrong");
+            model.addAttribute("questions", securityQuestionRepository.findAll());
 
             return "register";
         }

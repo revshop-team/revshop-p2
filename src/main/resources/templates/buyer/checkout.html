@@ -77,7 +77,7 @@
 
     <div class="row g-5">
 
-        <!-- LEFT SIDE - SHIPPING FORM -->
+        <!-- LEFT SIDE -->
         <div class="col-lg-7">
 
             <div class="card checkout-card p-4">
@@ -88,27 +88,39 @@
 
                     <div class="row g-3">
 
+                        <!-- FULL NAME -->
                         <div class="col-md-6">
                             <input type="text"
                                    name="fullName"
                                    class="form-control"
                                    placeholder="Full Name"
+                                   pattern="[A-Za-z ]{3,50}"
+                                   title="Name should contain only letters"
+                                   oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'')"
                                    required>
                         </div>
 
+                        <!-- PHONE -->
                         <div class="col-md-6">
-                            <input type="text"
+                            <input type="tel"
                                    name="phone"
                                    class="form-control"
                                    placeholder="Phone Number"
+                                   pattern="[6-9]{1}[0-9]{9}"
+                                   maxlength="10"
+                                   inputmode="numeric"
+                                   title="Enter valid 10 digit mobile number"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                    required>
                         </div>
 
+                        <!-- ADDRESS -->
                         <div class="col-12">
                             <input type="text"
                                    name="addressLine1"
                                    class="form-control"
                                    placeholder="Address Line 1"
+                                   minlength="5"
                                    required>
                         </div>
 
@@ -119,27 +131,40 @@
                                    placeholder="Address Line 2 (Optional)">
                         </div>
 
+                        <!-- CITY -->
                         <div class="col-md-4">
                             <input type="text"
+                                   id="city"
                                    name="city"
                                    class="form-control"
                                    placeholder="City"
+                                   readonly
                                    required>
                         </div>
 
+                        <!-- STATE -->
                         <div class="col-md-4">
                             <input type="text"
+                                   id="state"
                                    name="state"
                                    class="form-control"
                                    placeholder="State"
+                                   readonly
                                    required>
                         </div>
 
+                        <!-- PINCODE -->
                         <div class="col-md-4">
                             <input type="text"
+                                   id="pincode"
                                    name="pincode"
                                    class="form-control"
                                    placeholder="Pincode"
+                                   pattern="[0-9]{6}"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   title="Enter valid 6 digit pincode"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                                    required>
                         </div>
 
@@ -148,17 +173,22 @@
                     <hr class="my-4">
 
                     <label class="form-label fw-semibold">Payment Method</label>
+
                     <select class="form-select mb-4"
                             name="paymentMethod"
                             required>
-                            <option value="">Select Payment Method</option>
-                            <option value="COD">Cash On Delivery</option>
-                            <option value="ONLINE">Online Payment</option>
+
+                        <option value="">Select Payment Method</option>
+                        <option value="COD">Cash On Delivery</option>
+                        <option value="ONLINE">Online Payment</option>
+
                     </select>
 
                     <button type="submit"
                             class="btn btn-success w-100 btn-place">
+
                         Place Order
+
                     </button>
 
                 </form>
@@ -167,7 +197,7 @@
 
         </div>
 
-        <!-- RIGHT SIDE - ORDER SUMMARY -->
+        <!-- RIGHT SIDE -->
         <div class="col-lg-5">
 
             <div class="order-summary p-4">
@@ -176,23 +206,19 @@
 
                 <div th:if="${cart != null && !#lists.isEmpty(cart.cartItems)}">
 
-                    <!-- Item Count -->
                     <div class="summary-row">
                         <span>Items</span>
                         <span th:text="${#lists.size(cart.cartItems)}"></span>
                     </div>
 
-                    <!-- Subtotal -->
                     <div class="summary-row">
                         <span>Subtotal</span>
                         <span>
                             ₹
-                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
-                            </span>
+                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}"></span>
                         </span>
                     </div>
 
-                    <!-- Shipping -->
                     <div class="summary-row">
                         <span>Shipping</span>
                         <span class="text-success">Free</span>
@@ -200,13 +226,11 @@
 
                     <hr>
 
-                    <!-- Total -->
                     <div class="summary-row summary-total">
                         <span>Total</span>
                         <span>
                             ₹
-                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}">
-                            </span>
+                            <span th:text="${#aggregates.sum(cart.cartItems.?[true].![product.sellingPrice * quantity])}"></span>
                         </span>
                     </div>
 
@@ -228,6 +252,48 @@
     </div>
 
 </div>
+
+<!-- PINCODE AUTO FILL SCRIPT -->
+
+<script>
+
+    document.getElementById("pincode").addEventListener("keyup", function(){
+
+        let pincode = this.value;
+
+        if(pincode.length === 6){
+             document.getElementById("city").value = "Loading...";
+             document.getElementById("state").value = "Loading...";
+            fetch("https://api.postalpincode.in/pincode/" + pincode)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if(data[0].Status === "Success"){
+
+                    let postOffice = data[0].PostOffice[0];
+
+                    document.getElementById("city").value = postOffice.District;
+                    document.getElementById("state").value = postOffice.State;
+
+                }
+                else{
+
+                    alert("Invalid Pincode");
+
+                    document.getElementById("city").value = "";
+                    document.getElementById("state").value = "";
+
+                }
+
+            });
+
+        }
+
+    });
+
+</script>
 
 </body>
 </html>

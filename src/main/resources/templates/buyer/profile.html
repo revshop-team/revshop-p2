@@ -144,7 +144,10 @@
                             <label class="form-label fw-semibold">Date of Birth</label>
                             <input type="date"
                                    class="form-control"
-                                   th:field="*{dateOfBirth}">
+                                   th:name="dateOfBirth"
+                                   th:value="${buyerDetails.dateOfBirth != null
+                   ? #temporals.format(buyerDetails.dateOfBirth,'yyyy-MM-dd')
+                   : ''}">
                         </div>
 
                     </div>
