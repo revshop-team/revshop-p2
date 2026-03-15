@@ -4,6 +4,7 @@ import com.revshop.entity.BuyerDetails;
 import com.revshop.entity.User;
 import com.revshop.exceptions.UserNotFoundException;
 import com.revshop.repo.BuyerDetailsRepository;
+import com.revshop.repo.SellerDetailsRepository;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceInterfaces.BuyerService;
 import org.slf4j.Logger;
@@ -17,11 +18,13 @@ public class BuyerServiceImpl implements BuyerService {
 
     private final BuyerDetailsRepository buyerDetailsRepository;
     private final UserRepository userRepository;
+    private final SellerDetailsRepository sellerDetailsRepository;
 
     public BuyerServiceImpl(BuyerDetailsRepository buyerDetailsRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,SellerDetailsRepository sellerDetailsRepository) {
         this.buyerDetailsRepository = buyerDetailsRepository;
         this.userRepository = userRepository;
+        this.sellerDetailsRepository = sellerDetailsRepository;
     }
 
     @Override
@@ -55,9 +58,30 @@ public class BuyerServiceImpl implements BuyerService {
                       return  new UserNotFoundException("User not found");
                 });
 
+
         BuyerDetails existing = buyerDetailsRepository
                 .findById(user.getUserId())
                 .orElse(new BuyerDetails());
+
+        String newPhone = updatedDetails.getPhone();
+
+        // ⭐ CHECK BUYER DUPLICATE (excluding self)
+        boolean buyerPhoneExists =
+                buyerDetailsRepository.existsByPhone(newPhone);
+
+        if (buyerPhoneExists &&
+                !existing.getPhone().equals(newPhone)) {
+
+            throw new RuntimeException("Phone already used by another buyer");
+        }
+
+        // ⭐ CHECK SELLER DUPLICATE
+        boolean sellerPhoneExists =
+                sellerDetailsRepository.existsByPhone(newPhone);
+
+        if (sellerPhoneExists) {
+            throw new RuntimeException("Phone already used by seller");
+        }
 
         existing.setUser(user);
         existing.setFullName(updatedDetails.getFullName());

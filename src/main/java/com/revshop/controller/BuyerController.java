@@ -68,37 +68,25 @@ public class BuyerController {
 
         String email = authentication.getName();
 
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // latest products
-        PageRequest pageable = PageRequest.of(
-                0,
-                8,
-                Sort.by("createdAt").descending()
-        );
+        PageRequest pageable = PageRequest.of(0, 8, Sort.by("createdAt").descending());
+        Page<Product> latestProducts = productService.getActiveProducts(pageable);
 
-        Page<Product> latestProducts =
-                productService.getActiveProducts(pageable);
+        List<Product> purchaseSuggestions = suggestionService.suggestByOrder(user);
+        List<Product> viewSuggestions = suggestionService.suggestByView(user);
 
+        model.addAttribute("latestProducts", latestProducts.getContent());
+        model.addAttribute("purchaseSuggestions", purchaseSuggestions);
+        model.addAttribute("viewSuggestions", viewSuggestions);
 
-        // ⭐ PURCHASE BASED SUGGESTIONS
-        List<Product> purchaseSuggestions =
-                suggestionService.suggestByOrder(user);
-
-
-        // ⭐ VIEW BASED SUGGESTIONS
-        List<Product> viewSuggestions =
-                suggestionService.suggestByView(user);
-
-
-        model.addAttribute("latestProducts",
-                latestProducts.getContent());
-
-        model.addAttribute("purchaseSuggestions",
-                purchaseSuggestions);
-
-        model.addAttribute("viewSuggestions",
-                viewSuggestions);
+        // 🔹 ADD THIS:
+        String buyerName = user.getBuyerDetails() != null
+                ? user.getBuyerDetails().getFullName()
+                : "Buyer"; // fallback if null
+        model.addAttribute("buyerName", buyerName);
 
         return "buyer/home";
     }
