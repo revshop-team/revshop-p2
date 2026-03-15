@@ -1,6 +1,9 @@
 package com.revshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -23,15 +26,21 @@ public class BuyerDetails {
     @JoinColumn(name = "buyer_id")
     private User user;
 
-    @Column(name = "full_name", length = 100)
+
+    @NotBlank(message = "Username is required")
+    @Column(name = "full_name", unique = true, nullable = false,length = 100)
     private String fullName;
 
+
+    @NotBlank(message = "Gender is required")
     @Column(name = "gender", length = 10)
     private String gender;
 
+    @NotNull(message = "Date of birth is required")
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Pattern(regexp = "^[789][0-9]{9}$", message = "Phone number must be 10 digits starting with 9, 8, or 7")
     @Column(name = "phone", unique = true, length = 15)
     private String phone;
 

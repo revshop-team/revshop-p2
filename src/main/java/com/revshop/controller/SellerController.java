@@ -60,9 +60,19 @@ public class SellerController {
 
     // RENDER SELLER'S DASHBOARD
     @GetMapping("/dashboard")
-    public String sellerDashboard() {
+    public String sellerDashboard(Authentication authentication, Model model) {
         logger.info("Seller dashboard accessed");
+        String email = authentication.getName();
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
         return "seller/dashboard";
     }
 
@@ -82,9 +92,19 @@ public class SellerController {
 
     // show add product page
     @GetMapping("/add-product")
-    public String showAddProductForm(Model model) {
+    public String showAddProductForm(Model model,Authentication authentication) {
         logger.info("Add product page requested");
+        String email = authentication.getName();
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("product", new Product());
         model.addAttribute("categories", categoryRepository.findAll());
@@ -101,6 +121,12 @@ public class SellerController {
 
         User user = userService.findByEmail(email);
 
+
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
         SellerDetails details = sellerService.getSellerDetails(user.getUserId());
 
         if (details == null) {
@@ -108,6 +134,8 @@ public class SellerController {
 
             details = new SellerDetails();
         }
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("sellerDetails", details);
 
@@ -326,6 +354,17 @@ public class SellerController {
 
         User seller = userService.findByEmail(email);
 
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
+        model.addAttribute("businessName", businessName);
+
         model.addAttribute("products",
                 productService.getProductBySeller(seller)
                         .stream()
@@ -417,6 +456,15 @@ public class SellerController {
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
 
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         // 1. Get all order items of this seller
         List<OrderItem> orderItems = orderItemRepository.findBySeller(seller)
                 .stream()
@@ -478,6 +526,8 @@ public class SellerController {
         }
 
         // 6. Send data to UI
+        model.addAttribute("businessName", businessName);
+
         model.addAttribute("newOrderMap", newOrderMap);
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("paymentMap", paymentMap);
@@ -492,6 +542,15 @@ public class SellerController {
 
         String email = authentication.getName();
         User seller = userService.findByEmail(email);
+
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
 
         List<Review> reviews = reviewRepository.findReviewsForSellerProducts(seller);
 
@@ -517,6 +576,8 @@ public class SellerController {
                     reviewRepository.countByProduct_ProductId(productId));
         }
 
+        model.addAttribute("businessName", businessName);
+
         model.addAttribute("productReviewsMap", productReviewsMap);
         model.addAttribute("avgRatingMap", avgRatingMap);
         model.addAttribute("reviewCountMap", reviewCountMap);
@@ -529,9 +590,19 @@ public class SellerController {
         String email = authentication.getName();
         logger.info("Seller checking low stock products: {}", email);
 
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         List<Product> lowStockProducts =
                 lowStockService.getLowStockProducts(email);
         logger.debug("Low stock products count {}", lowStockProducts.size());
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("lowStockProducts", lowStockProducts);
 
@@ -544,8 +615,19 @@ public class SellerController {
         String email = authentication.getName();
         logger.info("Seller viewing notifications {}", email);
 
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
         List<Notification> notifications =
                 notificationService.getUserNotifications(email);
+
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("notifications", notifications);
 
@@ -590,6 +672,16 @@ public class SellerController {
 
 
         User seller = userService.findByEmail(email);
+
+
+        // This already throws UserNotFoundException if not found
+        User user = userService.findByEmail(email);
+
+        // Get business name safely
+        String businessName = user.getSellerDetails() != null
+                ? user.getSellerDetails().getBusinessName()
+                : "Seller"; // fallback
+
 
         logger.debug("Logged seller ID: {}", seller.getUserId());        // 🔥 FETCH ALL ORDER ITEMS (Reliable)
         List<OrderItem> allItems = orderItemRepository.findAll();
@@ -662,6 +754,7 @@ public class SellerController {
                 topProduct = entry.getKey();
             }
         }
+        model.addAttribute("businessName", businessName);
 
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("pendingOrders", pendingOrders);

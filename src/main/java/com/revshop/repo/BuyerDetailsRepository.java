@@ -15,5 +15,8 @@ public interface BuyerDetailsRepository extends JpaRepository<BuyerDetails, Long
      * @return BuyerDetails
      */
     Optional<BuyerDetails> findByUser_Email(String email);
+    Optional<BuyerDetails> findByFullName(String fullName);
 
+    boolean existsByFullName(String fullName);
+    boolean existsByPhone(String phone);
 }

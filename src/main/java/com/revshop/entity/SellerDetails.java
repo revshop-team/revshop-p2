@@ -1,6 +1,8 @@
 package com.revshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Entity
@@ -21,15 +23,21 @@ public class SellerDetails {
     @JoinColumn(name = "seller_id")
     private User user;
 
-    @Column(name = "business_name", length = 150)
+    @NotBlank(message = "Business name is required")
+    @Column(name = "business_name",unique = true, length = 150)
     private String businessName;
 
+    @NotBlank(message = "GST number is required")
+    @Pattern(regexp = "[0-9A-Z]{15}", message = "GST number must be exactly 15 alphanumeric characters")
     @Column(name = "gst_number", unique = true, length = 20)
     private String gstNumber;
 
+    @NotBlank(message = "Address is required")
     @Column(name = "address", length = 255)
     private String address;
 
+    @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^[789][0-9]{9}$", message = "Phone number must be 10 digits starting with 9, 8, or 7")
     @Column(name = "phone", unique = true, length = 15)
     private String phone;
 
