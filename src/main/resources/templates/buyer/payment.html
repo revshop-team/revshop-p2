@@ -3,77 +3,192 @@
 <head>
 
     <title>Secure Payment | RevShop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
 
-        body{
-        background:#f4f6f9;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0A192F, #132a4d, #1b355d);
+            background-size: 300% 300%;
+            animation: bgMove 14s ease infinite;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        .gateway-card{
-        max-width:520px;
-        margin:auto;
-        margin-top:60px;
-        border-radius:12px;
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .gateway-header{
-        background:#0f172a;
-        color:white;
-        padding:15px;
-        border-radius:12px 12px 0 0;
+        .gateway-card {
+            max-width: 520px;
+            width: 100%;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #ffffff, #f6f7fb);
+            color: #0A192F;
+            box-shadow: 0 18px 40px rgba(0,0,0,.35);
+            transition: .45s ease;
+            animation: slideUp 1s ease forwards, floatItem 6s ease-in-out infinite;
+            opacity: 0;
         }
 
-        .payment-tab{
-        cursor:pointer;
-        padding:10px;
-        text-align:center;
-        font-weight:500;
-        border-bottom:2px solid transparent;
+        .gateway-card:hover {
+            box-shadow: 0 30px 70px rgba(0,0,0,.5);
         }
 
-        .payment-tab.active{
-        border-bottom:2px solid #22c55e;
-        color:#22c55e;
+        @keyframes slideUp {
+            0% { transform: translateY(60px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
 
-        .payment-section{
-        display:none;
+        @keyframes floatItem {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); } /* Subtle float for input stability */
         }
 
-        .payment-section.active{
-        display:block;
+        .gateway-header {
+            background: #0A192F;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            border-bottom: 3px solid #D4AF37;
         }
 
-        .pay-btn{
-        font-size:18px;
-        padding:12px;
+        .gateway-header h5 {
+            color: #D4AF37;
+            font-weight: 700;
+            letter-spacing: .5px;
         }
 
-        .secure-text{
-        font-size:13px;
-        color:#6b7280;
-        text-align:center;
+        /* TABS */
+        .payment-tab {
+            cursor: pointer;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            transition: all 0.3s ease;
         }
 
-        .qr-box{
-        display:inline-block;
-        padding:12px;
-        border-radius:10px;
-        background:white;
-        box-shadow:0 0 0 0 rgba(34,197,94,0.7);
-        animation:pulse 2s infinite;
+        .payment-tab.active {
+            border-bottom: 3px solid #D4AF37;
+            color: #0A192F;
         }
-        .btn-outline-danger{
-        margin-top:15px;
+
+        .payment-tab:hover:not(.active) {
+            color: #D4AF37;
         }
-        @keyframes pulse{
-        0%{ box-shadow:0 0 0 0 rgba(34,197,94,0.7);}
-        70%{ box-shadow:0 0 0 12px rgba(34,197,94,0);}
-        100%{ box-shadow:0 0 0 0 rgba(34,197,94,0);}
+
+        .payment-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .payment-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* INPUTS */
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all .3s ease;
+            border: 1px solid #dce1e6;
+            font-size: 14px;
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: #D4AF37;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212,175,55,.25);
+            transform: scale(1.02);
+        }
+
+        /* BUTTONS */
+        .btn-pay {
+            background: #D4AF37 !important;
+            border: 2px solid transparent !important;
+            color: #0A192F !important;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            transition: all .35s ease !important;
+            letter-spacing: .3px;
+        }
+
+        .btn-pay:hover {
+            background: #0A192F !important;
+            border-color: #0A192F !important;
+            color: #D4AF37 !important;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(10,25,47,.4) !important;
+        }
+
+        .btn-cancel {
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            background: transparent;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn-cancel:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .secure-text {
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .qr-box {
+            display: inline-block;
+            padding: 12px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 0 0 0 rgba(212,175,55,0.7);
+            animation: pulseQR 2s infinite;
+        }
+
+        @keyframes pulseQR {
+            0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(212,175,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+        }
+
+        /* Custom Loader */
+        .spinner-border {
+            color: #D4AF37 !important;
+            width: 3rem;
+            height: 3rem;
         }
 
     </style>
@@ -82,121 +197,114 @@
 
 <body>
 
-<div class="card shadow gateway-card">
+<div class="card gateway-card">
 
     <div class="gateway-header text-center">
-        <h5 class="mb-0">🔒 Secure Payment Gateway</h5>
-        <p class="small text-light mb-0">Powered by RevShop Pay</p>
+        <h5 class="mb-0"><i class="bi bi-shield-lock-fill me-2"></i>Secure Payment Gateway</h5>
+        <p class="small text-light mb-0 mt-1" style="opacity: 0.8;">Powered by RevShop Pay</p>
     </div>
 
-    <div class="card-body" id="paymentContent">
+    <div class="card-body p-4" id="paymentContent">
 
-        <h4 class="text-center mb-1">
-            Amount: ₹
-            <span th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',2,'POINT')}"></span>
-        </h4>
+        <h3 class="text-center mb-1 fw-bold" style="color: #0A192F;">
+            Amount: ₹ <span th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',2,'POINT')}"></span>
+        </h3>
 
-        <p class="secure-text">
-            256-bit SSL secured transaction
+        <p class="secure-text mb-3">
+            <i class="bi bi-lock-fill"></i> 256-bit SSL secured transaction
         </p>
 
-        <p class="text-center text-muted">
-            Order ID: <b th:text="${order.orderId}"></b>
-        </p>
+        <div class="bg-light rounded p-2 mb-4 text-center">
+            <p class="mb-0 text-muted" style="font-size: 14px;">
+                Order ID: <b th:text="${order.orderId}" class="text-dark"></b>
+            </p>
+        </div>
 
-        <div class="row text-center mb-4">
+        <div class="row text-center mb-4 g-0">
 
             <div class="col payment-tab active" onclick="showTab('upi')">
-                📱 UPI
+                <i class="bi bi-phone me-1"></i> UPI
             </div>
 
             <div class="col payment-tab" onclick="showTab('card')">
-                💳 Card
+                <i class="bi bi-credit-card me-1"></i> Card
             </div>
 
             <div class="col payment-tab" onclick="showTab('bank')">
-                🏦 NetBanking
+                <i class="bi bi-bank me-1"></i> NetBanking
             </div>
 
         </div>
 
-        <!-- UPI -->
-
         <div id="upi" class="payment-section active text-center">
 
-            <h5 class="fw-semibold mb-3">📱 Pay using UPI</h5>
+            <h6 class="fw-semibold mb-3 text-start">Pay using UPI</h6>
 
             <input id="upiInput"
                    class="form-control mb-3"
                    placeholder="Enter UPI ID (example@upi)">
 
-            <button class="btn btn-success w-100 pay-btn mb-3"
+            <button class="btn btn-pay w-100 mb-4"
                     onclick="payUPI()">
-
                 Pay ₹ <span th:text="${order.totalAmount}"></span>
-
             </button>
 
-            <hr>
-
-            <p class="text-muted mb-2">OR Scan QR Code</p>
-
-            <div class="qr-box mb-3">
-
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=revshop-payment">
-
+            <div class="d-flex align-items-center mb-4">
+                <hr class="flex-grow-1">
+                <span class="mx-3 text-muted small fw-semibold">OR Scan QR Code</span>
+                <hr class="flex-grow-1">
             </div>
 
-            <button class="btn btn-success w-100"
+            <div class="qr-box mb-4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=revshop-payment" alt="Payment QR" class="img-fluid rounded">
+            </div>
+
+            <button class="btn btn-pay w-100"
                     onclick="payQR()">
                 Confirm QR Payment
             </button>
 
         </div>
 
-        <!-- CARD -->
-
         <div id="card" class="payment-section">
+
+            <h6 class="fw-semibold mb-3">Enter Card Details</h6>
 
             <input id="cardNumber"
                    class="form-control mb-3"
-                   placeholder="Card Number (16 digits)">
+                   placeholder="Card Number (16 digits)" maxlength="16">
 
-            <div class="row">
-
+            <div class="row g-2">
                 <div class="col">
                     <input id="cardExpiry"
                            class="form-control mb-3"
-                           placeholder="MM/YY">
+                           placeholder="MM/YY" maxlength="5">
                 </div>
-
                 <div class="col">
                     <input id="cardCvv"
+                           type="password"
                            class="form-control mb-3"
-                           placeholder="CVV">
+                           placeholder="CVV" maxlength="3">
                 </div>
-
             </div>
 
             <input id="cardName"
-                   class="form-control mb-3"
+                   class="form-control mb-4"
                    placeholder="Card Holder Name">
 
-            <button class="btn btn-success w-100 pay-btn"
+            <button class="btn btn-pay w-100"
                     onclick="payCard()">
-
                 Pay ₹ <span th:text="${order.totalAmount}"></span>
-
             </button>
 
         </div>
 
-        <!-- NETBANKING -->
-
         <div id="bank" class="payment-section">
 
+            <h6 class="fw-semibold mb-3">Select your Bank</h6>
+
             <select id="bankSelect" class="form-select mb-3">
-                <option value="">Select Bank</option>
+                <option value="" hidden>Select Bank</option>
                 <option value="SBI">State Bank of India</option>
                 <option value="HDFC">HDFC Bank</option>
                 <option value="ICICI">ICICI Bank</option>
@@ -204,27 +312,25 @@
             </select>
 
             <div id="bankLoginFields" style="display:none">
-
                 <input id="bankUser"
                        class="form-control mb-3"
                        placeholder="Customer ID / Username">
 
                 <input id="bankPass"
                        type="password"
-                       class="form-control mb-3"
+                       class="form-control mb-4"
                        placeholder="Password">
-
             </div>
 
-            <button class="btn btn-success w-100 pay-btn"
+            <button class="btn btn-pay w-100"
                     onclick="payBank()">
                 Login & Pay
             </button>
 
-
         </div>
-        <div class="mt-3 text-center">
-            <button class="btn btn-outline-danger w-100"
+
+        <div class="mt-4 text-center">
+            <button class="btn btn-cancel w-100"
                     onclick="cancelPayment()">
                 Cancel Payment
             </button>
@@ -233,154 +339,116 @@
     </div>
 
     <div id="paymentLoader" class="text-center p-5" style="display:none">
-
-        <div class="spinner-border text-success mb-3"></div>
-
-        <h5>Processing Payment...</h5>
-
+        <div class="spinner-border mb-3" role="status"></div>
+        <h4 class="fw-bold" style="color: #0A192F;">Processing Payment</h4>
         <p class="text-muted" id="paymentMethodText"></p>
-
+        <p class="small text-muted mt-4"><i class="bi bi-shield-check text-success"></i> Please do not refresh the page or press back.</p>
     </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script th:inline="javascript">
 
     const orderId = [[${order.orderId}]];
 
     function showTab(tab){
-
-    document.querySelectorAll(".payment-tab")
-    .forEach(t=>t.classList.remove("active"));
-
-    document.querySelectorAll(".payment-section")
-    .forEach(s=>s.classList.remove("active"));
-
-    document.querySelector("[onclick=\"showTab('"+tab+"')\"]")
-    .classList.add("active");
-
-    document.getElementById(tab)
-    .classList.add("active");
-
+        document.querySelectorAll(".payment-tab").forEach(t=>t.classList.remove("active"));
+        document.querySelectorAll(".payment-section").forEach(s=>s.classList.remove("active"));
+        document.querySelector("[onclick=\"showTab('"+tab+"')\"]").classList.add("active");
+        document.getElementById(tab).classList.add("active");
     }
 
     function payUPI(){
-
-    const upi=document.getElementById("upiInput").value.trim();
-
-    if(!upi){
-    alert("Please enter UPI ID");
-    return;
-    }
-
-    if(!upi.match(/^[\w.-]+@[\w]+$/)){
-    alert("Invalid UPI ID");
-    return;
-    }
-
-    paySuccess("UPI");
-
+        const upi=document.getElementById("upiInput").value.trim();
+        if(!upi){
+            alert("Please enter UPI ID");
+            return;
+        }
+        if(!upi.match(/^[\w.-]+@[\w]+$/)){
+            alert("Invalid UPI ID");
+            return;
+        }
+        paySuccess("UPI");
     }
 
     function payQR(){
-    paySuccess("UPI QR");
+        paySuccess("UPI QR");
     }
 
     function payCard(){
+        const card=document.getElementById("cardNumber").value.trim();
+        const cvv=document.getElementById("cardCvv").value.trim();
+        const expiry=document.getElementById("cardExpiry").value.trim();
+        const name=document.getElementById("cardName").value.trim();
 
-    const card=document.getElementById("cardNumber").value.trim();
-    const cvv=document.getElementById("cardCvv").value.trim();
-    const expiry=document.getElementById("cardExpiry").value.trim();
-    const name=document.getElementById("cardName").value.trim();
-
-    if(card.length!==16){
-    alert("Card number must be 16 digits");
-    return;
-    }
-
-    if(!expiry){
-    alert("Enter expiry date");
-    return;
-    }
-
-    if(cvv.length!==3){
-    alert("CVV must be 3 digits");
-    return;
-    }
-
-    if(!name){
-    alert("Enter card holder name");
-    return;
-    }
-
-    paySuccess("Card");
-
+        if(card.length!==16){
+            alert("Card number must be 16 digits");
+            return;
+        }
+        if(!expiry){
+            alert("Enter expiry date");
+            return;
+        }
+        if(cvv.length!==3){
+            alert("CVV must be 3 digits");
+            return;
+        }
+        if(!name){
+            alert("Enter card holder name");
+            return;
+        }
+        paySuccess("Card");
     }
 
     document.getElementById("bankSelect").addEventListener("change",function(){
-
-    if(this.value!==""){
-    document.getElementById("bankLoginFields").style.display="block";
-    }else{
-    document.getElementById("bankLoginFields").style.display="none";
-    }
-
+        if(this.value!==""){
+            document.getElementById("bankLoginFields").style.display="block";
+        }else{
+            document.getElementById("bankLoginFields").style.display="none";
+        }
     });
 
     function payBank(){
+        const bank=document.getElementById("bankSelect").value;
+        const user=document.getElementById("bankUser").value.trim();
+        const pass=document.getElementById("bankPass").value.trim();
 
-    const bank=document.getElementById("bankSelect").value;
-    const user=document.getElementById("bankUser").value.trim();
-    const pass=document.getElementById("bankPass").value.trim();
-
-    if(!bank){
-    alert("Please select bank");
-    return;
-    }
-
-    if(!user){
-    alert("Enter bank username");
-    return;
-    }
-
-    if(!pass){
-    alert("Enter bank password");
-    return;
-    }
-
-    paySuccess("NetBanking");
-
+        if(!bank){
+            alert("Please select bank");
+            return;
+        }
+        if(!user){
+            alert("Enter bank username");
+            return;
+        }
+        if(!pass){
+            alert("Enter bank password");
+            return;
+        }
+        paySuccess("NetBanking");
     }
 
     function paySuccess(method){
+        document.getElementById("paymentContent").style.display="none";
+        document.getElementById("paymentLoader").style.display="block";
+        document.getElementById("paymentMethodText").innerText = "Processing payment via " + method;
 
-    document.getElementById("paymentContent").style.display="none";
-    document.getElementById("paymentLoader").style.display="block";
-
-    document.getElementById("paymentMethodText").innerText =
-    "Processing payment via "+method;
-
-    setTimeout(function(){
-
-    if(method === "UPI" || method === "UPI QR"){
-    window.location="/buyer/payment/process?orderId="+orderId+"&status=success";
-    }else{
-    window.location="/buyer/payment/otp?orderId="+orderId;
+        setTimeout(function(){
+            if(method === "UPI" || method === "UPI QR"){
+                window.location="/buyer/payment/process?orderId="+orderId+"&status=success";
+            } else {
+                window.location="/buyer/payment/otp?orderId="+orderId;
+            }
+        }, 2000);
     }
 
-    },2000);
-
-    }
     function cancelPayment(){
-
-    if(confirm("Are you sure you want to cancel this payment?")){
-
-        window.location =
-        "/buyer/payment/process?orderId="+orderId+"&status=failed";
-
+        if(confirm("Are you sure you want to cancel this payment?")){
+            window.location = "/buyer/payment/process?orderId="+orderId+"&status=failed";
+        }
     }
 
-}
 </script>
 
 </body>

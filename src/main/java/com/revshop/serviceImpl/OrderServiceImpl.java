@@ -149,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         logger.info("Order created successfully. OrderId: {}", order.getOrderId());
 
         // 🔔 NOTIFY SELLERS
-        notificationService.notifySellerOrderPlaced(order.getOrderId());
+//        notificationService.notifySellerOrderPlaced(order.getOrderId());
         // Save address
         OrderAddress address = new OrderAddress();
         address.setOrder(order);
@@ -189,15 +189,15 @@ public class OrderServiceImpl implements OrderService {
         paymentRepository.save(payment);
         logger.info("Payment record created for orderId: {}", order.getOrderId());
 
-        Notification buyerNotification = new Notification();
-        buyerNotification.setUser(buyer); // Buyer receives notification
-        buyerNotification.setOrder(order);
-        buyerNotification.setIsRead("N");
+//        Notification buyerNotification = new Notification();
+//        buyerNotification.setUser(buyer); // Buyer receives notification
+//        buyerNotification.setOrder(order);
+//        buyerNotification.setIsRead("N");
 
 // Optional custom message (your entity auto-generates too)
-        buyerNotification.setMessage("Your order #" + order.getOrderId() + " has been placed successfully!");
+//        buyerNotification.setMessage("Your order #" + order.getOrderId() + " has been placed successfully!");
 
-        notificationRepository.save(buyerNotification);
+//        notificationRepository.save(buyerNotification);
         // CLEAR CART PROPERLY
         cart.getCartItems().clear();
         cartRepository.save(cart);
