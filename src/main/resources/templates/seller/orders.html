@@ -238,8 +238,11 @@
             <p class="mb-0">
 
                 <strong>👤 Buyer:</strong>
-                <span th:text="${item.order.buyer.email}"></span>
-
+                <span th:text="${item.order.buyer.buyerDetails != null ?
+                    item.order.buyer.buyerDetails.fullName :
+                    item.order.buyer.email}">
+    </span>
+            </p>
             </p>
 
         </div>
