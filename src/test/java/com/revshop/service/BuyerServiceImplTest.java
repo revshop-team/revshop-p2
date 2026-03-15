@@ -4,6 +4,7 @@ import com.revshop.entity.BuyerDetails;
 import com.revshop.entity.User;
 import com.revshop.exceptions.UserNotFoundException;
 import com.revshop.repo.BuyerDetailsRepository;
+import com.revshop.repo.SellerDetailsRepository;
 import com.revshop.repo.UserRepository;
 import com.revshop.serviceImpl.BuyerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class BuyerServiceImplTest {
 
+    @Mock
+    private SellerDetailsRepository sellerDetailsRepository;
     @Mock private BuyerDetailsRepository buyerDetailsRepository;
     @Mock private UserRepository userRepository;
     @InjectMocks private BuyerServiceImpl buyerService;
