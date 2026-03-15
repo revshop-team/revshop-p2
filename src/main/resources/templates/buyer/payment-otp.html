@@ -1,57 +1,173 @@
 <!DOCTYPE html>
-
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
     <title>OTP Verification | RevShop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
 
-        body{
-        background:#f4f6f9;
-        font-family:Segoe UI;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0A192F, #132a4d, #1b355d);
+            background-size: 300% 300%;
+            animation: bgMove 14s ease infinite;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .otp-card{
-        max-width:420px;
-        margin:auto;
-        margin-top:120px;
-        border-radius:12px;
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .otp-icon{
-        font-size:60px;
-        color:#0d6efd;
+        .otp-card {
+            max-width: 450px;
+            width: 100%;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #ffffff, #f6f7fb);
+            color: #0A192F;
+            box-shadow: 0 18px 40px rgba(0,0,0,.35);
+            transition: .45s ease;
+            animation: slideUp 0.8s ease forwards, floatItem 6s ease-in-out infinite;
+            opacity: 0;
+            padding: 40px 30px;
         }
 
-        .otp-container{
-        display:flex;
-        justify-content:center;
-        gap:10px;
-        margin-bottom:20px;
+        .otp-card:hover {
+            box-shadow: 0 30px 70px rgba(0,0,0,.5);
         }
 
-        .otp-box{
-        width:45px;
-        height:55px;
-        text-align:center;
-        font-size:22px;
-        border-radius:8px;
-        border:1px solid #ced4da;
+        @keyframes slideUp {
+            0% { transform: translateY(60px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
 
-        .otp-box:focus{
-        outline:none;
-        border-color:#0d6efd;
-        box-shadow:0 0 4px rgba(13,110,253,0.5);
+        @keyframes floatItem {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
 
-        .timer{
-        font-size:13px;
-        color:#6b7280;
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: #e6f0ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: #D4AF37;
+            background: #0A192F;
+            font-size: 35px;
+            box-shadow: 0 10px 20px rgba(10, 25, 47, 0.2);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        @keyframes popIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .otp-title {
+            font-weight: 700;
+            color: #0A192F;
+            letter-spacing: 0.5px;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            margin-top: 20px;
+        }
+
+        .otp-box {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            border-radius: 12px;
+            border: 2px solid #dce1e6;
+            background: #fff;
+            color: #0A192F;
+            transition: all 0.3s ease;
+        }
+
+        .otp-box:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* BUTTONS */
+        .btn-verify {
+            background: #D4AF37 !important;
+            border: 2px solid transparent !important;
+            color: #0A192F !important;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            transition: all .35s ease !important;
+            letter-spacing: .3px;
+        }
+
+        .btn-verify:hover:not(:disabled) {
+            background: #0A192F !important;
+            border-color: #0A192F !important;
+            color: #D4AF37 !important;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(10,25,47,.3) !important;
+        }
+
+        .btn-verify:disabled {
+            background: #e2e8f0 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none !important;
+        }
+
+        .timer {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .btn-resend {
+            color: #0A192F;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .btn-resend:hover {
+            color: #D4AF37;
+            text-decoration: underline;
+        }
+
+        /* Custom Loader */
+        .spinner-border {
+            color: #D4AF37 !important;
+            width: 3rem;
+            height: 3rem;
         }
 
     </style>
@@ -60,49 +176,57 @@
 
 <body>
 
-<div class="container">
+<div class="container px-4">
 
-    <div class="card shadow otp-card text-center p-4">
+    <div class="card otp-card text-center mx-auto" id="otpCardUI">
 
-        <div class="otp-icon mb-3">
-            🔐
+        <div class="icon-wrapper">
+            <i class="bi bi-shield-lock-fill"></i>
         </div>
 
-        <h4>OTP Verification</h4>
+        <h4 class="otp-title mb-2">OTP Verification</h4>
 
-        <p class="text-muted">
-            Enter the 6-digit OTP sent to mobile number ending with <b>**72</b>
+        <p class="text-muted" style="font-size: 14px;">
+            Enter the 6-digit OTP sent to mobile number ending with <b class="text-dark">**72</b>
         </p>
 
         <div class="otp-container">
-
-            <input class="otp-box" maxlength="1">
-            <input class="otp-box" maxlength="1">
-            <input class="otp-box" maxlength="1">
-            <input class="otp-box" maxlength="1">
-            <input class="otp-box" maxlength="1">
-            <input class="otp-box" maxlength="1">
-
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric">
         </div>
 
         <button id="verifyBtn"
-                class="btn btn-success w-100"
+                class="btn btn-verify w-100"
                 onclick="verifyOTP()"
                 disabled>
-            Verify & Complete Payment </button>
+            Verify & Complete Payment
+        </button>
 
-        <p class="timer mt-3">
-            OTP expires in <span id="time">30</span> seconds
+        <p class="timer mt-4 mb-2">
+            <i class="bi bi-clock me-1"></i> OTP expires in <span id="time" class="text-danger fw-bold">30</span> seconds
         </p>
 
-        <p class="text-muted mt-2">
-            Demo OTP: <b>123456</b>
-        </p>
+        <div class="bg-light rounded p-2 mb-3 mt-3">
+            <p class="text-muted mb-0 small">
+                Demo OTP: <b class="text-dark fs-6 tracking-widest">123456</b>
+            </p>
+        </div>
 
-        <button class="btn btn-link"
+        <button class="btn btn-link btn-resend p-0"
                 onclick="resendOTP()">
-            Resend OTP </button>
+            Resend OTP
+        </button>
 
+    </div>
+
+    <div id="otpLoader" class="text-center p-5" style="display:none; animation: slideUp 0.8s ease forwards;">
+        <div class="spinner-border mb-3" role="status"></div>
+        <h4 class="fw-bold text-white">Verifying OTP...</h4>
+        <p class="text-light" style="opacity: 0.8;">Securing your transaction</p>
     </div>
 
 </div>
@@ -118,23 +242,26 @@
 
     inputs.forEach((input,index)=>{
 
-    input.addEventListener("input",function(){
+        input.addEventListener("input",function(){
 
-    if(this.value.length===1 && index<5){
-    inputs[index+1].focus();
-    }
+            // Ensure only numbers are entered
+            this.value = this.value.replace(/[^0-9]/g, '');
 
-    checkOTP();
+            if(this.value.length===1 && index<5){
+                inputs[index+1].focus();
+            }
 
-    });
+            checkOTP();
 
-    input.addEventListener("keydown",function(e){
+        });
 
-    if(e.key==="Backspace" && !this.value && index>0){
-    inputs[index-1].focus();
-    }
+        input.addEventListener("keydown",function(e){
 
-    });
+            if(e.key==="Backspace" && !this.value && index>0){
+                inputs[index-1].focus();
+            }
+
+        });
 
     });
 
@@ -142,15 +269,15 @@
 
     function checkOTP(){
 
-    let otp="";
+        let otp="";
 
-    inputs.forEach(i=>otp+=i.value);
+        inputs.forEach(i=>otp+=i.value);
 
-    if(otp.length===6){
-    verifyBtn.disabled=false;
-    }else{
-    verifyBtn.disabled=true;
-    }
+        if(otp.length===6){
+            verifyBtn.disabled=false;
+        }else{
+            verifyBtn.disabled=true;
+        }
 
     }
 
@@ -158,22 +285,24 @@
 
     function verifyOTP(){
 
-    let otp="";
+        let otp="";
 
-    inputs.forEach(i=>otp+=i.value);
+        inputs.forEach(i=>otp+=i.value);
 
-    if(otp!=="123456"){
-    alert("Invalid OTP");
-    return;
-    }
+        if(otp!=="123456"){
+            alert("Invalid OTP");
+            return;
+        }
 
-    document.querySelector(".otp-card").style.display="none";
+        // Show loader for a premium transition UX
+        document.getElementById("otpCardUI").style.display="none";
+        document.getElementById("otpLoader").style.display="block";
 
-    setTimeout(function(){
+        setTimeout(function(){
 
-    window.location="/buyer/payment/process?orderId="+orderId+"&status=success";
+            window.location="/buyer/payment/process?orderId="+orderId+"&status=success";
 
-    },1500);
+        },1500);
 
     }
 
@@ -184,18 +313,20 @@
 
     function startTimer(){
 
-    timerInterval=setInterval(function(){
+        timerInterval=setInterval(function(){
 
-    if(time<=0){
-    document.getElementById("time").innerText="Expired";
-    clearInterval(timerInterval);
-    return;
-    }
+            if(time<=0){
+                document.getElementById("time").innerText="Expired";
+                document.getElementById("time").classList.remove("text-danger");
+                document.getElementById("time").classList.add("text-muted");
+                clearInterval(timerInterval);
+                return;
+            }
 
-    document.getElementById("time").innerText=time;
-    time--;
+            document.getElementById("time").innerText=time;
+            time--;
 
-    },1000);
+        },1000);
 
     }
 
@@ -205,15 +336,22 @@
 
     function resendOTP(){
 
-    alert("New OTP sent (Demo OTP remains 123456)");
+        alert("New OTP sent (Demo OTP remains 123456)");
 
-    clearInterval(timerInterval);
+        clearInterval(timerInterval);
 
-    time=30;
+        time=30;
 
-    document.getElementById("time").innerText=time;
+        document.getElementById("time").innerText=time;
+        document.getElementById("time").classList.add("text-danger");
+        document.getElementById("time").classList.remove("text-muted");
 
-    startTimer();
+        // Clear inputs
+        inputs.forEach(i => i.value = "");
+        inputs[0].focus();
+        checkOTP();
+
+        startTimer();
 
     }
 
