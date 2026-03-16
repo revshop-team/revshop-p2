@@ -1,105 +1,381 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
     <title>Add Product | RevShop</title>
+
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons (REQUIRED) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #f5f7fa; }
 
-        .form-card { border-radius: 16px; }
-
-        .form-label { font-weight: 600; }
-
-        .image-preview {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 2px dashed #dee2e6;
-    margin-top: 10px;
-    display: none;
-}
-
-        .error-text {
-            color: red;
-            font-size: 13px;
+        body{
+        font-family:'Poppins',sans-serif;
+        background:linear-gradient(180deg,#0A192F,#112240);
+        min-height:100vh;
+        color:white;
+        overflow-x:hidden;
         }
+
+        /* NAVBAR */
+
+        .classic-navbar{
+        background:#0A192F;
+        border-bottom:1px solid #060f1d;
+        }
+
+        .navbar-brand{
+        line-height:1.2;
+        }
+
+        .brand-text{
+        font-size:1.55rem;
+        letter-spacing:-0.2px;
+        line-height:1.35;
+        padding-bottom:2px;
+        display:inline-block;
+        }
+
+        .brand-subtext{
+        font-size:.7rem;
+        font-style:italic;
+        color:#e2e8f0;
+        display:flex;
+        align-items:center;
+        gap:5px;
+        }
+
+        .brand-accent{
+        background:linear-gradient(90deg,#D4AF37,#f5d76e,#bfa132,#D4AF37);
+        background-size:200% auto;
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        display:inline-block;
+        padding-right:2px;
+        animation:goldMove 4s linear infinite;
+        }
+
+        @keyframes goldMove{
+        0%{background-position:0%}
+        100%{background-position:200%}
+        }
+
+        /* DIAMOND */
+
+        .brand-diamond{
+        color:#D4AF37;
+        font-size:11px;
+        animation:diamondJump 1.3s infinite ease-in-out;
+        }
+
+        @keyframes diamondJump{
+        0%{transform:translateY(0)}
+        50%{transform:translateY(-4px)}
+        100%{transform:translateY(0)}
+        }
+
+        /* PROFILE PILL */
+
+        .profile-pill{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:5px 12px;
+        border-radius:50px;
+        color:#fff;
+        font-size:.85rem;
+        border:1px solid rgba(212,175,55,.6);
+        transition:.3s;
+        }
+
+        .profile-pill:hover{
+        background:rgba(255,255,255,.08);
+        border-color:#D4AF37;
+        box-shadow:0 0 12px rgba(212,175,55,.6);
+        }
+
+        .seller-tag{
+        font-size:.6rem;
+        font-weight:800;
+        background:#D4AF37;
+        color:#0A192F;
+        padding:2px 6px;
+        border-radius:12px;
+        }
+
+        /* BELL SHAKE */
+
+        .bell-icon{
+        color:white;
+        cursor:pointer;
+        transition:.25s;
+        display:inline-block;
+        transform-origin:top;
+        }
+
+        .bell-icon:hover{
+        color:#D4AF37;
+        animation:bellRing .6s ease;
+        }
+
+        @keyframes bellRing{
+        0%{transform:rotate(0)}
+        15%{transform:rotate(22deg)}
+        30%{transform:rotate(-18deg)}
+        45%{transform:rotate(15deg)}
+        60%{transform:rotate(-10deg)}
+        75%{transform:rotate(6deg)}
+        100%{transform:rotate(0)}
+        }
+
+        /* DROPDOWN */
+
+        .dropdown-menu{
+        background:#0A192F;
+        border:1px solid rgba(212,175,55,.5);
+        border-radius:14px;
+        box-shadow:0 12px 35px rgba(0,0,0,.6);
+        animation:dropdownFade .35s ease;
+        padding-top:8px;
+        }
+
+        @keyframes dropdownFade{
+        0%{opacity:0;transform:translateY(-10px) scale(.95);}
+        100%{opacity:1;transform:translateY(0) scale(1);}
+        }
+
+        .dropdown-item{
+        color:white;
+        font-size:.9rem;
+        transition:.25s;
+        }
+
+        .dropdown-item:hover{
+        background:#D4AF37;
+        color:#0A192F;
+        transform:translateX(5px);
+        }
+
+        .dropdown-account{
+        color:white;
+        font-size:.85rem;
+        }
+
+        /* PAGE TITLE */
+
+        .page-title{
+        color:#D4AF37;
+        font-weight:600;
+        margin-bottom:25px;
+        animation:slideDown .7s ease;
+        }
+
+        @keyframes slideDown{
+        from{opacity:0;transform:translateY(-20px)}
+        to{opacity:1;transform:translateY(0)}
+        }
+
+        /* FORM CARD */
+
+        .form-card{
+        border-radius:18px;
+        background:white;
+        color:#0A192F;
+        padding:35px;
+        box-shadow:0 20px 60px rgba(0,0,0,.5);
+        transition:.4s;
+        animation:fadeUp .8s ease;
+        }
+
+        .form-card:hover{
+        transform:translateY(-6px) scale(1.01);
+        box-shadow:0 30px 80px rgba(0,0,0,.6);
+        }
+
+        @keyframes fadeUp{
+        from{opacity:0;transform:translateY(40px)}
+        to{opacity:1;transform:translateY(0)}
+        }
+
+        /* INPUTS */
+
+        .form-control,
+        .form-select{
+        border-radius:10px;
+        transition:.25s;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+        border-color:#D4AF37;
+        box-shadow:0 0 8px rgba(212,175,55,.5);
+        }
+
+        .form-label{
+        font-weight:600;
+        }
+
+        /* BUTTON */
+
+        .save-btn{
+        background:#D4AF37;
+        border:none;
+        color:#0A192F;
+        font-weight:600;
+        border-radius:30px;
+        padding:10px;
+        transition:.35s;
+        }
+
+        .save-btn:hover{
+        transform:translateY(-2px) scale(1.03);
+        box-shadow:0 0 15px rgba(212,175,55,.7);
+        }
+
+        /* IMAGE */
+
+        .image-preview{
+        width:120px;
+        height:120px;
+        object-fit:cover;
+        border-radius:10px;
+        border:2px dashed #dee2e6;
+        margin-top:10px;
+        display:none;
+        transition:.3s;
+        }
+
+        .image-preview:hover{
+        transform:scale(1.05);
+        }
+
+        .error-text{
+        color:red;
+        font-size:13px;
+        }
+
     </style>
+
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4 py-2">
+<!-- NAVBAR -->
 
-    <a class="navbar-brand fw-bold d-flex align-items-center"
-       th:href="@{/seller/dashboard}">
-        <i class="bi bi-shop me-2"></i>
-        RevShop <span class="fw-light ms-1">Seller</span>
-    </a>
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm py-2 classic-navbar">
 
-    <button class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#sellerNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="container">
 
-    <div class="collapse navbar-collapse" id="sellerNavbar">
-        <div class="ms-auto d-flex align-items-center gap-4">
+        <a class="navbar-brand d-flex flex-column align-items-start me-4 text-decoration-none"
+           th:href="@{/seller/dashboard}">
 
-            <!-- Notifications -->
-            <a th:href="@{/seller/notifications}"
-               class="position-relative text-light text-decoration-none">
-                <i class="bi bi-bell fs-5"></i>
+<span class="fst-italic fw-bold text-white brand-text">
+Rev<span class="brand-accent">Shop</span>
+</span>
 
-                <span id="notificationCount"
-                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
+            <span class="brand-subtext">
+<span class="text-white">Shop</span>
+<span class="brand-accent fw-bold">Smart</span>
+<i class="bi bi-gem brand-diamond"></i>
+</span>
 
-            <!-- Account Dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i>
-                    <span th:text="${businessName}">Business Name</span>
-                </button>
+        </a>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item" th:href="@{/seller/profile}">
-                            <i class="bi bi-person me-2"></i>
-                            Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item text-danger" th:href="@{/logout}">
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <button class="navbar-toggler border-0 text-white"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+            <i class="bi bi-list fs-2"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item">
+
+                    <a th:href="@{/seller/notifications}"
+                       class="nav-link position-relative text-decoration-none">
+
+                        <i class="bi bi-bell-fill fs-5 bell-icon"></i>
+
+                        <span id="notificationCount"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item dropdown">
+
+                    <a href="#"
+                       class="text-decoration-none d-flex align-items-center dropdown-toggle"
+                       data-bs-toggle="dropdown">
+
+                        <div class="profile-pill">
+
+                            <i class="bi bi-person-circle text-white"></i>
+                            <span class="fw-semibold text-capitalize"
+                                  th:text="${businessName}">
+Business
+</span>
+
+                            <span class="seller-tag">SELLER</span>
+
+                        </div>
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="px-3 py-2 dropdown-account">
+                            <strong th:text="${businessName}">Business Name</strong><br>
+                            <small th:text="${#authentication.name}">email</small>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               th:href="@{/seller/profile}">
+                                <i class="bi bi-person me-2"></i>
+                                My Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger"
+                               th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
 
         </div>
+
     </div>
+
 </nav>
 
-<!-- ================= PAGE CONTENT ================= -->
-<div class="container mt-5">
-    <div class="card shadow p-4 form-card">
+<!-- PAGE -->
 
-        <h3 class="mb-4 fw-bold">Add New Product</h3>
+<div class="container py-5">
+
+    <h3 class="page-title">Add New Product</h3>
+
+    <div class="form-card">
 
         <div th:if="${error}" class="alert alert-danger text-center">
             <span th:text="${error}"></span>
@@ -111,41 +387,29 @@
               enctype="multipart/form-data"
               onsubmit="return validateProductForm()">
 
-            <!-- Product Name -->
             <div class="mb-3">
                 <label class="form-label">Product Name</label>
-                <input type="text" id="productName"
-                       class="form-control"
-                       th:field="*{productName}" required>
+                <input type="text" class="form-control" th:field="*{productName}" required>
             </div>
-
-            <!-- Description -->
             <div class="mb-3">
                 <label class="form-label">Description</label>
-                <textarea
-                        class="form-control"
-                        rows="3"
-                        th:field="*{description}"
-                        placeholder="Enter product description"
-                        required>
-    </textarea>
-            </div>
 
-            <!-- Manufacturer -->
+                <textarea class="form-control"
+                          th:field="*{description}"
+                          rows="3"
+                          placeholder="Enter product description..."
+                          required>
+    </textarea>
+
+            </div>
             <div class="mb-3">
                 <label class="form-label">Manufacturer</label>
-                <input type="text" id="manufacturer"
-                       class="form-control"
-                       th:field="*{manufacturer}" required>
+                <input type="text" class="form-control" th:field="*{manufacturer}" required>
             </div>
 
-            <!-- MRP -->
             <div class="mb-3">
                 <label class="form-label">MRP (₹)</label>
-                <input type="number" step="0.01" id="mrp"
-                       class="form-control"
-                       th:field="*{mrp}" required>
-                <div id="priceError" class="error-text"></div>
+                <input type="number" step="0.01" id = "mrp" class="form-control" th:field="*{mrp}" required>
             </div>
 
             <div class="mb-3">
@@ -153,28 +417,30 @@
                 <input type="number"
                        step="0.01"
                        class="form-control"
-                       th:field="*{discount}" oninput="updateSellingPrice()">
+                       id="discount"
+                       th:field="*{discount}"
+                       oninput="updateSellingPrice()">
             </div>
 
-            <!-- Selling Price -->
             <div class="mb-3">
                 <label class="form-label">Selling Price (₹)</label>
-                <input type="number" step="0.01" id="sellingPrice"
+                <input type="number"
+                       step="0.01"
+                       id="sellingPrice"
                        class="form-control"
-                       th:field="*{sellingPrice}" required>
+                       th:field="*{sellingPrice}"
+                       required>
             </div>
 
-            <!-- Stock -->
             <div class="mb-3">
                 <label class="form-label">Stock Quantity</label>
-                <input type="number" id="stock"
-                       class="form-control"
-                       th:field="*{stock}" required>
+                <input type="number" class="form-control" th:field="*{stock}" required>
             </div>
 
-            <!-- Threshold -->
+
             <div class="mb-3">
                 <label class="form-label">Stock Threshold (Low Alert)</label>
+
                 <input type="number"
                        id="threshold"
                        class="form-control"
@@ -182,59 +448,76 @@
                        min="0"
                        th:field="*{stockThreshold}"
                        required>
+
                 <div id="thresholdError" class="error-text"></div>
             </div>
 
 
-            <!-- Category -->
             <div class="mb-3">
                 <label class="form-label">Category</label>
+
                 <select class="form-select"
-                        id="category"
-                        th:field="*{category.categoryId}" required>
+                        th:field="*{category.categoryId}"
+                        required>
+
                     <option value="">-- Select Category --</option>
+
                     <option th:each="cat : ${categories}"
                             th:value="${cat.categoryId}"
-                            th:text="${cat.categoryName}">
+                            th:text="${cat.categoryName == 'Fashion' ? '👗 Fashion' :
+                  cat.categoryName == 'Groceries' ? '🛒 Groceries' :
+                  cat.categoryName == 'Mobiles' ? '📱 Mobiles' :
+                  cat.categoryName == 'Laptops' ? '💻 Laptops' :
+                  cat.categoryName == 'Furniture' ? '🪑 Furniture' :
+                  cat.categoryName == 'Beauty' ? '💄 Beauty' :
+                  cat.categoryName == 'Sports' ? '⚽ Sports' :
+                  cat.categoryName == 'Toys' ? '🧸 Toys' :
+                  cat.categoryName == 'Electronics' ? '🔌 Electronics' :
+                  cat.categoryName == 'Clothing & Apparel' ? '👕 Clothing & Apparel' :
+                  cat.categoryName == 'Home & Kitchen' ? '🏠 Home & Kitchen' :
+                  cat.categoryName == 'Books' ? '📚 Books' :
+                  cat.categoryName == 'Toys & Games' ? '🎮 Toys & Games' :
+                  cat.categoryName == 'Footwear' ? '👟 Footwear' :
+                  cat.categoryName == 'Watches' ? '⌚ Watches' :
+                  cat.categoryName == 'Automotive' ? '🚗 Automotive' :
+                  cat.categoryName == 'Stationery' ? '✏️ Stationery' :
+                  cat.categoryName == 'Health' ? '🩺 Health' :
+                  cat.categoryName == 'Jewellery' ? '💍 Jewellery' :
+                  cat.categoryName}">
                     </option>
+
                 </select>
+
             </div>
 
-            <!-- Image -->
-            <!-- Product Image -->
             <div class="mb-3">
-                <label class="form-label">
-                    Product Image
-                    <small class="text-muted"></small>
-                </label>
+
+                <label class="form-label">Product Image</label>
+
+                <input type="file"
+                       name="imageFile"
+                       class="form-control"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       required
+                       onchange="previewUploadedImage(event)">
+
                 <img id="imagePreview"
                      class="image-preview"
-                     src="/images/default.png"
+                     src=""
                      alt="Preview"
-                     style="display:block;">
+                     style="display:none; margin-top:10px;">
 
-                <div class="mb-3">
-
-                    <label class="form-label">Product Image</label>
-
-                    <input type="file"
-                           name="imageFile"
-                           class="form-control"
-                           accept="image/*"
-                           required>
-
-                </div>
             </div>
-
-            <button type="submit" class="btn btn-success w-100">
+            <button type="submit" class="save-btn w-100">
                 Save Product
             </button>
 
         </form>
-    </div>
-</div>
 
-<!-- ================= IMAGE PREVIEW ================= -->
+    </div>
+
+</div>
+<!-- NEW SCRIPT -->
 <script>
 
     document.addEventListener("DOMContentLoaded", function(){
@@ -282,7 +565,6 @@
     });
 
 
-    // ✅ MUST be outside
     function updateSellingPrice() {
 
         const mrp =
@@ -295,10 +577,23 @@
             (mrp - (mrp * discount / 100)).toFixed(2);
     }
 
+
+function previewUploadedImage(event){
+    const preview = document.getElementById("imagePreview");
+    const file = event.target.files[0];
+
+    if(file){
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    }
+}
+
+
 </script>
 
-<!-- Bootstrap JS -->
+<!-- BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>
