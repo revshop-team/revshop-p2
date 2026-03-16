@@ -4,6 +4,9 @@ import com.revshop.entity.Order;
 import com.revshop.entity.Payment;
 import com.revshop.repo.OrderRepository;
 import com.revshop.repo.PaymentRepository;
+// Add this import!
+import com.revshop.repo.NotificationRepository;
+import com.revshop.serviceInterfaces.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +23,11 @@ public class PaymentControllerTest {
     @Mock private PaymentRepository paymentRepository;
     @Mock private OrderRepository orderRepository;
     @Mock private Model model;
+    @Mock private NotificationService notificationService;
+
+    // 🟢 ADDED THIS MOCK TO FIX THE NULL POINTER EXCEPTION
+    @Mock private NotificationRepository notificationRepository;
+
     @InjectMocks private PaymentController controller;
 
     @Test
