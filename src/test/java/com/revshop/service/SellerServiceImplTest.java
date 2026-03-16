@@ -2,6 +2,7 @@ package com.revshop.service;
 
 import com.revshop.entity.SellerDetails;
 import com.revshop.entity.User;
+import com.revshop.repo.BuyerDetailsRepository;
 import com.revshop.repo.SellerDetailsRepository;
 import com.revshop.serviceImpl.SellerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SellerServiceImplTest {
+
+    @Mock
+    private BuyerDetailsRepository buyerDetailsRepository;
 
     @Mock
     private SellerDetailsRepository sellerRepo;

@@ -1,4 +1,4 @@
-package com.revshop.service;
+package com.revshop.serviceImpl;
 
 import com.revshop.entity.*;
 import com.revshop.repo.*;

@@ -21,6 +21,7 @@ public class DataInitializer {
             if (repository.count() == 0) {
 
                 SecurityQuestion q1 = new SecurityQuestion();
+
                 q1.setQuestionText("What is your first pet name?");
                 repository.save(q1);
 
