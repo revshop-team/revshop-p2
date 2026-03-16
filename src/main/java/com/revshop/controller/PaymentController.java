@@ -3,6 +3,7 @@ package com.revshop.controller;
 import com.revshop.entity.*;
 import com.revshop.repo.*;
 
+import com.revshop.serviceInterfaces.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,11 @@ public class PaymentController {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private NotificationService notificationService;
+
     /* ================= PAYMENT PAGE ================= */
 
     @GetMapping("/{orderId}")
@@ -40,6 +46,7 @@ public class PaymentController {
         return "buyer/payment";
     }
 
+
     /* ================= OTP PAGE ================= */
 
     @GetMapping("/otp")
@@ -52,6 +59,7 @@ public class PaymentController {
         return "buyer/payment-otp";
     }
 
+
     /* ================= PROCESS PAYMENT ================= */
 
     @GetMapping("/process")
@@ -61,7 +69,6 @@ public class PaymentController {
         logger.info("Processing payment for orderId: {} with status: {}", orderId, status);
 
         Payment payment = paymentRepository.findByOrder_OrderId(orderId);
-
         Order order = payment.getOrder();
 
         if ("success".equals(status)) {
@@ -76,6 +83,18 @@ public class PaymentController {
             paymentRepository.save(payment);
             orderRepository.save(order);
 
+            /* 🔔 CREATE BUYER NOTIFICATION ONLY ON SUCCESS */
+            notificationService.notifySellerOrderPlaced(order.getOrderId());
+
+            Notification notification = new Notification();
+            notification.setUser(order.getBuyer());
+            notification.setOrder(order);
+            notification.setMessage("Your order #" + order.getOrderId() + " has been placed successfully!");
+            notification.setIsRead("N");
+            notification.setCreatedAt(LocalDateTime.now());
+
+            notificationRepository.save(notification);
+
             return "redirect:/buyer/payment/success/" + orderId;
 
         } else {
@@ -84,7 +103,7 @@ public class PaymentController {
 
             payment.setPaymentStatus("FAILED");
 
-            order.setStatus("PAYMENT_FAILED");
+            order.setStatus("PENDING_PAYMENT");
 
             paymentRepository.save(payment);
             orderRepository.save(order);
@@ -92,6 +111,7 @@ public class PaymentController {
             return "redirect:/buyer/payment/cancel/" + orderId;
         }
     }
+
 
     /* ================= SUCCESS PAGE ================= */
 
@@ -106,8 +126,14 @@ public class PaymentController {
 
         return "buyer/payment-success";
     }
+
+
+    /* ================= CANCEL PAGE ================= */
+
     @GetMapping("/cancel/{orderId}")
     public String paymentCancel(@PathVariable Long orderId, Model model){
+
+        logger.warn("Payment cancelled for orderId: {}", orderId);
 
         Order order = orderRepository.findById(orderId).orElseThrow();
 

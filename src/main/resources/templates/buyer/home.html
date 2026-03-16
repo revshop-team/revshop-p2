@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,237 +7,309 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            background: linear-gradient(180deg,#f8fafc,#eef2f7);
-        }
-
-        .welcome-card {
-            background: linear-gradient(135deg,#0f172a,#1e293b);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0A192F, #132a4d, #1b355d);
+            background-size: 300% 300%;
+            animation: bgMove 15s ease infinite;
+            min-height: 100vh;
             color: white;
-            border-radius: 16px;
+            overflow-x: hidden;
         }
 
-        .welcome-card .btn-light {
-            font-weight: 500;
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
+        /* HERO CARD */
+        .welcome-card {
+            background: linear-gradient(135deg, #0A192F, #1e3a66);
+            border-radius: 22px;
+            box-shadow: 0 30px 70px rgba(0,0,0,.5);
+            animation: heroFloat 6s ease-in-out infinite;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        @keyframes heroFloat {
+            0% { transform: translateY(0) }
+            50% { transform: translateY(-8px) }
+            100% { transform: translateY(0) }
+        }
+
+        /* HERO TEXT */
+        .welcome-card h3 {
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: .5px;
+        }
+
+        .welcome-card p {
+            color: #d1d5db;
+            font-size: 15px;
+        }
+
+        .welcome-card .text-warning {
+            color: #D4AF37 !important;
+        }
+
+        /* HERO BUTTONS */
+        .hero-btn {
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 10px 24px;
+            transition: .35s ease;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,.4);
+        }
+
+        /* SECTION TITLE */
         .section-title {
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: .5px;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
         }
 
+        /* PRODUCT CARD */
         .product-card {
             border: none;
-            border-radius: 16px;
-            transition: all 0.3s ease;
+            border-radius: 18px;
+            overflow: hidden;
+            background: white;
+            color: #0A192F;
+            box-shadow: 0 18px 45px rgba(0,0,0,.35);
+            transition: .45s;
+            position: relative;
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes cardFloat {
+            0% { transform: translateY(0) }
+            50% { transform: translateY(-10px) }
+            100% { transform: translateY(0) }
         }
 
         .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 30px 80px rgba(0,0,0,.45);
         }
 
+        /* IMAGE */
         .product-card img {
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
+            height: 220px;
+            object-fit: cover;
+            transition: transform .5s ease;
+            border-bottom: 1px solid #f1f5f9;
         }
 
+        .product-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* PRICE */
         .price {
-            font-size: 1.1rem;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f9d58;
         }
 
+        /* BADGES */
+        .badge {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        /* VIEW DETAILS BUTTON */
+        .btn-view {
+            background: #0A192F !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 10px 20px;
+            transition: all .35s ease !important;
+            cursor: pointer;
+            text-decoration: none !important;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-view:hover {
+            background: #2563eb !important;
+            color: white !important;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45) !important;
+        }
+
+        /* VIEW ALL LINK */
+        .view-link {
+            font-weight: 600;
+            color: #D4AF37;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .view-link:hover {
+            text-decoration: underline;
+            color: #bfa132;
+        }
+
+        /* FOOTER */
         footer {
-            background: transparent;
+            color: #cbd5e1;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
         }
     </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
-<div th:replace="buyer/fragments/navbar :: navbar"></div>
+<div th:replace="~{buyer/fragments/navbar :: navbar}"></div>
 
 <div class="container py-5">
 
-    <!-- Welcome Hero Card -->
-    <div class="welcome-card p-4 p-md-5 shadow-lg mb-5">
-
+    <div class="welcome-card p-4 p-md-5 mb-5">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
-
             <div>
-                <h3 class="fw-bold mb-2">
+                <h3 class="mb-2">
                     Welcome back,
                     <span class="text-warning" th:text="${buyerName}"></span>
                 </h3>
-                <p class="mb-0 text-light opacity-75">
+                <p class="mb-0">
                     Discover fresh arrivals curated just for you.
                 </p>
             </div>
-
             <div class="mt-4 mt-md-0">
-                <a th:href="@{/buyer/products}"
-                   class="btn btn-warning px-4 me-2 shadow-sm">
-                    Browse Products
+                <a th:href="@{/buyer/products}" class="btn btn-warning hero-btn me-2">
+                    <i class="bi bi-bag me-1"></i> Browse Products
                 </a>
-
-                <a th:href="@{/buyer/orders}"
-                   class="btn btn-outline-light px-4">
-                    My Orders
+                <a th:href="@{/buyer/orders}" class="btn btn-outline-light hero-btn">
+                    <i class="bi bi-box-seam me-1"></i> My Orders
                 </a>
             </div>
-
         </div>
-
     </div>
 
-    <!-- Purchase Suggestions -->
-
-    <div th:if="${purchaseSuggestions != null and !purchaseSuggestions.isEmpty()}">
-
+    <div th:if="${purchaseSuggestions != null and !purchaseSuggestions.isEmpty()}" class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="section-title mb-0">Suggestions for you</h4>
+            <h4 class="section-title mb-0">
+                <i class="bi bi-stars text-warning me-2"></i>Suggestions for you
+            </h4>
         </div>
 
         <div class="row g-4">
-
-            <div class="col-xl-3 col-lg-4 col-md-6"
-                 th:each="product : ${purchaseSuggestions}">
-
-                <div class="card product-card shadow-sm h-100">
-
-                    <img th:src="@{/images/{img}(img=${product.imageName})}"
-                         class="card-img-top"
-                         style="height:220px; object-fit:cover;">
-
+            <div class="col-xl-3 col-lg-4 col-md-6" th:each="product : ${purchaseSuggestions}">
+                <div class="card product-card h-100">
+                    <img th:src="@{/images/{img}(img=${product.imageName})}" class="card-img-top" alt="Product">
                     <div class="card-body d-flex flex-column p-4">
+                        <h6 class="fw-semibold mb-2 text-truncate" th:text="${product.productName}"></h6>
+                        <p class="price mb-3" th:text="'₹ ' + ${product.sellingPrice}"></p>
 
-                        <h6 th:text="${product.productName}"></h6>
+                        <div class="mb-3">
+                            <span th:if="${product.stock > 0}" class="badge bg-success-subtle text-success fw-semibold">
+                                <i class="bi bi-check-circle me-1"></i>In Stock
+                            </span>
+                            <span th:if="${product.stock <= 0}" class="badge bg-danger-subtle text-danger fw-semibold">
+                                <i class="bi bi-x-circle me-1"></i>Out of Stock
+                            </span>
+                        </div>
 
-                        <p class="price text-success fw-bold"
-                           th:text="'₹ ' + ${product.sellingPrice}">
-                        </p>
-
-                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
-                           class="btn btn-dark w-100 rounded-pill">
-                            View Details
-                        </a>
-
+                        <div class="mt-auto">
+                            <a th:href="@{/buyer/product/{id}(id=${product.productId})}" class="btn btn-view w-100">
+                                View Details
+                            </a>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- View Suggestions -->
-
-    <div th:if="${viewSuggestions != null and !viewSuggestions.isEmpty()}">
-
-        <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-            <h4 class="section-title mb-0">You may also like</h4>
+    <div th:if="${viewSuggestions != null and !viewSuggestions.isEmpty()}" class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="section-title mb-0">
+                <i class="bi bi-eye me-2" style="color: #60a5fa;"></i>You may also like
+            </h4>
         </div>
 
         <div class="row g-4">
-
-            <div class="col-xl-3 col-lg-4 col-md-6"
-                 th:each="product : ${viewSuggestions}">
-
-                <div class="card product-card shadow-sm h-100">
-
-                    <img th:src="@{/images/{img}(img=${product.imageName})}"
-                         class="card-img-top"
-                         style="height:220px; object-fit:cover;">
-
+            <div class="col-xl-3 col-lg-4 col-md-6" th:each="product : ${viewSuggestions}">
+                <div class="card product-card h-100">
+                    <img th:src="@{/images/{img}(img=${product.imageName})}" class="card-img-top" alt="Product">
                     <div class="card-body d-flex flex-column p-4">
+                        <h6 class="fw-semibold mb-2 text-truncate" th:text="${product.productName}"></h6>
+                        <p class="price mb-3" th:text="'₹ ' + ${product.sellingPrice}"></p>
 
-                        <h6 th:text="${product.productName}"></h6>
+                        <div class="mb-3">
+                            <span th:if="${product.stock > 0}" class="badge bg-success-subtle text-success fw-semibold">
+                                <i class="bi bi-check-circle me-1"></i>In Stock
+                            </span>
+                            <span th:if="${product.stock <= 0}" class="badge bg-danger-subtle text-danger fw-semibold">
+                                <i class="bi bi-x-circle me-1"></i>Out of Stock
+                            </span>
+                        </div>
 
-                        <p class="price text-success fw-bold"
-                           th:text="'₹ ' + ${product.sellingPrice}">
-                        </p>
-
-                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
-                           class="btn btn-dark w-100 rounded-pill">
-                            View Details
-                        </a>
-
+                        <div class="mt-auto">
+                            <a th:href="@{/buyer/product/{id}(id=${product.productId})}" class="btn btn-view w-100">
+                                View Details
+                            </a>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- Section Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="section-title mb-0">Latest Products</h4>
-        <a th:href="@{/buyer/products}"
-           class="text-decoration-none fw-semibold text-primary">
-            View All →
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+        <h4 class="section-title mb-0">
+            <i class="bi bi-clock-history text-success me-2"></i>Latest Products
+        </h4>
+        <a th:href="@{/buyer/products}" class="view-link">
+            View All <i class="bi bi-arrow-right ms-1"></i>
         </a>
     </div>
 
-    <!-- Product Grid -->
-    <div class="row g-4">
-
-        <div class="col-xl-3 col-lg-4 col-md-6"
-             th:each="product : ${latestProducts}">
-
-            <div class="card product-card shadow-sm h-100">
-
-                <img th:src="@{/images/{img}(img=${product.imageName})}"
-                     class="card-img-top"
-                     style="height:220px; object-fit:cover;">
-
+    <div class="row g-4 mb-5">
+        <div class="col-xl-3 col-lg-4 col-md-6" th:each="product : ${latestProducts}">
+            <div class="card product-card h-100">
+                <img th:src="@{/images/{img}(img=${product.imageName})}" class="card-img-top" alt="Product">
                 <div class="card-body d-flex flex-column p-4">
-
-                    <h6 class="fw-semibold mb-2"
-                        th:text="${product.productName}">
-                    </h6>
-
-                    <p class="price text-success fw-bold mb-2"
-                       th:text="'₹ ' + ${product.sellingPrice}">
-                    </p>
+                    <h6 class="fw-semibold mb-2 text-truncate" th:text="${product.productName}"></h6>
+                    <p class="price mb-3" th:text="'₹ ' + ${product.sellingPrice}"></p>
 
                     <div class="mb-3">
-                        <span th:if="${product.stock > 0}"
-                              class="badge bg-success-subtle text-success">
-                            In Stock
+                        <span th:if="${product.stock > 0}" class="badge bg-success-subtle text-success fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i>In Stock
                         </span>
-
-                        <span th:if="${product.stock == 0}"
-                              class="badge bg-danger-subtle text-danger">
-                            Out of Stock
+                        <span th:if="${product.stock <= 0}" class="badge bg-danger-subtle text-danger fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i>Out of Stock
                         </span>
                     </div>
 
                     <div class="mt-auto">
-                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}"
-                           class="btn btn-dark w-100 rounded-pill">
+                        <a th:href="@{/buyer/product/{id}(id=${product.productId})}" class="btn btn-view w-100">
                             View Details
                         </a>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
 </div>
 
-<!-- Footer -->
-<footer class="py-4 mt-5 text-center text-muted small">
+<footer class="py-4 mt-5 text-center small">
     © 2026 RevShop. Crafted with precision.
 </footer>
 
